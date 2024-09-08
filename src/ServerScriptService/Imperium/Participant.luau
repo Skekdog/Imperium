@@ -52,11 +52,22 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     participant.Position = position
 
     local tile = participant.Round.Tiles[position]
+
+    print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
+
+    local char = participant.Player.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:MoveTo(tile.Model:GetPivot().Position)
+            hum.MoveToFinished:Wait() -- todo: implement a timeout and moveDirectly
+            --todo: on an unrelated note, findnearesttilebycolour should only move forward
+        end
+    end
+
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
     end
-
-    print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
