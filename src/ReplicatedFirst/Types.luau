@@ -11,6 +11,7 @@ export type Board = {
     Tiles: {TileDescription},
     Colours: {[string]: Color3, Default: Color3},
 
+    StartingJailCards: number,
     StartingMoney: number,
     PassGoMoney: number,
 
@@ -101,6 +102,7 @@ export type Round = {
     Turn: Turn,
     Map: string,
     Theme: string,
+    Board: Board,
 
     Participants: {Participant},
     Tiles: {Tile},

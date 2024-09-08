@@ -44,7 +44,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
     if participant.Position == 1 and not moveDirectly then
-        GiveMoney(participant, 200)
+        GiveMoney(participant, participant.Round.Board.PassGoMoney)
     end
 
     participant.Position = position
@@ -104,7 +104,7 @@ end
 
 local function TryPlayMove(participant: Types.Participant): ()
     if participant.JailedOn ~= 0 then
-        if RollDice(participant).IsDoubles then
+        if participant.Round.Board.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
             MoveBy(participant, RollDice(participant).Result)
         end
         return
@@ -114,7 +114,7 @@ local function TryPlayMove(participant: Types.Participant): ()
     if roll.IsDoubles then
         participant.DoublesStreak += 1
 
-        if participant.DoublesStreak == 3 then
+        if participant.DoublesStreak >= participant.Round.Board.DoublesConsecutiveJailAmount then
             return SendToJail(participant)
         end
     else
@@ -142,8 +142,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.Player = player
     participant.Round = round
 
-    participant.JailCards = 0
-    participant.Money = 1500
+    participant.JailCards = round.Board.StartingJailCards
+    participant.Money = round.Board.StartingMoney
     participant.Assets = {}
 
     participant.DoublesStreak = 0

@@ -33,6 +33,7 @@ end
 module.Name = "Classic"
 module.Colours = Colours
 
+module.StartingJailCards = 0
 module.StartingMoney = 1500
 module.PassGoMoney = 200
 
