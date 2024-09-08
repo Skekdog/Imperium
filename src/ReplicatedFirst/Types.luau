@@ -74,6 +74,7 @@ export type Participant = {
     JailCards: number,
     Assets: {Asset},
 
+    HasMoved: boolean,
     Position: number,
     JailedOn: number,
     DoublesStreak: number,
@@ -99,11 +100,17 @@ export type Participant = {
 }
 
 export type Round = {
-    Turn: Turn,
     Board: Board,
+
+    Turn: Turn,
+    CurrentParticipant: Participant,
 
     Participants: {Participant},
     Tiles: {Tile},
+
+    GetParticipant: (Round, player: Player) -> Participant,
+    StartNextParticipantTurn: (Round) -> (),
+    FindTileByName: (Round, name: string) -> number,
 }
 
 return {}

@@ -4,6 +4,7 @@ local Types = require(ReplicatedFirst.Types)
 local module = {}
 
 local function SendToJail(participant: Types.Participant): ()
+    participant:MoveToTileByName("Jail")
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
 end
@@ -43,34 +44,31 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
-    if participant.Position == 1 and not moveDirectly then
+    if participant.Position == 1 and not moveDirectly and participant.HasMoved then
         GiveMoney(participant, participant.Round.Board.PassGoMoney)
     end
 
+    participant.HasMoved = true
     participant.Position = position
 
     local tile = participant.Round.Tiles[position]
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
     end
+
+    print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
-    MoveTo(participant, participant.Position + amount)
+    local position = (participant.Position + amount) % #participant.Round.Tiles
+    if position == 0 then
+        position = 1
+    end
+    MoveTo(participant, position)
 end
 
 local function MoveToTileByName(participant: Types.Participant, name: string): ()
-    local foundTile: number?
-    for i, tile in participant.Round.Tiles do
-        if tile.TileDescription.Name == name or (tile.TileDescription.Asset and tile.TileDescription.Asset.Name == name) then
-            foundTile = i
-            break
-        end
-    end
-
-    assert(foundTile, `Tile {name} not found`)
-
-    MoveTo(participant, foundTile)
+    MoveTo(participant, participant.Round:FindTileByName(name))
 end
 
 local function FindClosestPositionByColour(participant: Types.Participant, colour: string): number?
@@ -95,6 +93,8 @@ end
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
+
+    print("Roll 1: ", roll1, " Roll 2: ", roll2, " Total: ", roll1 + roll2, " Doubles: ", roll1 == roll2)
 
     return {
         Result = roll1 + roll2,
@@ -146,6 +146,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.Money = round.Board.StartingMoney
     participant.Assets = {}
 
+    participant.HasMoved = false
     participant.DoublesStreak = 0
     participant.Position = 1
     participant.JailedOn = 0

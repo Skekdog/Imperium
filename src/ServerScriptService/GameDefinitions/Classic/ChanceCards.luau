@@ -36,7 +36,7 @@ module[4] = {
 module[5] = {
     Title = "Advance to the nearest Railroad. If unowned, you may buy it from the Bank. If owned, pay owner twice the rental to which they are otherwise entitled.",
     Effect = function(participant: Types.Participant): ()
-        local closestRailroad = participant:FindClosestPositionByColour("Railroad")
+        local closestRailroad = participant:FindClosestPositionByColour("Station")
         assert(closestRailroad, "No railroads found")
         participant:MoveTo(closestRailroad)
     end
@@ -78,9 +78,9 @@ module[10] = {
 }
 
 module[11] = {
-    Title = "Take a trip to Reading Railroad. If you pass Go, collect £200.",
+    Title = "Take a trip to King's Cross Station. If you pass Go, collect £200.",
     Effect = function(participant: Types.Participant): ()
-        participant:MoveToTileByName("Reading Railroad")
+        participant:MoveToTileByName("King's Cross Station")
     end
 }
 

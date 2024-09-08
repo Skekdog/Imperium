@@ -7,6 +7,38 @@ local Types = require(ReplicatedFirst.Types)
 
 local module = {}
 
+local function StartNextParticipantTurn(round: Types.Round): ()
+    local lastIndex = table.find(round.Participants, round.CurrentParticipant)
+    assert(lastIndex, "Round has no current participant")
+
+    if lastIndex >= #round.Participants then
+        round.Turn += 1
+        lastIndex = 0
+    end
+
+    lastIndex += 1
+
+    round.CurrentParticipant = round.Participants[lastIndex]
+end
+
+local function GetParticipant(round: Types.Round, player: Player): Types.Participant
+    for _, participant in round.Participants do
+        if participant.Player == player then
+            return participant
+        end
+    end
+    error(`Participant {player} not found`)
+end
+
+local function FindTileByName(round: Types.Round, name: string): number
+    for i, tile in round.Tiles do
+        if tile.TileDescription.Name == name or (tile.TileDescription.Asset and tile.TileDescription.Asset.Name == name) then
+            return i
+        end
+    end
+    error(`Tile {name} not found`)
+end
+
 function module.new(board: Types.Board): Types.Round
     assert(#board.Tiles % 4 == 0, "Board size must be a multiple of 4")
 
@@ -21,11 +53,19 @@ function module.new(board: Types.Board): Types.Round
     for i, description in board.Tiles do
         table.insert(round.Tiles, Tile.new(board, i, description))
     end
-
+    
     round.Participants = {}
+    round.CurrentParticipant = nil :: any
+
+    round.StartNextParticipantTurn = StartNextParticipantTurn
+    round.GetParticipant = GetParticipant
+    round.FindTileByName = FindTileByName
+
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))
     end
+
+    round.CurrentParticipant = round.Participants[#round.Participants]
 
     return round
 end

@@ -45,6 +45,13 @@ local function createPlr(plr: Player)
 	clone.Name = "Player-"..plr.Name
 	clone.Parent = list :: any
 
+	plr:GetAttributeChangedSignal("Money"):Connect(function()
+		updatePlr(plr, clone)
+	end)
+	plr:GetAttributeChangedSignal("Wins"):Connect(function()
+		updatePlr(plr, clone)
+	end)
+
 	updatePlr(plr, clone)
 
 	return clone :: PlayerElement
