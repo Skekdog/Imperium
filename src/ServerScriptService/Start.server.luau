@@ -6,6 +6,9 @@ local Round = require(script.Parent.Imperium.Round)
 Players.PlayerAdded:Wait()
 local round = Round.new(Classic)
 
+local INTERMISSION_DURATION = 5
+local TURN_DURATION = 15
+
 ReplicatedStorage.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
     local participant = round:GetParticipant(plr)
 
@@ -14,4 +17,5 @@ ReplicatedStorage.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
     end
 end)
 
-round:StartNextParticipantTurn()
+task.wait(INTERMISSION_DURATION)
+round:StartRound()

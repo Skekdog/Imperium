@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local Participant = require(script.Parent.Participant)
 local Tile = require(script.Parent.Tile)
@@ -39,11 +40,27 @@ local function FindTileByName(round: Types.Round, name: string): number
     error(`Tile {name} not found`)
 end
 
+local function StartRound(round: Types.Round): ()
+    if round.Started then
+        error("Round already started")
+    end
+
+    round.Started = true
+
+    for _, v in round.Participants do
+        v.Player:SetAttribute("Status", "Playing")
+    end
+    ReplicatedStorage.ServerClient.StartGame:FireAllClients()
+
+    StartNextParticipantTurn(round)
+end
+
 function module.new(board: Types.Board): Types.Round
     assert(#board.Tiles % 4 == 0, "Board size must be a multiple of 4")
 
     local round = {}
 
+    round.Started = false
     round.Board = board
     round.Turn = 0
 
@@ -60,6 +77,7 @@ function module.new(board: Types.Board): Types.Round
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.GetParticipant = GetParticipant
     round.FindTileByName = FindTileByName
+    round.StartRound = StartRound
 
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))

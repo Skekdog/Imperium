@@ -102,12 +102,14 @@ export type Participant = {
 export type Round = {
     Board: Board,
 
+    Started: boolean,
     Turn: Turn,
     CurrentParticipant: Participant,
 
     Participants: {Participant},
     Tiles: {Tile},
 
+    StartRound: (Round) -> (),
     GetParticipant: (Round, player: Player) -> Participant,
     StartNextParticipantTurn: (Round) -> (),
     FindTileByName: (Round, name: string) -> number,
