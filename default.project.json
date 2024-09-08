@@ -1,0 +1,24 @@
+{
+    "name": "Imperium",
+    "emitLegacyScripts": true,
+
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedFirst": {
+            "$path": "src/ReplicatedFirst"
+        },
+        "ServerScriptService": {
+            "$path": "src/ServerScriptService"
+        },
+        "ReplicatedStorage": {
+            "$path": "src/ReplicatedStorage"
+        },
+        "ServerStorage": {
+            "$path": "Assets"
+        },
+        "Workspace": {
+            "$path": "src/Workspace",
+            "$ignoreUnknownInstances": true
+        }
+    }
+}
