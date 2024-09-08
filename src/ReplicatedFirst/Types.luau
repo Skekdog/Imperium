@@ -6,6 +6,26 @@ export type DiceRollResult = {
     IsDoubles: boolean,
 }
 
+export type Board = {
+    Name: string,
+    Tiles: {TileDescription},
+    Colours: {[string]: Color3, Default: Color3},
+
+    StartingMoney: number,
+    PassGoMoney: number,
+
+    JailFine: number,
+    JailLength: number,
+    DoublesConsecutiveJailAmount: number,
+
+    CanLeaveJailByRollingDoubles: boolean,
+    AllowJailedRentCollection: boolean,
+    AllowJailedTrading: boolean,
+
+    FreeParkingBonusEnabled: boolean,
+    FreeParkingBonusInitial: number,
+}
+
 export type AssetDescription = {
     Name: string,
     Colour: string,
@@ -84,12 +104,6 @@ export type Round = {
 
     Participants: {Participant},
     Tiles: {Tile},
-}
-
-export type Board = {
-    Name: string,
-    Tiles: {TileDescription},
-    Colours: {[string]: Color3, Default: Color3},
 }
 
 return {}
