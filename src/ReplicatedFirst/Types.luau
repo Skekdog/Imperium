@@ -27,6 +27,11 @@ export type Board = {
     FreeParkingBonusInitial: number,
 }
 
+export type GameConfiguration = {
+    AuctionTime: number,
+    PlayerTurnTime: number,
+}
+
 export type AssetDescription = {
     Name: string,
     Colour: string,
@@ -74,7 +79,7 @@ export type Participant = {
     JailCards: number,
     Assets: {Asset},
 
-    HasMoved: boolean,
+    LastMovedAt: number,
     Position: number,
     JailedOn: number,
     DoublesStreak: number,
@@ -101,6 +106,7 @@ export type Participant = {
 
 export type Round = {
     Board: Board,
+    GameConfiguration: GameConfiguration,
 
     Started: boolean,
     Turn: Turn,

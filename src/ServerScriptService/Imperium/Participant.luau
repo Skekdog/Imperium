@@ -44,11 +44,11 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
-    if participant.Position == 1 and not moveDirectly and participant.HasMoved then
+    if participant.Position == 1 and not moveDirectly and participant.LastMovedAt ~= 0 then
         GiveMoney(participant, participant.Round.Board.PassGoMoney)
     end
 
-    participant.HasMoved = true
+    participant.LastMovedAt = workspace:GetServerTimeNow()
     participant.Position = position
 
     local tile = participant.Round.Tiles[position]
@@ -107,21 +107,22 @@ local function TryPlayMove(participant: Types.Participant): ()
         if participant.Round.Board.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
             MoveBy(participant, RollDice(participant).Result)
         end
-        return
-    end
-
-    local roll = RollDice(participant)
-    if roll.IsDoubles then
-        participant.DoublesStreak += 1
-
-        if participant.DoublesStreak >= participant.Round.Board.DoublesConsecutiveJailAmount then
-            return SendToJail(participant)
-        end
     else
-        participant.DoublesStreak = 0
+        local roll = RollDice(participant)
+        if roll.IsDoubles then
+            participant.DoublesStreak += 1
+
+            if participant.DoublesStreak >= participant.Round.Board.DoublesConsecutiveJailAmount then
+                return SendToJail(participant)
+            end
+        else
+            participant.DoublesStreak = 0
+        end
+
+        MoveBy(participant, roll.Result)
     end
 
-    MoveBy(participant, roll.Result)
+    participant.Round:StartNextParticipantTurn()
 end
 
 local function GiveJailCard(participant: Types.Participant): ()
@@ -146,7 +147,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.Money = round.Board.StartingMoney
     participant.Assets = {}
 
-    participant.HasMoved = false
+    participant.LastMovedAt = 0
     participant.DoublesStreak = 0
     participant.Position = 1
     participant.JailedOn = 0
