@@ -31,7 +31,9 @@ export type Asset = {
     Hotels: number,
 
     TransferTo: (Asset, AssetOwner) -> (),
+    
     Mortgage: (Asset) -> (),
+    Unmortgaged: (Asset) -> (),
 }
 
 export type EdgeTile = typeof(ServerStorage.Tile)
