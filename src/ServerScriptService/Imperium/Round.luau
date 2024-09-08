@@ -11,6 +11,7 @@ function module.new(board: Types.Board): Types.Round
 
     local round = {}
 
+    round.Board = board
     round.Turn = 0
     round.Map = "TestMap"
     round.Theme = "TestTheme"

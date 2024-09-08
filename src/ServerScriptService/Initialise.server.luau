@@ -12,6 +12,8 @@ Players.PlayerAdded:Connect(function(plr): ()
     local profile = ProfileManager.LoadProfile(plr)
 	if profile then
         ReplicatedStorage.ServerClient.LoadSavedData:FireClient(plr, profile.Data.Settings)
+
+		plr:SetAttribute("Wins", profile.Data.Wins)
     end
 end)
 
