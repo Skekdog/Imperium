@@ -102,10 +102,19 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     }
 end
 
+local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
+    participant.JailedOn = 0
+    if not skipTurn then
+        participant:TryPlayMove()
+    end
+end
+
 local function TryPlayMove(participant: Types.Participant): ()
     if participant.JailedOn ~= 0 then
-        if participant.Round.Board.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
-            MoveBy(participant, RollDice(participant).Result)
+        if participant.JailedOn <= participant.Round.Turn - participant.Round.Board.JailLength then
+            LeaveJail(participant)
+        elseif participant.Round.Board.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
+            LeaveJail(participant)
         end
     else
         local roll = RollDice(participant)
@@ -166,6 +175,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.FindClosestPositionByColour = FindClosestPositionByColour
     participant.GiveJailCard = GiveJailCard
     participant.TransferJailCard = TransferJailCard
+    participant.LeaveJail = LeaveJail
 
     player:SetAttribute("Money", participant.Money)
 

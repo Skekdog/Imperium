@@ -90,7 +90,9 @@ export type Participant = {
     MoveToTileByName: (Participant, name: string) -> (),
     MoveTo: (Participant, position: number, moveDirectly: boolean?) -> (),
     MoveBy: (Participant, amount: number) -> (),
+
     SendToJail: (Participant) -> (),
+    LeaveJail: (Participant, skipTurn: boolean?) -> (),
 
     FindClosestPositionByColour: (Participant, colour: string) -> number?,
 
