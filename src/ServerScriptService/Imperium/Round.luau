@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ServerStorage = game:GetService("ServerStorage")
 local Participant = require(script.Parent.Participant)
 local Tile = require(script.Parent.Tile)
 local Types = require(ReplicatedFirst.Types)
@@ -13,8 +14,8 @@ function module.new(board: Types.Board): Types.Round
 
     round.Board = board
     round.Turn = 0
-    round.Map = "TestMap"
-    round.Theme = "TestTheme"
+
+    ServerStorage.Maps:FindFirstChild("Happy Home"):Clone().Parent = workspace :: any
 
     round.Tiles = {}
     for i, description in board.Tiles do

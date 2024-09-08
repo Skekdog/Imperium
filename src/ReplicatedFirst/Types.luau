@@ -100,8 +100,6 @@ export type Participant = {
 
 export type Round = {
     Turn: Turn,
-    Map: string,
-    Theme: string,
     Board: Board,
 
     Participants: {Participant},

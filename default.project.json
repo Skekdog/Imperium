@@ -14,7 +14,8 @@
             "$path": "src/ReplicatedStorage"
         },
         "ServerStorage": {
-            "$path": "Assets"
+            "$path": "Assets",
+            "$ignoreUnknownInstances": true
         },
         "Workspace": {
             "$path": "src/Workspace",
