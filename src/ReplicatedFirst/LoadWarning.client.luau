@@ -15,7 +15,7 @@ local special = plr.PlayerGui:WaitForChild("Special")
 
 while not found do
     if (os.clock() - start > 5) and unregisteredUIs:FindFirstChild("LoadWarning") then
-        unregisteredUIs.LoadWarning.Parent = special
+        unregisteredUIs.LoadWarning.Parent = special :: any
     end
     task.wait()
 end

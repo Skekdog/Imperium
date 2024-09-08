@@ -43,7 +43,7 @@ local function createPlr(plr: Player)
 
 	clone.Visible = true
 	clone.Name = "Player-"..plr.Name
-	clone.Parent = list
+	clone.Parent = list :: any
 
 	updatePlr(plr, clone)
 
