@@ -11,7 +11,13 @@
             "$path": "src/ServerScriptService"
         },
         "ReplicatedStorage": {
-            "$path": "src/ReplicatedStorage"
+            "$path": "src/ReplicatedStorage",
+            "$properties": {
+                "Attributes": {
+                    "TimeMilestone": {"Float64": 0},
+                    "CurrentPlayer": {"String": ""}
+                }
+            }
         },
         "ServerStorage": {
             "$path": "Assets",

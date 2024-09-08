@@ -17,5 +17,7 @@ ReplicatedStorage.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
     end
 end)
 
+ReplicatedStorage:SetAttribute("TimeMilestone", workspace:GetServerTimeNow() + INTERMISSION_DURATION)
 task.wait(INTERMISSION_DURATION)
+
 round:StartRound()
