@@ -21,6 +21,7 @@ end
 
 local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Money += amount
+    participant.Player:SetAttribute("Money", participant.Money)
 end
 
 local function TransferAssetTo(participant: Types.Participant, to: Types.AssetOwner, asset: Types.Asset): ()
@@ -163,6 +164,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.FindClosestPositionByColour = FindClosestPositionByColour
     participant.GiveJailCard = GiveJailCard
     participant.TransferJailCard = TransferJailCard
+
+    player:SetAttribute("Money", participant.Money)
 
     return participant
 end
