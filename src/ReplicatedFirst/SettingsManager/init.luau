@@ -1,5 +1,4 @@
 local HTTPService = game:GetService("HttpService")
-local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
 
 export type SettingDefinition = {
@@ -25,18 +24,6 @@ local module = {}
 module.SETTINGS_VERSION = 3
 module.Settings = {}
 module.AvailableSettings = {
-	{
-		Name = "Shadows",
-		Tab = "Display",
-		Category = "Environment",
-		Tooltip = "Enable or disable global shadows.",
-		PossibleValues = "Boolean",
-		Default = true,
-		Callback = function(val)
-			Lighting.GlobalShadows = val :: boolean
-		end,
-	},
-	
 	{
 		Name = "UI Theme",
 		Tab = "Display",
