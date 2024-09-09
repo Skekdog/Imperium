@@ -1,17 +1,44 @@
+local MemoryStoreService = game:GetService("MemoryStoreService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local SetTimeMilestone = require(script.Parent.SetTimeMilestone)
 
+local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") :: Teleport.GameInfo?
+
+if not info then
+    local temp = {
+        Players = if RunService:IsStudio() then 1 else 8,
+        TurnDuration = 15,
+        AuctionTime = 15,
+    }
+    info = temp
+end
+assert(info)
+
+local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 10
 
-local plr = Players.PlayerAdded:Wait()
-plr.CharacterAdded:Wait()
+local turnTime = info.TurnDuration
+local auctionTime = info.AuctionTime
+
+local startWait = os.time()
+
+local players = #Players:GetPlayers()
+
+-- Note: we can't use Players.PlayerAdded because then we don't check for max time
+while (players < info.Players) and (os.time() - startWait < MAX_PLAYER_LOAD_WAIT_TIME) do
+    task.wait()
+    players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
+end
+
 local round = Round.new(Classic, {
-    PlayerTurnTime = 15,
-    AuctionTime = 15
+    PlayerTurnTime = turnTime,
+    AuctionTime = auctionTime,
 })
 
 ReplicatedStorage.Game.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
