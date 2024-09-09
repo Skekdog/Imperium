@@ -9,7 +9,7 @@ return function(player: Player | Types.Participant): string
     end
 
     if plr.Name == plr.DisplayName then
-        return plr.Name
+        return `@{plr.Name}`
     else
         return `{plr.DisplayName} (@{plr.Name})`
     end
