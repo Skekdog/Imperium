@@ -1,0 +1,49 @@
+{
+    "name": "Imperium",
+    "emitLegacyScripts": false,
+    "servePlaceIds": [110109018598423],
+    "servePort": 34000,
+
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedFirst": {
+            "Shared": {"$path": "src/ReplicatedFirst/Shared"},
+            "Lobby": {"$path": "src/ReplicatedFirst/Lobby"}
+        },
+        "ServerScriptService": {
+            "Shared": {"$path": "src/ServerScriptService/Shared"},
+            "Lobby": {"$path": "src/ServerScriptService/Lobby"}
+        },
+        "ReplicatedStorage": {
+            "Shared": {"$path": "src/ReplicatedStorage/Shared"},
+            "Lobby": {"$path": "src/ReplicatedStorage/Lobby"}
+        },
+        "ServerStorage": {
+            "Shared": {"$path": "Assets/Shared"},
+            "Lobby": {"$path": "Assets/Lobby"}
+        },
+        "TextChatService": {
+            "$className": "TextChatService",
+            "ChatWindowConfiguration": {
+                "$className": "ChatWindowConfiguration",
+                "$properties": {
+                    "Tags": ["StyledUI"],
+                    "Attributes": {"Style": {"String": "Primary"}}
+                }
+            },
+            "ChatInputBarConfiguration": {
+                "$className": "ChatInputBarConfiguration",
+                "$properties": {
+                    "Tags": ["StyledUI"],
+                    "Attributes": {"Style": {"String": "Secondary"}}
+                }
+            }
+        },
+        "Lighting": {
+            "$className": "Lighting",
+            "$properties": {
+                "GlobalShadows": false
+            }
+        }
+    }
+}

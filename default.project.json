@@ -1,17 +1,23 @@
 {
     "name": "Imperium",
-    "emitLegacyScripts": true,
+    "emitLegacyScripts": false,
 
     "tree": {
         "$className": "DataModel",
         "ReplicatedFirst": {
-            "$path": "src/ReplicatedFirst"
+            "Shared": {"$path": "src/ReplicatedFirst/Shared"},
+            "Game": {"$path": "src/ReplicatedFirst/Game"},
+            "Lobby": {"$path": "src/ReplicatedFirst/Lobby"}
         },
         "ServerScriptService": {
-            "$path": "src/ServerScriptService"
+            "Shared": {"$path": "src/ServerScriptService/Shared"},
+            "Game": {"$path": "src/ServerScriptService/Game"},
+            "Lobby": {"$path": "src/ServerScriptService/Lobby"}
         },
         "ReplicatedStorage": {
-            "$path": "src/ReplicatedStorage",
+            "Shared": {"$path": "src/ReplicatedStorage/Shared"},
+            "Game": {"$path": "src/ReplicatedStorage/Game"},
+            "Lobby": {"$path": "src/ReplicatedStorage/Lobby"},
             "$properties": {
                 "Attributes": {
                     "TimeMilestone": {"Float64": 0},
@@ -20,12 +26,9 @@
             }
         },
         "ServerStorage": {
-            "$path": "Assets",
-            "$ignoreUnknownInstances": true
-        },
-        "Workspace": {
-            "$path": "src/Workspace",
-            "$ignoreUnknownInstances": true
+            "Shared": {"$path": "Assets/Shared"},
+            "Game": {"$path": "Assets/Game"},
+            "Lobby": {"$path": "Assets/Lobby"}
         },
         "TextChatService": {
             "$className": "TextChatService",

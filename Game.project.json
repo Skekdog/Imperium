@@ -1,0 +1,55 @@
+{
+    "name": "Imperium",
+    "emitLegacyScripts": false,
+    "servePlaceIds": [72812941745571],
+    "servePort": 35000,
+
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedFirst": {
+            "Shared": {"$path": "src/ReplicatedFirst/Shared"},
+            "Game": {"$path": "src/ReplicatedFirst/Game"}
+        },
+        "ServerScriptService": {
+            "Shared": {"$path": "src/ServerScriptService/Shared"},
+            "Game": {"$path": "src/ServerScriptService/Game"}
+        },
+        "ReplicatedStorage": {
+            "Shared": {"$path": "src/ReplicatedStorage/Shared"},
+            "Game": {"$path": "src/ReplicatedStorage/Game"},
+            "$properties": {
+                "Attributes": {
+                    "TimeMilestone": {"Float64": 0},
+                    "CurrentPlayer": {"String": ""}
+                }
+            }
+        },
+        "ServerStorage": {
+            "Shared": {"$path": "Assets/Shared"},
+            "Game": {"$path": "Assets/Game"}
+        },
+        "TextChatService": {
+            "$className": "TextChatService",
+            "ChatWindowConfiguration": {
+                "$className": "ChatWindowConfiguration",
+                "$properties": {
+                    "Tags": ["StyledUI"],
+                    "Attributes": {"Style": {"String": "Primary"}}
+                }
+            },
+            "ChatInputBarConfiguration": {
+                "$className": "ChatInputBarConfiguration",
+                "$properties": {
+                    "Tags": ["StyledUI"],
+                    "Attributes": {"Style": {"String": "Secondary"}}
+                }
+            }
+        },
+        "Lighting": {
+            "$className": "Lighting",
+            "$properties": {
+                "GlobalShadows": false
+            }
+        }
+    }
+}
