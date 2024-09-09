@@ -11,11 +11,11 @@ function module.GetRowFromPosition(position: number, numTiles: number): number
 end
 
 function module.GetNextCornerPosition(position: number, numTiles: number): number
-    return math.ceil((position - 1) / module.GetTilesPerRow(numTiles)) * module.GetTilesPerRow(numTiles)
+    return math.ceil(position / module.GetTilesPerRow(numTiles)) * module.GetTilesPerRow(numTiles) + 1
 end
 
 function module.GetWrapAround(position: number, numTiles: number): number
-    return position % (numTiles + 1)
+    return math.max(position % (numTiles + 1), 1)
 end
 
 return module

@@ -32,7 +32,7 @@ end
 assert(info)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
-local INTERMISSION_DURATION = 10
+local INTERMISSION_DURATION = 5
 
 local turnTime = info.TurnDuration
 local auctionTime = info.AuctionTime

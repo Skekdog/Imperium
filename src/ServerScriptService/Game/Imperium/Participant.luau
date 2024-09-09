@@ -5,7 +5,7 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local function SendToJail(participant: Types.Participant): ()
-    participant:MoveToTileByName("Jail")
+    participant:MoveToTileByName("Jail", true)
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
 end
@@ -81,6 +81,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
+    local lastPosition = participant.Position
     if participant.Position == 1 and not moveDirectly and participant.LastMovedAt ~= 0 then
         GiveMoney(participant, participant.Round.Board.PassGoMoney)
     end
@@ -94,7 +95,27 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
 
-    moveCharacter(participant.Player.Character, tile, moveDirectly)
+    if not moveDirectly then
+        local allTiles = participant.Round.Tiles
+        local targetRow = TileUtils.GetRowFromPosition(position, #allTiles)
+        local currentPosition = lastPosition
+
+        local startTime = os.time()
+        local currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
+        while currentRow ~= targetRow do
+            local nextCornerPosition = TileUtils.GetWrapAround(TileUtils.GetNextCornerPosition(currentPosition, #allTiles), #allTiles)
+            local nextCorner = participant.Round.Tiles[nextCornerPosition]
+
+            currentPosition = nextCornerPosition
+            currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
+
+            print(currentPosition)
+            moveCharacter(participant.Player.Character, nextCorner, false, os.time() - startTime)
+        end
+        moveCharacter(participant.Player.Character, tile)
+    else
+        moveCharacter(participant.Player.Character, tile, moveDirectly)
+    end
 
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
@@ -106,8 +127,8 @@ local function MoveBy(participant: Types.Participant, amount: number): ()
     MoveTo(participant, position)
 end
 
-local function MoveToTileByName(participant: Types.Participant, name: string): ()
-    MoveTo(participant, participant.Round:FindTileByName(name))
+local function MoveToTileByName(participant: Types.Participant, name: string, moveDirectly: boolean?): ()
+    MoveTo(participant, participant.Round:FindTileByName(name), moveDirectly)
 end
 
 local function FindClosestPositionByColour(participant: Types.Participant, colour: string): number?
