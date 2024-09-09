@@ -20,7 +20,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 		return
 	end
 
-	local status = "Playing"
+	local status = plr:GetAttribute("Status")
 	clone.Money.Text = tostring(plr:GetAttribute("Money"))
 	clone.Wins.Text = tostring(plr:GetAttribute("Wins"))
 
@@ -45,12 +45,13 @@ local function createPlr(plr: Player)
 	clone.Name = "Player-"..plr.Name
 	clone.Parent = list :: any
 
-	plr:GetAttributeChangedSignal("Money"):Connect(function()
+	local function update(): ()
 		updatePlr(plr, clone)
-	end)
-	plr:GetAttributeChangedSignal("Wins"):Connect(function()
-		updatePlr(plr, clone)
-	end)
+	end
+
+	plr:GetAttributeChangedSignal("Money"):Connect(update)
+	plr:GetAttributeChangedSignal("Wins"):Connect(update)
+	plr:GetAttributeChangedSignal("Status"):Connect(update)
 
 	updatePlr(plr, clone)
 

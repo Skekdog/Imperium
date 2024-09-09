@@ -37,6 +37,10 @@ local INTERMISSION_DURATION = 10
 local turnTime = info.TurnDuration
 local auctionTime = info.AuctionTime
 
+Players.PlayerAdded:Connect(function(plr)
+    plr:SetAttribute("Status", "Spectating")
+end)
+
 local startWait = os.time()
 local players = #Players:GetPlayers()
 
