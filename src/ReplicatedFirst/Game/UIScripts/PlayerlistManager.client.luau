@@ -20,7 +20,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 		return
 	end
 
-	local status = plr:GetAttribute("Status")
+	local status = plr:GetAttribute("Status") or "Spectating"
 	clone.Money.Text = tostring(plr:GetAttribute("Money"))
 	clone.Wins.Text = tostring(plr:GetAttribute("Wins"))
 
