@@ -1,4 +1,5 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local Types = require(ReplicatedFirst.Types)
 
 local module = {}
@@ -121,6 +122,7 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
 end
 
 local function TryPlayMove(participant: Types.Participant): ()
+    SetTimeMilestone(nil)
     if participant.JailedOn ~= 0 then
         if participant.JailedOn <= participant.Round.Turn - participant.Round.Board.JailLength then
             LeaveJail(participant)
@@ -169,7 +171,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
 
     participant.LastMovedAt = 0
     participant.DoublesStreak = 0
-    participant.Position = 1
+    participant.Position = 0
     participant.JailedOn = 0
 
     participant.SendToJail = SendToJail

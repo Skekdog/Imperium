@@ -19,14 +19,22 @@ end)
 
 task.spawn(function()
     while true do
-        local milestone = ReplicatedStorage:GetAttribute("TimeMilestone") :: number
+        task.wait()
+
+        local milestone = ReplicatedStorage:GetAttribute("TimeMilestone") :: number?
+        if not milestone then
+            object.Timer.Visible = false
+            continue
+        end
+
+        object.Timer.Visible = true
+
         local diff = math.round(milestone - workspace:GetServerTimeNow())
 
-        if diff < 0 then
+        if diff <= 0 then
             diff = 0
         end
 
         object.Timer.Text = `{diff}s`
-        task.wait()
     end
 end)

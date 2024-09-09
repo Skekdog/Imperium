@@ -6,7 +6,8 @@ local SetTimeMilestone = require(script.Parent.SetTimeMilestone)
 
 local INTERMISSION_DURATION = 5
 
-Players.PlayerAdded:Wait()
+local plr = Players.PlayerAdded:Wait()
+plr.CharacterAdded:Wait()
 local round = Round.new(Classic, {
     PlayerTurnTime = 15,
     AuctionTime = 15

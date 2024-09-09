@@ -59,6 +59,7 @@ local function StartRound(round: Types.Round): ()
 
     for _, v in round.Participants do
         v.Player:SetAttribute("Status", "Playing")
+        v:MoveTo(1, true)
     end
     ReplicatedStorage.ServerClient.StartGame:FireAllClients()
 
