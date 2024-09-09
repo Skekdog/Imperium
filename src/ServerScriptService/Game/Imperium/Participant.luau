@@ -1,4 +1,5 @@
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
+local TileUtils = require(script.Parent.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -42,7 +43,7 @@ end
 
 local MAX_MOVE_DURATION = 45
 local MAX_DIRECT_MOVE_DURATION = 10
-local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?): ()
+local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?): ()
     if not char then
         return
     end
@@ -59,7 +60,7 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?): 
 
     local targetPosition = tile.Model:GetPivot().Position + Vector3.new(0, 3, 0)
 
-    local startTime = os.time()
+    local startTime = os.time() - (elapsedTime or 0)
     local reached = false
 
     repeat
@@ -101,10 +102,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
-    local position = (participant.Position + amount) % #participant.Round.Tiles
-    if position == 0 then
-        position = 1
-    end
+    local position = TileUtils.GetWrapAround(participant.Position + amount, #participant.Round.Tiles)
     MoveTo(participant, position)
 end
 
