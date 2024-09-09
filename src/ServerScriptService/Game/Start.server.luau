@@ -3,10 +3,21 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
+local Tile = require(script.Parent.Imperium.Tile)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local SetWaitingText = require(script.Parent.SetWaitingText)
+
+local board = Classic
+
+ServerStorage.Game.Maps:FindFirstChild("Happy Home"):Clone().Parent = workspace :: any
+
+local tiles = {}
+for i, description in board.Tiles do
+    table.insert(tiles, Tile.new(board, i, description))
+end
 
 local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") :: Teleport.GameInfo?
 
@@ -37,7 +48,7 @@ while (players < info.Players) and (os.time() - startWait < MAX_PLAYER_LOAD_WAIT
     players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
 end
 
-local round = Round.new(Classic, {
+local round = Round.new(Classic, tiles, {
     PlayerTurnTime = turnTime,
     AuctionTime = auctionTime,
 })

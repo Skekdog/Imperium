@@ -1,10 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local Participant = require(script.Parent.Participant)
-local Tile = require(script.Parent.Tile)
 local Types = require(ReplicatedFirst.Game.Types)
 
 local module = {}
@@ -68,7 +66,7 @@ local function StartRound(round: Types.Round): ()
     StartNextParticipantTurn(round)
 end
 
-function module.new(board: Types.Board, gameConfiguration: Types.GameConfiguration): Types.Round
+function module.new(board: Types.Board, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     assert(#board.Tiles % 4 == 0, "Board size must be a multiple of 4")
 
     local round = {}
@@ -79,12 +77,7 @@ function module.new(board: Types.Board, gameConfiguration: Types.GameConfigurati
     round.Started = false
     round.Turn = 0
 
-    ServerStorage.Game.Maps:FindFirstChild("Happy Home"):Clone().Parent = workspace :: any
-
-    round.Tiles = {}
-    for i, description in board.Tiles do
-        table.insert(round.Tiles, Tile.new(board, i, description))
-    end
+    round.Tiles = tiles
     
     round.Participants = {}
     round.CurrentParticipant = nil :: any
