@@ -109,7 +109,6 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
             currentPosition = nextCornerPosition
             currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
 
-            print(currentPosition)
             moveCharacter(participant.Player.Character, nextCorner, false, os.time() - startTime)
         end
         moveCharacter(participant.Player.Character, tile)
