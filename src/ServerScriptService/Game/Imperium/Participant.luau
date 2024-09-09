@@ -40,6 +40,42 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
     end
 end
 
+local MAX_MOVE_DURATION = 45
+local MAX_DIRECT_MOVE_DURATION = 10
+local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?): ()
+    if not char then
+        return
+    end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then
+        return
+    end
+
+    local root = hum.RootPart
+    if not root then
+        return
+    end
+
+    local targetPosition = tile.Model:GetPivot().Position + Vector3.new(0, 3, 0)
+
+    local startTime = os.time()
+    local reached = false
+
+    repeat
+        if (root.Position - targetPosition).Magnitude < 2.5 then
+            reached = true
+            break
+        end
+        hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
+        task.wait(0.5)
+    until os.time() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION
+    
+    if not reached then
+        root.Position = targetPosition
+    end
+end
+
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
@@ -57,15 +93,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
 
-    local char = participant.Player.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum:MoveTo(tile.Model:GetPivot().Position)
-            hum.MoveToFinished:Wait() -- todo: implement a timeout and moveDirectly
-            --todo: on an unrelated note, findnearesttilebycolour should only move forward
-        end
-    end
+    moveCharacter(participant.Player.Character, tile, moveDirectly)
 
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
@@ -106,8 +134,6 @@ end
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
-
-    print("Roll 1: ", roll1, " Roll 2: ", roll2, " Total: ", roll1 + roll2, " Doubles: ", roll1 == roll2)
 
     return {
         Result = roll1 + roll2,
