@@ -1,6 +1,5 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerStorage = game:GetService("ServerStorage")
-local Types = require(ReplicatedFirst.Game.Types)
+local Types = require(script.Parent.Types)
 
 local module = {}
 

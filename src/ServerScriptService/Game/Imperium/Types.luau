@@ -88,7 +88,7 @@ export type Participant = {
     TryPlayMove: (Participant) -> (),
 
     MoveToTileByName: (Participant, name: string) -> (),
-    MoveTo: (Participant, position: number, moveDirectly: boolean?) -> (),
+    MoveTo: (Participant, position: number, moveDirectly: boolean?, initialMove: boolean?) -> (),
     MoveBy: (Participant, amount: number) -> (),
 
     SendToJail: (Participant) -> (),

@@ -1,8 +1,7 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ChanceCards = require(script.Parent.ChanceCards)
 local CommunityChests = require(script.Parent.CommunityChests)
 local Colours = require(script.Parent.Colours)
-local Types = require(ReplicatedFirst.Game.Types)
+local Types = require(script.Parent.Parent.Parent.Imperium.Types)
 local module = {}
 
 local function DrawCard(tile: Types.TileDescription, participant: Types.Participant): ()

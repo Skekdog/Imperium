@@ -1,6 +1,5 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
-local Types = require(ReplicatedFirst.Game.Types)
+local Types = require(script.Parent.Types)
 
 local module = {}
 
@@ -41,7 +40,7 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
     end
 end
 
-local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?): ()
+local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
@@ -49,7 +48,9 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         GiveMoney(participant, participant.Round.Board.PassGoMoney)
     end
 
-    participant.LastMovedAt = workspace:GetServerTimeNow()
+    if not intialMove then
+        participant.LastMovedAt = workspace:GetServerTimeNow()
+    end
     participant.Position = position
 
     local tile = participant.Round.Tiles[position]

@@ -1,5 +1,4 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local Types = require(ReplicatedFirst.Game.Types)
+local Types = require(script.Parent.Parent.Parent.Imperium.Types)
 
 local module = {}
 

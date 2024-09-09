@@ -1,9 +1,8 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local Participant = require(script.Parent.Participant)
-local Types = require(ReplicatedFirst.Game.Types)
+local Types = require(script.Parent.Types)
 
 local module = {}
 
@@ -59,7 +58,7 @@ local function StartRound(round: Types.Round): ()
     ReplicatedStorage.Game.ServerClient.SetMovementEnabled:FireAllClients(false)
     for _, v in round.Participants do
         v.Player:SetAttribute("Status", "Playing")
-        task.spawn(v.MoveTo, v, 1, true)
+        task.spawn(v.MoveTo, v, 1, true, true)
     end
     ReplicatedStorage.Game.ServerClient.StartGame:FireAllClients()
 
