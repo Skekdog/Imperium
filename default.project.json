@@ -21,7 +21,8 @@
             "$properties": {
                 "Attributes": {
                     "TimeMilestone": {"Float64": 0},
-                    "CurrentPlayer": {"String": ""}
+                    "CurrentPlayer": {"String": ""},
+                    "WaitingText": {"String": "Waiting for players..."}
                 }
             }
         },

@@ -8,6 +8,17 @@ local UIManager = require(ReplicatedFirst.Shared.UIManager)
 local ui = UIManager.WaitForUI("CurrentTurnIndicator")
 local object = ui.Object :: typeof(UIManager.UnregisteredUIs.CurrentTurnIndicator)
 
+local function setWaitingText(): ()
+    local text = ReplicatedStorage:GetAttribute("WaitingText") :: string?
+    if not text then
+        return
+    end
+
+    object.Turn.Text = text
+end
+ReplicatedStorage:GetAttributeChangedSignal("WaitingText"):Connect(setWaitingText)
+setWaitingText()
+
 ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
     local player = Players:FindFirstChild(ReplicatedStorage:GetAttribute("CurrentPlayer") :: string)
     if not player or not player:IsA("Player") then

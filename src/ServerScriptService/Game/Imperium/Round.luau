@@ -22,6 +22,7 @@ local function StartNextParticipantTurn(round: Types.Round): ()
     local lastMovedAt = round.CurrentParticipant.LastMovedAt
 
     round.CurrentParticipant = round.Participants[lastIndex]
+    ReplicatedStorage:SetAttribute("CurrentPlayer", round.CurrentParticipant.Player.Name)
     SetTimeMilestone(round.GameConfiguration.PlayerTurnTime)
 
     task.delay(round.GameConfiguration.PlayerTurnTime, function()
@@ -57,9 +58,10 @@ local function StartRound(round: Types.Round): ()
 
     round.Started = true
 
+    ReplicatedStorage.Game.ServerClient.SetMovementEnabled:FireAllClients(false)
     for _, v in round.Participants do
         v.Player:SetAttribute("Status", "Playing")
-        v:MoveTo(1, true)
+        task.spawn(v.MoveTo, v, 1, true)
     end
     ReplicatedStorage.Game.ServerClient.StartGame:FireAllClients()
 

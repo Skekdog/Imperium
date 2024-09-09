@@ -6,7 +6,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
 local Round = require(ServerScriptService.Game.Imperium.Round)
-local SetTimeMilestone = require(script.Parent.SetTimeMilestone)
+local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") :: Teleport.GameInfo?
 
@@ -27,8 +27,9 @@ local turnTime = info.TurnDuration
 local auctionTime = info.AuctionTime
 
 local startWait = os.time()
-
 local players = #Players:GetPlayers()
+
+SetWaitingText("Waiting for players...", MAX_PLAYER_LOAD_WAIT_TIME)
 
 -- Note: we can't use Players.PlayerAdded because then we don't check for max time
 while (players < info.Players) and (os.time() - startWait < MAX_PLAYER_LOAD_WAIT_TIME) do
@@ -49,7 +50,8 @@ ReplicatedStorage.Game.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
     end
 end)
 
-SetTimeMilestone(INTERMISSION_DURATION)
+SetWaitingText("Starting soon...", INTERMISSION_DURATION)
 task.wait(INTERMISSION_DURATION)
 
+SetWaitingText(nil, 0)
 round:StartRound()
