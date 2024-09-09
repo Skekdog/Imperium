@@ -5,7 +5,7 @@ local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local SetTimeMilestone = require(script.Parent.SetTimeMilestone)
 
-local INTERMISSION_DURATION = 5
+local INTERMISSION_DURATION = 10
 
 local plr = Players.PlayerAdded:Wait()
 plr.CharacterAdded:Wait()
