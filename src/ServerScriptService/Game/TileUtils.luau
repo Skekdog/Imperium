@@ -14,6 +14,10 @@ function module.GetNextCornerPosition(position: number, numTiles: number): numbe
     return math.ceil(position / module.GetTilesPerRow(numTiles)) * module.GetTilesPerRow(numTiles) + 1
 end
 
+function module.GetLastCornerPosition(position: number, numTiles: number): number
+    return (position // module.GetTilesPerRow(numTiles)) * module.GetTilesPerRow(numTiles)
+end
+
 function module.GetWrapAround(position: number, numTiles: number): number
     return math.max(position % (numTiles + 1), 1)
 end
