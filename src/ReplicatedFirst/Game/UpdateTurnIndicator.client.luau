@@ -43,7 +43,7 @@ task.spawn(function()
 
         local diff = math.round(milestone - workspace:GetServerTimeNow())
 
-        if diff <= 0 then
+        if diff <= 0 then -- We specifically want to check for == 0, because of negative 0. (I love IEEE 754)
             diff = 0
         end
 
