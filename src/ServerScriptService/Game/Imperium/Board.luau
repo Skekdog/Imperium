@@ -4,7 +4,7 @@ local module = {}
 
 local function FindTileByName(board: Types.Board, name: string): number
     for i, tile in board.Tiles do
-        if tile.TileDescription.Name == name or (tile.TileDescription.Asset and tile.TileDescription.Asset.Name == name) then
+        if tile.TileDescription.Name == name or (tile.TileDescription.AssetDescription and tile.TileDescription.AssetDescription.Name == name) then
             return i
         end
     end

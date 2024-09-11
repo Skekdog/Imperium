@@ -81,11 +81,11 @@ module.FreeParkingBonusInitial = 0
 module.Tiles = {
     {
         Name = "Go" :: string?,
-        Asset = nil :: Types.AssetDescription?,
+        AssetDescription = nil :: Types.AssetDescription?,
         OnEnter = nil :: ((Types.TileDescription, Types.Participant) -> ())?,
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Old Kent Road",
             Colour = "Brown",
             Price = 60,
@@ -96,7 +96,7 @@ module.Tiles = {
         OnEnter = DrawCard
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Whitechapel Road",
             Colour = "Brown",
             Price = 60,
@@ -107,7 +107,7 @@ module.Tiles = {
         OnEnter = TaxTile
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "King's Cross Station",
             Colour = "Station",
             Price = 200,
@@ -115,7 +115,7 @@ module.Tiles = {
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "The Angel Islington",
             Colour = "Light Blue",
             Price = 100,
@@ -126,14 +126,14 @@ module.Tiles = {
         OnEnter = DrawCard
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Euston Road",
             Colour = "Light Blue",
             Price = 100,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Pentonville Road",
             Colour = "Light Blue",
             Price = 120,
@@ -143,14 +143,14 @@ module.Tiles = {
         Name = "Jail"
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Pall Mall",
             Colour = "Pink",
             Price = 140,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Electric Company",
             Colour = "Utility",
             Price = 150,
@@ -158,21 +158,21 @@ module.Tiles = {
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Whitehall",
             Colour = "Pink",
             Price = 140,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Northumberland Avenue",
             Colour = "Pink",
             Price = 160,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Marylebone Station",
             Colour = "Station",
             Price = 200,
@@ -180,7 +180,7 @@ module.Tiles = {
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Bow Street",
             Colour = "Orange",
             Price = 180,
@@ -191,14 +191,14 @@ module.Tiles = {
         OnEnter = DrawCard
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Marlborough Street",
             Colour = "Orange",
             Price = 180,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Vine Street",
             Colour = "Orange",
             Price = 200,
@@ -208,7 +208,7 @@ module.Tiles = {
         Name = "Free Parking"
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Strand",
             Colour = "Red",
             Price = 220,
@@ -219,21 +219,21 @@ module.Tiles = {
         OnEnter = DrawCard
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Fleet Street",
             Colour = "Red",
             Price = 220,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Trafalgar Square",
             Colour = "Red",
             Price = 240,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Fenchurch St Station",
             Colour = "Station",
             Price = 200,
@@ -241,21 +241,21 @@ module.Tiles = {
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Leicester Square",
             Colour = "Yellow",
             Price = 260,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Coventry Street",
             Colour = "Yellow",
             Price = 260,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Water Works",
             Colour = "Utility",
             Price = 150,
@@ -263,7 +263,7 @@ module.Tiles = {
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Piccadilly",
             Colour = "Yellow",
             Price = 280,
@@ -274,14 +274,14 @@ module.Tiles = {
         OnEnter = GoToJail
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Regent Street",
             Colour = "Green",
             Price = 300,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Oxford Street",
             Colour = "Green",
             Price = 300,
@@ -292,14 +292,14 @@ module.Tiles = {
         OnEnter = DrawCard
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Bond Street",
             Colour = "Green",
             Price = 320,
         }
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Liverpool Street Station",
             Colour = "Station",
             Price = 200,
@@ -311,7 +311,7 @@ module.Tiles = {
         OnEnter = DrawCard
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Park Lane",
             Colour = "Dark Blue",
             Price = 350,
@@ -322,7 +322,7 @@ module.Tiles = {
         OnEnter = TaxTile
     },
     {
-        Asset = {
+        AssetDescription = {
             Name = "Mayfair",
             Colour = "Dark Blue",
             Price = 400,

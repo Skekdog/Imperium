@@ -41,7 +41,7 @@ export type AssetDescription = {
 
 export type TileDescription = {
     Name: string?,
-    Asset: AssetDescription?,
+    AssetDescription: AssetDescription?,
     OnEnter: ((TileDescription, Participant) -> ())?,
 }
 

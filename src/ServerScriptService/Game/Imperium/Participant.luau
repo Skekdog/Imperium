@@ -93,7 +93,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     local tile = participant.Board.Tiles[position]
 
-    print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
+    print(`Moved to {if tile.TileDescription.AssetDescription then tile.TileDescription.AssetDescription.Name else tile.TileDescription.Name}`)
 
     if not moveDirectly then
         local allTiles = participant.Board.Tiles
@@ -135,7 +135,7 @@ end
 local function FindClosestForwardPositionByColour(participant: Types.Participant, colour: string): number?
     local validPositions: {number} = {}
     for i, v in participant.Board.Tiles do
-        if v.TileDescription.Asset and v.TileDescription.Asset.Colour == colour then
+        if v.TileDescription.AssetDescription and v.TileDescription.AssetDescription.Colour == colour then
             table.insert(validPositions, i)
         end
     end

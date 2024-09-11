@@ -9,12 +9,12 @@ function module.new(boardConfiguration: Types.BoardConfiguration, position: numb
 
     local name = tileDescription.Name
     if not name then
-        assert(tileDescription.Asset, "Tile description must have either a name or an asset with a name")
-        name = tileDescription.Asset.Name
+        assert(tileDescription.AssetDescription, "Tile description must have either a name or an asset with a name")
+        name = tileDescription.AssetDescription.Name
     end
     assert(name)
 
-    local colour = if tileDescription.Asset then tileDescription.Asset.Colour else "Default"
+    local colour = if tileDescription.AssetDescription then tileDescription.AssetDescription.Colour else "Default"
 
     tile.TileDescription = tileDescription
 
