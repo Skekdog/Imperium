@@ -68,9 +68,9 @@ export type CornerTile = typeof(ServerStorage.Game.CornerTile)
 export type TileModel = EdgeTile | CornerTile
 
 export type Tile = {
-    Asset: Asset?,
     TileDescription: TileDescription,
-    Model: TileModel
+    Model: TileModel,
+    Asset: Asset?,
 }
 
 export type Participant = {

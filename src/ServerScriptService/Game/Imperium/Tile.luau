@@ -1,5 +1,6 @@
 local ServerStorage = game:GetService("ServerStorage")
-local TileUtils = require(script.Parent.Parent.TileUtils)
+local TileMath = require(script.Parent.Parent.TileMath)
+local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -7,19 +8,13 @@ local module = {}
 function module.new(boardConfiguration: Types.BoardConfiguration, position: number, tileDescription: Types.TileDescription): Types.Tile
     local tile = {}
 
-    local name = tileDescription.Name
-    if not name then
-        assert(tileDescription.AssetDescription, "Tile description must have either a name or an asset with a name")
-        name = tileDescription.AssetDescription.Name
-    end
-    assert(name)
-
-    local colour = if tileDescription.AssetDescription then tileDescription.AssetDescription.Colour else "Default"
+    local name = TileUtils.GetName(tileDescription)
+    local colour = TileUtils.GetColour(tileDescription)
 
     tile.TileDescription = tileDescription
 
-    local tilesPerRow = TileUtils.GetTilesPerRow(#boardConfiguration.Tiles)
-    local row = TileUtils.GetRowFromPosition(position, #boardConfiguration.Tiles)
+    local tilesPerRow = TileMath.GetTilesPerRow(#boardConfiguration.Tiles)
+    local row = TileMath.GetRowFromPosition(position, #boardConfiguration.Tiles)
 
     local offset = (position - 1) % tilesPerRow
     local isCorner = offset == 0

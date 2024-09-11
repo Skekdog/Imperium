@@ -1,5 +1,6 @@
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
-local TileUtils = require(script.Parent.Parent.TileUtils)
+local TileMath = require(script.Parent.Parent.TileMath)
+local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -93,21 +94,21 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     local tile = participant.Board.Tiles[position]
 
-    print(`Moved to {if tile.TileDescription.AssetDescription then tile.TileDescription.AssetDescription.Name else tile.TileDescription.Name}`)
+    print(`Moved to {TileUtils.GetName(tile.TileDescription)}`)
 
     if not moveDirectly then
         local allTiles = participant.Board.Tiles
-        local targetRow = TileUtils.GetRowFromPosition(position, #allTiles)
+        local targetRow = TileMath.GetRowFromPosition(position, #allTiles)
         local currentPosition = participant.PreviousPosition
 
         local startTime = os.time()
-        local currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
+        local currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
         while currentRow ~= targetRow do
-            local nextCornerPosition = TileUtils.GetWrapAround(TileUtils.GetNextCornerPosition(currentPosition, #allTiles), #allTiles)
+            local nextCornerPosition = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, #allTiles), #allTiles)
             local nextCorner = participant.Board.Tiles[nextCornerPosition]
 
             currentPosition = nextCornerPosition
-            currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
+            currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
 
             moveCharacter(participant.Player.Character, nextCorner, false, os.time() - startTime)
         end
@@ -124,7 +125,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
-    local position = TileUtils.GetWrapAround(participant.Position + amount, #participant.Board.Tiles)
+    local position = TileMath.GetWrapAround(participant.Position + amount, #participant.Board.Tiles)
     MoveTo(participant, position)
 end
 
