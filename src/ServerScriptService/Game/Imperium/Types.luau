@@ -36,6 +36,7 @@ export type AssetDescription = {
     Name: string,
     Colour: string,
     Price: number,
+    Rent: ((Asset, Participant) -> number)?,
 }
 
 export type TileDescription = {
@@ -80,6 +81,7 @@ export type Participant = {
     Assets: {Asset},
 
     LastMovedAt: number,
+    PreviousPosition: number,
     Position: number,
     JailedOn: number,
     DoublesStreak: number,
@@ -95,6 +97,8 @@ export type Participant = {
     LeaveJail: (Participant, skipTurn: boolean?) -> (),
 
     FindClosestForwardPositionByColour: (Participant, colour: string) -> number?,
+
+    TryPayRent: (Participant, Tile) -> (),
 
     GiveJailCard: (Participant) -> (),
     GiveMoney: (Participant, amount: number) -> (),
@@ -121,6 +125,8 @@ export type Round = {
     GetParticipant: (Round, player: Player) -> Participant,
     StartNextParticipantTurn: (Round) -> (),
     FindTileByName: (Round, name: string) -> number,
+
+    TryGetAssetFromTile: (Round, tile: Tile) -> Asset?,
 }
 
 return {}

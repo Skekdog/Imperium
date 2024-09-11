@@ -81,7 +81,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
-    local lastPosition = participant.Position
+    participant.PreviousPosition = participant.Position
     if participant.Position == 1 and not moveDirectly and participant.LastMovedAt ~= 0 then
         GiveMoney(participant, participant.Round.Board.PassGoMoney)
     end
@@ -98,7 +98,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     if not moveDirectly then
         local allTiles = participant.Round.Tiles
         local targetRow = TileUtils.GetRowFromPosition(position, #allTiles)
-        local currentPosition = lastPosition
+        local currentPosition = participant.PreviousPosition
 
         local startTime = os.time()
         local currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
@@ -115,6 +115,8 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     else
         moveCharacter(participant.Player.Character, tile, moveDirectly)
     end
+
+    participant:TryPayRent(tile)
 
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
@@ -208,6 +210,31 @@ local function TransferJailCard(participant: Types.Participant, to: Types.AssetO
     end
 end
 
+local function TryPayRent(participant: Types.Participant, tile: Types.Tile): ()
+    local asset = participant.Round:TryGetAssetFromTile(tile)
+    if not asset then
+        return
+    end
+
+    if asset.Owner == participant or asset.Owner == "Bank" then
+        return
+    end
+
+    local rent: number
+    if asset.AssetDescription.Rent then
+        rent = asset.AssetDescription.Rent(asset, participant)
+    else
+        local initialPrice = asset.AssetDescription.Price
+        local houses = asset.Houses
+        local hotels = asset.Hotels
+
+        --todo: double check that this formula is correct (because it ain't correct)
+        rent = (initialPrice / 20) + (houses * (initialPrice / 8)) + (hotels * (initialPrice / 10))
+    end
+
+    participant:TransferMoneyTo(asset.Owner, rent)
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -220,6 +247,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
 
     participant.LastMovedAt = 0
     participant.DoublesStreak = 0
+    participant.PreviousPosition = 0
     participant.Position = 0
     participant.JailedOn = 0
 
@@ -238,6 +266,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.GiveJailCard = GiveJailCard
     participant.TransferJailCard = TransferJailCard
     participant.LeaveJail = LeaveJail
+    participant.TryPayRent = TryPayRent
 
     player:SetAttribute("Money", participant.Money)
 

@@ -29,6 +29,37 @@ local function TaxTile(tile: Types.TileDescription, participant: Types.Participa
     end
 end
 
+local function GetRentForUtility(asset: Types.Asset, participant: Types.Participant): number
+    local roll = math.abs(participant.Position - participant.PreviousPosition)
+
+    local ownedUtilities = 0
+    for _, asset in participant.Assets do
+        if asset.AssetDescription.Colour == "Utility" then
+            ownedUtilities += 1
+        end
+    end
+
+    if ownedUtilities == 1 then
+        return roll * 4
+    elseif ownedUtilities == 2 then
+        return roll * 10
+    elseif ownedUtilities > 0 then
+        return roll * (10 + ownedUtilities)
+    else
+        return 0
+    end
+end
+
+local function GetRentForStation(asset: Types.Asset, participant: Types.Participant): number
+    local ownedStations = 0
+    for _, asset in participant.Assets do
+        if asset.AssetDescription.Colour == "Station" then
+            ownedStations += 1
+        end
+    end
+    return ownedStations * 25
+end
+
 module.Name = "Classic"
 module.Colours = Colours
 
@@ -80,6 +111,7 @@ module.Tiles = {
             Name = "King's Cross Station",
             Colour = "Station",
             Price = 200,
+            Rent = GetRentForStation,
         }
     },
     {
@@ -122,6 +154,7 @@ module.Tiles = {
             Name = "Electric Company",
             Colour = "Utility",
             Price = 150,
+            Rent = GetRentForUtility,
         }
     },
     {
@@ -143,6 +176,7 @@ module.Tiles = {
             Name = "Marylebone Station",
             Colour = "Station",
             Price = 200,
+            Rent = GetRentForStation,
         }
     },
     {
@@ -203,6 +237,7 @@ module.Tiles = {
             Name = "Fenchurch St Station",
             Colour = "Station",
             Price = 200,
+            Rent = GetRentForStation,
         }
     },
     {
@@ -224,6 +259,7 @@ module.Tiles = {
             Name = "Water Works",
             Colour = "Utility",
             Price = 150,
+            Rent = GetRentForUtility,
         }
     },
     {
@@ -267,6 +303,7 @@ module.Tiles = {
             Name = "Liverpool Street Station",
             Colour = "Station",
             Price = 200,
+            Rent = GetRentForStation,
         }
     },
     {

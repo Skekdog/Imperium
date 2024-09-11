@@ -65,6 +65,18 @@ local function StartRound(round: Types.Round): ()
     StartNextParticipantTurn(round)
 end
 
+local function TryGetAssetFromTile(round: Types.Round, tile: Types.Tile): Types.Asset?
+    local tileName = if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name
+    for _, v in round.Participants do
+        for _, asset in v.Assets do
+            if asset.AssetDescription.Name == tileName then
+                return asset
+            end
+        end
+    end
+    return
+end
+
 function module.new(board: Types.Board, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     assert(#board.Tiles % 4 == 0, "Board size must be a multiple of 4")
 
@@ -85,6 +97,7 @@ function module.new(board: Types.Board, tiles: {Types.Tile}, gameConfiguration: 
     round.GetParticipant = GetParticipant
     round.FindTileByName = FindTileByName
     round.StartRound = StartRound
+    round.TryGetAssetFromTile = TryGetAssetFromTile
 
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))
