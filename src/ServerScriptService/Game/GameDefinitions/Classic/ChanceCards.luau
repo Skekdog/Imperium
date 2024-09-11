@@ -26,7 +26,7 @@ module[3] = {
 module[4] = {
     Title = "Advance to the nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total ten times the amount thrown.",
     Effect = function(participant: Types.Participant): ()
-        local closestUtility = participant:FindClosestPositionByColour("Utility")
+        local closestUtility = participant:FindClosestForwardPositionByColour("Utility")
         assert(closestUtility, "No utilities found")
         participant:MoveTo(closestUtility)
     end
@@ -35,7 +35,7 @@ module[4] = {
 module[5] = {
     Title = "Advance to the nearest Railroad. If unowned, you may buy it from the Bank. If owned, pay owner twice the rental to which they are otherwise entitled.",
     Effect = function(participant: Types.Participant): ()
-        local closestRailroad = participant:FindClosestPositionByColour("Station")
+        local closestRailroad = participant:FindClosestForwardPositionByColour("Station")
         assert(closestRailroad, "No railroads found")
         participant:MoveTo(closestRailroad)
     end

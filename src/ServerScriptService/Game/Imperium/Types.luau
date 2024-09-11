@@ -94,7 +94,7 @@ export type Participant = {
     SendToJail: (Participant) -> (),
     LeaveJail: (Participant, skipTurn: boolean?) -> (),
 
-    FindClosestPositionByColour: (Participant, colour: string) -> number?,
+    FindClosestForwardPositionByColour: (Participant, colour: string) -> number?,
 
     GiveJailCard: (Participant) -> (),
     GiveMoney: (Participant, amount: number) -> (),

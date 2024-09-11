@@ -130,7 +130,7 @@ local function MoveToTileByName(participant: Types.Participant, name: string, mo
     MoveTo(participant, participant.Round:FindTileByName(name), moveDirectly)
 end
 
-local function FindClosestPositionByColour(participant: Types.Participant, colour: string): number?
+local function FindClosestForwardPositionByColour(participant: Types.Participant, colour: string): number?
     local validPositions: {number} = {}
     for i, v in participant.Round.Tiles do
         if v.TileDescription.Asset and v.TileDescription.Asset.Colour == colour then
@@ -140,7 +140,11 @@ local function FindClosestPositionByColour(participant: Types.Participant, colou
 
     local closest: {Position: number?, Distance: number} = {Position = nil, Distance = math.huge}
     for _, position in validPositions do
-        local distance = math.abs(position - participant.Position)
+        local distance = position - participant.Position
+        if distance < 0 then
+            distance += #participant.Round.Tiles
+        end
+        
         if distance < closest.Distance then
             closest = {Position = position, Distance = distance}
         end
@@ -230,7 +234,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.RollDice = RollDice
     participant.TryPlayMove = TryPlayMove
     participant.MoveToTileByName = MoveToTileByName
-    participant.FindClosestPositionByColour = FindClosestPositionByColour
+    participant.FindClosestForwardPositionByColour = FindClosestForwardPositionByColour
     participant.GiveJailCard = GiveJailCard
     participant.TransferJailCard = TransferJailCard
     participant.LeaveJail = LeaveJail
