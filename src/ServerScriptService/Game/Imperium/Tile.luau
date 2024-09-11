@@ -1,18 +1,12 @@
 local ServerStorage = game:GetService("ServerStorage")
+local Asset = require(script.Parent.Asset)
 local TileMath = require(script.Parent.Parent.TileMath)
 local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
 
-function module.new(boardConfiguration: Types.BoardConfiguration, position: number, tileDescription: Types.TileDescription): Types.Tile
-    local tile = {}
-
-    local name = TileUtils.GetName(tileDescription)
-    local colour = TileUtils.GetColour(tileDescription)
-
-    tile.TileDescription = tileDescription
-
+local function makeTileModel(boardConfiguration: Types.BoardConfiguration, position: number, name: string, colour: string): Types.TileModel
     local tilesPerRow = TileMath.GetTilesPerRow(#boardConfiguration.Tiles)
     local row = TileMath.GetRowFromPosition(position, #boardConfiguration.Tiles)
 
@@ -41,7 +35,6 @@ function module.new(boardConfiguration: Types.BoardConfiguration, position: numb
 
         model = edge
     end
-    tile.Model = model
 
     local posX, posZ = 1000, 1000
     local corner = (tilesPerRow - 1) * tileSizeZ / 2 + cornerRadius
@@ -75,6 +68,22 @@ function module.new(boardConfiguration: Types.BoardConfiguration, position: numb
     model:PivotTo(CFrame.new(posX, 0.6, posZ) * CFrame.Angles(0, math.rad(((row - 1) * -90) + 90), 0));
     (model :: Model).Parent = workspace:FindFirstChild("Board") or Instance.new("Folder", workspace)
     model.Parent.Name = "Board"
+
+    return model
+end
+
+function module.new(boardConfiguration: Types.BoardConfiguration, position: number, tileDescription: Types.TileDescription): Types.Tile
+    local tile = {}
+
+    local name = TileUtils.GetName(tileDescription)
+    local colour = TileUtils.GetColour(tileDescription)
+
+    tile.TileDescription = tileDescription
+    tile.Model = makeTileModel(boardConfiguration, position, name, colour)
+
+    if tile.TileDescription.AssetDescription then
+        tile.Asset = Asset.new(tile.TileDescription.AssetDescription)
+    end
 
     return tile
 end

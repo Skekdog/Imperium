@@ -22,6 +22,13 @@ local function RemoveAsset(participant: Types.Participant, asset: Types.Asset): 
     end
 end
 
+local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
+    assert(asset.Owner == "Bank", "Asset must be owned by bank")
+
+    participant:TransferMoneyTo("Bank", asset.AssetDescription.Price)
+    participant:GiveAsset(asset)
+end
+
 local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Money += amount
     participant.Player:SetAttribute("Money", participant.Money)
@@ -122,7 +129,18 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         moveCharacter(participant.Player.Character, tile, moveDirectly)
     end
 
-    participant:TryPayRent(tile)
+    local asset = tile.Asset
+    if asset then
+        local owner = asset.Owner
+
+        if owner ~= participant then
+            if owner == "Bank" then
+                PurchaseProperty(participant, asset)
+            else
+                participant:TryPayRent(tile)
+            end
+        end
+    end
 
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
@@ -263,6 +281,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.LeaveJail = LeaveJail
     participant.TryPayRent = TryPayRent
     participant.DrawCard = DrawCard
+
+    participant.PurchaseProperty = PurchaseProperty
 
     player:SetAttribute("Money", participant.Money)
 

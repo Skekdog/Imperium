@@ -127,6 +127,8 @@ export type Participant = {
     TransferJailCard: (Participant, to: AssetOwner) -> (),
 
     DrawCard: (Participant, card: CardDescription) -> (),
+
+    PurchaseProperty: (Participant, asset: Asset) -> (),
 }
 
 export type Board = {
