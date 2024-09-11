@@ -83,7 +83,8 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
     participant.PreviousPosition = participant.Position
-    if participant.Position == 1 and not moveDirectly and participant.LastMovedAt ~= 0 then
+    local passGo = (participant.Position == 1) or ((participant.Position > position) and (position ~= 1))
+    if passGo and not moveDirectly and participant.LastMovedAt ~= 0 then
         GiveMoney(participant, participant.Round.BoardConfiguration.PassGoMoney)
     end
 
