@@ -72,7 +72,14 @@ module[9] = {
 module[10] = {
     Title = "Make general repairs on all your property. For each house, pay £25. For each hotel, pay £100.",
     Effect = function(participant: Types.Participant): ()
-        
+        local houses = 0
+        local hotels = 0
+        for _, asset in participant.Assets do
+            houses += asset.Houses
+            hotels += asset.Hotels
+        end
+
+        participant:TransferMoneyTo("Bank", -((houses * 25) + (hotels * 100)))
     end
 }
 
