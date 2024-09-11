@@ -75,6 +75,7 @@ local function Mortgage(asset: Types.Asset): ()
     assert(asset.Owner ~= "Bank", "The bank cannot mortgage")
 
     asset.IsMortgaged = true
+    asset:SellAllDevelopments()
     asset.Owner:GiveMoney(GetMortgageValue(asset))
 end
 
