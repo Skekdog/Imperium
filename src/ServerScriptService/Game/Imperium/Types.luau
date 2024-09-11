@@ -125,6 +125,8 @@ export type Participant = {
     TransferAssetTo: (Participant, to: AssetOwner, asset: Asset) -> (),
     TransferMoneyTo: (Participant, to: AssetOwner, amount: number) -> (),
     TransferJailCard: (Participant, to: AssetOwner) -> (),
+
+    DrawCard: (Participant, card: CardDescription) -> (),
 }
 
 export type Board = {

@@ -78,6 +78,10 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
     end
 end
 
+local function DrawCard(participant: Types.Participant, card: Types.CardDescription): ()
+    card.Effect(participant)
+end
+
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
@@ -258,6 +262,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.TransferJailCard = TransferJailCard
     participant.LeaveJail = LeaveJail
     participant.TryPayRent = TryPayRent
+    participant.DrawCard = DrawCard
 
     player:SetAttribute("Money", participant.Money)
 
