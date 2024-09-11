@@ -36,7 +36,11 @@ export type AssetDescription = {
     Name: string,
     Colour: string,
     Price: number,
-    Rent: ((Asset, Participant) -> number)?,
+    Rent: ((Asset, Participant) -> number) | {
+        Default: number,
+        Houses: {[number]: number?},
+        Hotels: {[number]: number?},
+    }
 }
 
 export type TileDescription = {
@@ -70,6 +74,8 @@ export type Asset = {
     DevelopProperty: (Asset, development: "House" | "Hotel") -> (),
     SellDevelopment: (Asset) -> (),
     SellAllDevelopments: (Asset) -> (),
+
+    GetRentCost: (Asset, participant: Participant) -> number,
 }
 
 export type EdgeTile = typeof(ServerStorage.Game.Tile)

@@ -221,19 +221,7 @@ local function TryPayRent(participant: Types.Participant, tile: Types.Tile): ()
         return
     end
 
-    local rent: number
-    if asset.AssetDescription.Rent then
-        rent = asset.AssetDescription.Rent(asset, participant)
-    else
-        local initialPrice = asset.AssetDescription.Price
-        local houses = asset.Houses
-        local hotels = asset.Hotels
-
-        --todo: double check that this formula is correct (because it ain't correct)
-        rent = (initialPrice / 20) + (houses * (initialPrice / 8)) + (hotels * (initialPrice / 10))
-    end
-
-    participant:TransferMoneyTo(asset.Owner, rent)
+    participant:TransferMoneyTo(asset.Owner, asset:GetRentCost(participant))
 end
 
 function module.new(player: Player, round: Types.Round): Types.Participant

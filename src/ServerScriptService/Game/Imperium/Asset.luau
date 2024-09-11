@@ -86,6 +86,15 @@ local function UnMortgage(asset: Types.Asset): ()
     asset.Owner:TransferMoneyTo("Bank", GetUnMortgageCost(asset))
 end
 
+local function GetRentCost(asset: Types.Asset, participant: Types.Participant): number
+    if typeof(asset.AssetDescription.Rent) == "function" then
+        return asset.AssetDescription.Rent(asset, participant)
+    end
+
+    local rentTable = asset.AssetDescription.Rent
+    return rentTable.Houses[asset.Houses] or rentTable.Hotels[asset.Hotels] or rentTable.Default
+end
+
 function module.new(description: Types.AssetDescription): Types.Asset
     local asset = {}
 
@@ -106,6 +115,8 @@ function module.new(description: Types.AssetDescription): Types.Asset
     asset.DevelopProperty = DevelopProperty
     asset.SellDevelopment = SellDevelopment
     asset.SellAllDevelopments = SellAllDevelopments
+
+    asset.GetRentCost = GetRentCost
 
     return asset
 end

@@ -89,6 +89,11 @@ module.Tiles = {
             Name = "Old Kent Road",
             Colour = "Brown",
             Price = 60,
+            Rent = {
+                Default = 2,
+                Houses = {10, 30, 90, 160},
+                Hotels = {250},
+            },
         }
     },
     {
@@ -100,6 +105,11 @@ module.Tiles = {
             Name = "Whitechapel Road",
             Colour = "Brown",
             Price = 60,
+            Rent = {
+                Default = 4,
+                Houses = {20, 60, 180, 320},
+                Hotels = {450},
+            },
         }
     },
     {
@@ -119,6 +129,11 @@ module.Tiles = {
             Name = "The Angel Islington",
             Colour = "Light Blue",
             Price = 100,
+            Rent = {
+                Default = 6,
+                Houses = {30, 90, 270, 400},
+                Hotels = {550},
+            },
         }
     },
     {
@@ -130,6 +145,11 @@ module.Tiles = {
             Name = "Euston Road",
             Colour = "Light Blue",
             Price = 100,
+            Rent = {
+                Default = 6,
+                Houses = {30, 90, 270, 400},
+                Hotels = {550},
+            },
         }
     },
     {
@@ -137,6 +157,11 @@ module.Tiles = {
             Name = "Pentonville Road",
             Colour = "Light Blue",
             Price = 120,
+            Rent = {
+                Default = 8,
+                Houses = {40, 100, 300, 450},
+                Hotels = {600},
+            },
         }
     },
     {
@@ -147,6 +172,11 @@ module.Tiles = {
             Name = "Pall Mall",
             Colour = "Pink",
             Price = 140,
+            Rent = {
+                Default = 10,
+                Houses = {50, 150, 450, 625},
+                Hotels = {750},
+            },
         }
     },
     {
@@ -162,6 +192,11 @@ module.Tiles = {
             Name = "Whitehall",
             Colour = "Pink",
             Price = 140,
+            Rent = {
+                Default = 10,
+                Houses = {50, 150, 450, 625},
+                Hotels = {750},
+            },
         }
     },
     {
@@ -169,6 +204,11 @@ module.Tiles = {
             Name = "Northumberland Avenue",
             Colour = "Pink",
             Price = 160,
+            Rent = {
+                Default = 12,
+                Houses = {60, 180, 500, 700},
+                Hotels = {900},
+            },
         }
     },
     {
@@ -184,6 +224,11 @@ module.Tiles = {
             Name = "Bow Street",
             Colour = "Orange",
             Price = 180,
+            Rent = {
+                Default = 14,
+                Houses = {70, 200, 550, 750},
+                Hotels = {950},
+            },
         }
     },
     {
@@ -195,6 +240,11 @@ module.Tiles = {
             Name = "Marlborough Street",
             Colour = "Orange",
             Price = 180,
+            Rent = {
+                Default = 14,
+                Houses = {70, 200, 550, 750},
+                Hotels = {950},
+            },
         }
     },
     {
@@ -202,6 +252,11 @@ module.Tiles = {
             Name = "Vine Street",
             Colour = "Orange",
             Price = 200,
+            Rent = {
+                Default = 16,
+                Houses = {80, 220, 600, 800},
+                Hotels = {1000},
+            },
         }
     },
     {
@@ -212,6 +267,11 @@ module.Tiles = {
             Name = "Strand",
             Colour = "Red",
             Price = 220,
+            Rent = {
+                Default = 18,
+                Houses = {90, 250, 700, 875},
+                Hotels = {1050},
+            },
         }
     },
     {
@@ -223,6 +283,11 @@ module.Tiles = {
             Name = "Fleet Street",
             Colour = "Red",
             Price = 220,
+            Rent = {
+                Default = 18,
+                Houses = {90, 250, 700, 875},
+                Hotels = {1050},
+            },
         }
     },
     {
@@ -230,6 +295,11 @@ module.Tiles = {
             Name = "Trafalgar Square",
             Colour = "Red",
             Price = 240,
+            Rent = {
+                Default = 20,
+                Houses = {100, 300, 750, 925},
+                Hotels = {1100},
+            },
         }
     },
     {
@@ -245,6 +315,11 @@ module.Tiles = {
             Name = "Leicester Square",
             Colour = "Yellow",
             Price = 260,
+            Rent = {
+                Default = 22,
+                Houses = {110, 330, 800, 975},
+                Hotels = {1150},
+            },
         }
     },
     {
@@ -252,6 +327,11 @@ module.Tiles = {
             Name = "Coventry Street",
             Colour = "Yellow",
             Price = 260,
+            Rent = {
+                Default = 22,
+                Houses = {110, 330, 800, 975},
+                Hotels = {1150},
+            },
         }
     },
     {
@@ -267,6 +347,11 @@ module.Tiles = {
             Name = "Piccadilly",
             Colour = "Yellow",
             Price = 280,
+            Rent = {
+                Default = 24,
+                Houses = {120, 360, 850, 1025},
+                Hotels = {1200},
+            },
         }
     },
     {
@@ -278,6 +363,11 @@ module.Tiles = {
             Name = "Regent Street",
             Colour = "Green",
             Price = 300,
+            Rent = {
+                Default = 26,
+                Houses = {130, 390, 900, 1100},
+                Hotels = {1275},
+            },
         }
     },
     {
@@ -285,6 +375,11 @@ module.Tiles = {
             Name = "Oxford Street",
             Colour = "Green",
             Price = 300,
+            Rent = {
+                Default = 26,
+                Houses = {130, 390, 900, 1100},
+                Hotels = {1275},
+            },
         }
     },
     {
@@ -296,6 +391,11 @@ module.Tiles = {
             Name = "Bond Street",
             Colour = "Green",
             Price = 320,
+            Rent = {
+                Default = 28,
+                Houses = {150, 450, 1000, 1200},
+                Hotels = {1400},
+            },
         }
     },
     {
@@ -315,6 +415,11 @@ module.Tiles = {
             Name = "Park Lane",
             Colour = "Dark Blue",
             Price = 350,
+            Rent = {
+                Default = 35,
+                Houses = {175, 500, 1100, 1300},
+                Hotels = {1500},
+            },
         }
     },
     {
@@ -326,8 +431,13 @@ module.Tiles = {
             Name = "Mayfair",
             Colour = "Dark Blue",
             Price = 400,
+            Rent = {
+                Default = 50,
+                Houses = {200, 600, 1400, 1700},
+                Hotels = {2000},
+            },
         }
-    }
+    },
 }
 
 local typeCheck: Types.BoardConfiguration = module
