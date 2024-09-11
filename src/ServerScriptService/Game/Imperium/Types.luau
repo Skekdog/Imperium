@@ -53,14 +53,23 @@ export type CardDescription = {
 export type Asset = {
     AssetDescription: AssetDescription,
 
+    IsMortgaged: boolean,
     Owner: AssetOwner,
     Houses: number,
     Hotels: number,
 
-    TransferTo: (Asset, AssetOwner) -> (),
+    TransferTo: (Asset, to: AssetOwner) -> (),
     
     Mortgage: (Asset) -> (),
-    Unmortgaged: (Asset) -> (),
+    UnMortgage: (Asset) -> (),
+
+    GetMortgageValue: (Asset) -> number,
+    GetUnMortgageCost: (Asset) -> number,
+
+    GetDevelopmentCost: (Asset, development: "House" | "Hotel") -> number,
+    DevelopProperty: (Asset, development: "House" | "Hotel") -> (),
+    SellDevelopment: (Asset) -> (),
+    SellAllDevelopments: (Asset) -> (),
 }
 
 export type EdgeTile = typeof(ServerStorage.Game.Tile)
