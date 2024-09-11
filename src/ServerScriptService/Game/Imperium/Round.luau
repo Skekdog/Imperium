@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Board = require(script.Parent.Board)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
@@ -39,15 +40,6 @@ local function GetParticipant(round: Types.Round, player: Player): Types.Partici
     error(`Participant {player} not found`)
 end
 
-local function FindTileByName(round: Types.Round, name: string): number
-    for i, tile in round.Tiles do
-        if tile.TileDescription.Name == name or (tile.TileDescription.Asset and tile.TileDescription.Asset.Name == name) then
-            return i
-        end
-    end
-    error(`Tile {name} not found`)
-end
-
 local function StartRound(round: Types.Round): ()
     if round.Started then
         error("Round already started")
@@ -65,24 +57,11 @@ local function StartRound(round: Types.Round): ()
     StartNextParticipantTurn(round)
 end
 
-local function TryGetAssetFromTile(round: Types.Round, tile: Types.Tile): Types.Asset?
-    local tileName = if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name
-    for _, v in round.Participants do
-        for _, asset in v.Assets do
-            if asset.AssetDescription.Name == tileName then
-                return asset
-            end
-        end
-    end
-    return
-end
-
-function module.new(board: Types.Board, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
-    assert(#board.Tiles % 4 == 0, "Board size must be a multiple of 4")
-
+function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     local round = {}
 
-    round.Board = board
+    round.Board = Board.new(tiles)
+    round.BoardConfiguration = boardConfiguration
     round.GameConfiguration = gameConfiguration
 
     round.Started = false
@@ -95,9 +74,7 @@ function module.new(board: Types.Board, tiles: {Types.Tile}, gameConfiguration: 
 
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.GetParticipant = GetParticipant
-    round.FindTileByName = FindTileByName
     round.StartRound = StartRound
-    round.TryGetAssetFromTile = TryGetAssetFromTile
 
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))

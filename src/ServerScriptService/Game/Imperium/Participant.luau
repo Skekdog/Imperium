@@ -79,11 +79,11 @@ end
 
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
-    assert(position <= #participant.Round.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
+    assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
     participant.PreviousPosition = participant.Position
     if participant.Position == 1 and not moveDirectly and participant.LastMovedAt ~= 0 then
-        GiveMoney(participant, participant.Round.Board.PassGoMoney)
+        GiveMoney(participant, participant.Round.BoardConfiguration.PassGoMoney)
     end
 
     if not intialMove then
@@ -91,12 +91,12 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     end
     participant.Position = position
 
-    local tile = participant.Round.Tiles[position]
+    local tile = participant.Board.Tiles[position]
 
     print(`Moved to {if tile.TileDescription.Asset then tile.TileDescription.Asset.Name else tile.TileDescription.Name}`)
 
     if not moveDirectly then
-        local allTiles = participant.Round.Tiles
+        local allTiles = participant.Board.Tiles
         local targetRow = TileUtils.GetRowFromPosition(position, #allTiles)
         local currentPosition = participant.PreviousPosition
 
@@ -104,7 +104,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         local currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
         while currentRow ~= targetRow do
             local nextCornerPosition = TileUtils.GetWrapAround(TileUtils.GetNextCornerPosition(currentPosition, #allTiles), #allTiles)
-            local nextCorner = participant.Round.Tiles[nextCornerPosition]
+            local nextCorner = participant.Board.Tiles[nextCornerPosition]
 
             currentPosition = nextCornerPosition
             currentRow = TileUtils.GetRowFromPosition(currentPosition, #allTiles)
@@ -124,17 +124,17 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
-    local position = TileUtils.GetWrapAround(participant.Position + amount, #participant.Round.Tiles)
+    local position = TileUtils.GetWrapAround(participant.Position + amount, #participant.Board.Tiles)
     MoveTo(participant, position)
 end
 
 local function MoveToTileByName(participant: Types.Participant, name: string, moveDirectly: boolean?): ()
-    MoveTo(participant, participant.Round:FindTileByName(name), moveDirectly)
+    MoveTo(participant, participant.Board:FindTileByName(name), moveDirectly)
 end
 
 local function FindClosestForwardPositionByColour(participant: Types.Participant, colour: string): number?
     local validPositions: {number} = {}
-    for i, v in participant.Round.Tiles do
+    for i, v in participant.Board.Tiles do
         if v.TileDescription.Asset and v.TileDescription.Asset.Colour == colour then
             table.insert(validPositions, i)
         end
@@ -144,7 +144,7 @@ local function FindClosestForwardPositionByColour(participant: Types.Participant
     for _, position in validPositions do
         local distance = position - participant.Position
         if distance < 0 then
-            distance += #participant.Round.Tiles
+            distance += #participant.Board.Tiles
         end
         
         if distance < closest.Distance then
@@ -175,9 +175,9 @@ end
 local function TryPlayMove(participant: Types.Participant): ()
     SetTimeMilestone(nil)
     if participant.JailedOn ~= 0 then
-        if participant.JailedOn <= participant.Round.Turn - participant.Round.Board.JailLength then
+        if participant.JailedOn <= participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
             LeaveJail(participant)
-        elseif participant.Round.Board.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
+        elseif participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
             LeaveJail(participant)
         end
     else
@@ -185,7 +185,7 @@ local function TryPlayMove(participant: Types.Participant): ()
         if roll.IsDoubles then
             participant.DoublesStreak += 1
 
-            if participant.DoublesStreak >= participant.Round.Board.DoublesConsecutiveJailAmount then
+            if participant.DoublesStreak >= participant.Round.BoardConfiguration.DoublesConsecutiveJailAmount then
                 return SendToJail(participant)
             end
         else
@@ -211,7 +211,7 @@ local function TransferJailCard(participant: Types.Participant, to: Types.AssetO
 end
 
 local function TryPayRent(participant: Types.Participant, tile: Types.Tile): ()
-    local asset = participant.Round:TryGetAssetFromTile(tile)
+    local asset = tile.Asset
     if not asset then
         return
     end
@@ -240,9 +240,10 @@ function module.new(player: Player, round: Types.Round): Types.Participant
 
     participant.Player = player
     participant.Round = round
+    participant.Board = round.Board
 
-    participant.JailCards = round.Board.StartingJailCards
-    participant.Money = round.Board.StartingMoney
+    participant.JailCards = round.BoardConfiguration.StartingJailCards
+    participant.Money = round.BoardConfiguration.StartingMoney
     participant.Assets = {}
 
     participant.LastMovedAt = 0

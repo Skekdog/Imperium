@@ -4,7 +4,7 @@ local Types = require(script.Parent.Types)
 
 local module = {}
 
-function module.new(board: Types.Board, position: number, tileDescription: Types.TileDescription): Types.Tile
+function module.new(boardConfiguration: Types.BoardConfiguration, position: number, tileDescription: Types.TileDescription): Types.Tile
     local tile = {}
 
     local name = tileDescription.Name
@@ -18,8 +18,8 @@ function module.new(board: Types.Board, position: number, tileDescription: Types
 
     tile.TileDescription = tileDescription
 
-    local tilesPerRow = TileUtils.GetTilesPerRow(#board.Tiles)
-    local row = TileUtils.GetRowFromPosition(position, #board.Tiles)
+    local tilesPerRow = TileUtils.GetTilesPerRow(#boardConfiguration.Tiles)
+    local row = TileUtils.GetRowFromPosition(position, #boardConfiguration.Tiles)
 
     local offset = (position - 1) % tilesPerRow
     local isCorner = offset == 0
@@ -40,7 +40,7 @@ function module.new(board: Types.Board, position: number, tileDescription: Types
         edge.Name = "TileEdge" .. tostring(position)
 
         edge.Title.TitleUI.TextLabel.Text = name
-        edge.Title.Color = board.Colours[colour] or board.Colours.Default
+        edge.Title.Color = boardConfiguration.Colours[colour] or boardConfiguration.Colours.Default
 
         edge.Base.BaseUI.Owner.Text = ""
 

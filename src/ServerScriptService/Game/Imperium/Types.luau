@@ -6,7 +6,7 @@ export type DiceRollResult = {
     IsDoubles: boolean,
 }
 
-export type Board = {
+export type BoardConfiguration = {
     Name: string,
     Tiles: {TileDescription},
     Colours: {[string]: Color3, Default: Color3},
@@ -68,6 +68,7 @@ export type CornerTile = typeof(ServerStorage.Game.CornerTile)
 export type TileModel = EdgeTile | CornerTile
 
 export type Tile = {
+    Asset: Asset?,
     TileDescription: TileDescription,
     Model: TileModel
 }
@@ -75,6 +76,7 @@ export type Tile = {
 export type Participant = {
     Player: Player,
     Round: Round,
+    Board: Board,
 
     Money: number,
     JailCards: number,
@@ -110,23 +112,26 @@ export type Participant = {
     TransferJailCard: (Participant, to: AssetOwner) -> (),
 }
 
+export type Board = {
+    Tiles: {Tile},
+
+    FindTileByName: (Board, name: string) -> number,
+}
+
 export type Round = {
-    Board: Board,
+    BoardConfiguration: BoardConfiguration,
     GameConfiguration: GameConfiguration,
 
+    Board: Board,
     Started: boolean,
     Turn: Turn,
-    CurrentParticipant: Participant,
-
+   
     Participants: {Participant},
-    Tiles: {Tile},
+    CurrentParticipant: Participant,
 
     StartRound: (Round) -> (),
     GetParticipant: (Round, player: Player) -> Participant,
     StartNextParticipantTurn: (Round) -> (),
-    FindTileByName: (Round, name: string) -> number,
-
-    TryGetAssetFromTile: (Round, tile: Tile) -> Asset?,
 }
 
 return {}

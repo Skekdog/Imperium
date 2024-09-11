@@ -330,5 +330,5 @@ module.Tiles = {
     }
 }
 
-local typeCheck: Types.Board = module
+local typeCheck: Types.BoardConfiguration = module
 return typeCheck
