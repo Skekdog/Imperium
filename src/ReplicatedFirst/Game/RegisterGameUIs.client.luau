@@ -7,3 +7,6 @@ end
 
 UIManager.RegisterUI(UIManager.UnregisteredUIs.Playerlist)
 UIManager.RegisterUI(UIManager.UnregisteredUIs.CurrentTurnIndicator)
+UIManager.RegisterUI(UIManager.UnregisteredUIs.RollDice)
+UIManager.RegisterUI(UIManager.UnregisteredUIs.BuyProperty)
+UIManager.RegisterUI(UIManager.UnregisteredUIs.AuctionProperty)

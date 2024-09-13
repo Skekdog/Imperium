@@ -24,7 +24,7 @@ local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateS
 if not info then
     local temp = {
         Players = if RunService:IsStudio() then 1 else 8,
-        TurnDuration = 1,
+        TurnDuration = 15,
         AuctionTime = 15,
     }
     info = temp
