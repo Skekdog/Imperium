@@ -30,6 +30,8 @@ local function StartNextParticipantTurn(round: Types.Round): ()
     ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
     SetTimeMilestone(round.GameConfiguration.PlayerTurnTime)
 
+    ReplicatedStorage.Game.ServerClient.BeginTurn:FireAllClients(nextParticipant.Player.Name)
+
     task.delay(round.GameConfiguration.PlayerTurnTime, function()
         if lastMovedAt ~= nextParticipant.LastMovedAt then
             return

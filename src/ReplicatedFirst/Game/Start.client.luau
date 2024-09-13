@@ -10,15 +10,8 @@ local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
 local rollDice = UIManager.WaitForUI("RollDice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RollDice)}
-ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
-    local name = ReplicatedStorage:GetAttribute("CurrentPlayer")
-    if not name then
-        return rollDice:ToggleVisible(false)
-    end
-
-    if name == Players.LocalPlayer.Name then
-        rollDice:ToggleVisible(true)
-    end
+gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
+    rollDice:ToggleVisible(name == Players.LocalPlayer.Name)
 end)
 
 rollDice.Object.Activated:Connect(RollDice)
