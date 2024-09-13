@@ -35,6 +35,10 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
     while not responded and os.time() - startTime < duration do
         task.wait()
     end
+
+    if not responded then
+        ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, nil)
+    end
 end
 
 local function GiveMoney(participant: Types.Participant, amount: number): ()
@@ -137,6 +141,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
         if owner ~= participant then
             if owner == "Bank" then
+                participant.ValidPropertyPurchaseTurn = participant.Round.Turn
                 PromptPurchaseProperty(participant, asset)
             else
                 participant:TryPayRent(tile)

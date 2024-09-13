@@ -102,6 +102,8 @@ export type Participant = {
     LastMovedAt: number,
     PreviousPosition: number,
     Position: number,
+
+    ValidPropertyPurchaseTurn: number?,
     
     JailedOn: number,
     DoublesStreak: number,

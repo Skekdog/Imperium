@@ -79,9 +79,10 @@ gameClientServer.RespondPropertyPurchase.OnServerEvent:Connect(function(plr, acc
     end
 
     local participant = round:GetParticipant(plr)
-    if round.CurrentParticipant ~= participant then
+    if round.CurrentParticipant ~= participant or participant.ValidPropertyPurchaseTurn ~= round.Turn then
         return
     end
+    participant.ValidPropertyPurchaseTurn = nil
 
     if accepted then
         local tile = round.Board:TryFindTileByName(propertyName)

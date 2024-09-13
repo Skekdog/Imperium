@@ -20,20 +20,24 @@ rollDice.Object.Activated:Connect(RollDice)
 local buyPropertyUI = UIManager.WaitForUI("BuyProperty") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.BuyProperty)}
 local acceptBuyCon: RBXScriptConnection?
 local declineBuyCon: RBXScriptConnection?
-gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(description: {Name: string, Price: number})
+gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(description: {Name: string, Price: number}?)
     if acceptBuyCon then
         acceptBuyCon:Disconnect()
     end
     if declineBuyCon then
         declineBuyCon:Disconnect()
     end
+
+    if not description then
+        return buyPropertyUI:ToggleVisible(false)
+    end
+
+    buyPropertyUI:ToggleVisible(true)
     
     local object = buyPropertyUI.Object
     object.PropertyName.Text = description.Name
     object.Price.Text = "£" .. description.Price
     object.TextLabel.Text = `Would you like to purchase {description.Name} for £{description.Price}?`
-
-    buyPropertyUI:ToggleVisible(true)
 
     local function makeChoice(accepted: boolean)
         buyPropertyUI:ToggleVisible(false)
