@@ -8,26 +8,33 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local function StartNextParticipantTurn(round: Types.Round): ()
-    local lastIndex = table.find(round.Participants, round.CurrentParticipant)
-    assert(lastIndex, "Round has no current participant")
+    local lastIndex: number? = 0
+    if round.CurrentParticipant then
+        lastIndex = table.find(round.Participants, round.CurrentParticipant)
+        assert(lastIndex, "Round has no current participant")
+    end
+    assert(lastIndex)
 
     if lastIndex >= #round.Participants then
         round.Turn += 1
         lastIndex = 0
     end
+
     lastIndex += 1
 
-    local lastMovedAt = round.CurrentParticipant.LastMovedAt
+    local nextParticipant = round.Participants[lastIndex]    
+    round.CurrentParticipant = nextParticipant
 
-    round.CurrentParticipant = round.Participants[lastIndex]
-    ReplicatedStorage:SetAttribute("CurrentPlayer", round.CurrentParticipant.Player.Name)
+    local lastMovedAt = nextParticipant.LastMovedAt
+
+    ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
     SetTimeMilestone(round.GameConfiguration.PlayerTurnTime)
 
     task.delay(round.GameConfiguration.PlayerTurnTime, function()
-        if lastMovedAt ~= round.CurrentParticipant.LastMovedAt then
+        if lastMovedAt ~= nextParticipant.LastMovedAt then
             return
         end
-        round.CurrentParticipant:TryPlayMove()
+        nextParticipant:TryPlayMove()
     end)
 end
 
@@ -70,7 +77,6 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.Tiles = tiles
     
     round.Participants = {}
-    round.CurrentParticipant = nil :: any
 
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.GetParticipant = GetParticipant
@@ -79,6 +85,8 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))
     end
+
+    Random.new():Shuffle(round.Participants)
 
     round.CurrentParticipant = round.Participants[#round.Participants]
 

@@ -146,7 +146,7 @@ export type Round = {
     Turn: Turn,
    
     Participants: {Participant},
-    CurrentParticipant: Participant,
+    CurrentParticipant: Participant?,
 
     StartRound: (Round) -> (),
     GetParticipant: (Round, player: Player) -> Participant,
