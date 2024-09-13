@@ -205,6 +205,7 @@ end
 
 local function TryPlayMove(participant: Types.Participant): ()
     SetTimeMilestone(nil)
+    ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
     if participant.JailedOn ~= 0 then
         if participant.JailedOn <= participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
             LeaveJail(participant)

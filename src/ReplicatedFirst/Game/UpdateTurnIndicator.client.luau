@@ -20,7 +20,12 @@ ReplicatedStorage:GetAttributeChangedSignal("WaitingText"):Connect(setWaitingTex
 setWaitingText()
 
 ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
-    local player = Players:FindFirstChild(ReplicatedStorage:GetAttribute("CurrentPlayer") :: string)
+    local name = ReplicatedStorage:GetAttribute("CurrentPlayer") :: string?
+    if not name then
+        return
+    end
+
+    local player = Players:FindFirstChild(name)
     if not player or not player:IsA("Player") then
         object.Turn.Text = "Unknown Player's Turn"
         return
