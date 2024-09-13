@@ -51,6 +51,12 @@
             "$properties": {
                 "GlobalShadows": false
             }
+        },
+        "Workspace": {
+            "$className": "Workspace",
+            "$properties": {
+                "StreamingEnabled": false
+            }
         }
     }
 }
