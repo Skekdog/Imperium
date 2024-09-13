@@ -129,6 +129,7 @@ export type Participant = {
     DrawCard: (Participant, card: CardDescription) -> (),
 
     PurchaseProperty: (Participant, asset: Asset) -> (),
+    PromptPurchaseProperty: (Participant, asset: Asset) -> (),
 }
 
 export type Board = {

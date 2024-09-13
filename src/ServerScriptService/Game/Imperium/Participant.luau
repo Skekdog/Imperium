@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local TileMath = require(script.Parent.Parent.TileMath)
 local TileUtils = require(script.Parent.TileUtils)
@@ -27,6 +28,12 @@ local function PurchaseProperty(participant: Types.Participant, asset: Types.Ass
 
     participant:TransferMoneyTo("Bank", asset.AssetDescription.Price)
     participant:GiveAsset(asset)
+end
+
+local function PromptPurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
+    assert(asset.Owner == "Bank", "Asset must be owned by bank")
+
+    ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, asset.AssetDescription)
 end
 
 local function GiveMoney(participant: Types.Participant, amount: number): ()
@@ -283,6 +290,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.DrawCard = DrawCard
 
     participant.PurchaseProperty = PurchaseProperty
+    participant.PromptPurchaseProperty = PromptPurchaseProperty
 
     player:SetAttribute("Money", participant.Money)
 
