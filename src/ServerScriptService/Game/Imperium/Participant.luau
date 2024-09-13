@@ -23,6 +23,18 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
     assert(asset.Owner == "Bank", "Asset must be owned by bank")
 
     ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, asset.AssetDescription)
+
+    local startTime = os.time()
+    local responded = false
+    ReplicatedStorage.Game.ClientServer.RespondPropertyPurchase.OnServerEvent:Once(function()
+        responded = true
+    end)
+
+    local duration = participant.Round.GameConfiguration.PlayerTurnTime
+    SetTimeMilestone(duration)
+    while not responded and os.time() - startTime < duration do
+        task.wait()
+    end
 end
 
 local function GiveMoney(participant: Types.Participant, amount: number): ()
