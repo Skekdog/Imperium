@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -52,3 +53,11 @@ gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(descripti
         makeChoice(false)
     end)
 end)
+
+local moneyDisplay = UIManager.WaitForUI("MoneyDisplay") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.MoneyDisplay)}
+local function updateMoney()
+    moneyDisplay.Object.Text = "£" .. Players.LocalPlayer:GetAttribute("Money") :: number
+end
+moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
+Players.LocalPlayer:GetAttributeChangedSignal("Money"):Connect(updateMoney)
+updateMoney()
