@@ -81,6 +81,8 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
+    participant.IsMoving = true
+
     participant.PreviousPosition = participant.Position
     local passGo = (participant.Position == 1) or ((participant.Position > position) and (position ~= 1))
     if passGo and not moveDirectly and participant.LastMovedAt ~= 0 then
@@ -133,6 +135,8 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
     end
+
+    participant.IsMoving = false
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
@@ -247,6 +251,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.Money = round.BoardConfiguration.StartingMoney
     participant.Assets = {}
 
+    participant.IsMoving = false
     participant.LastMovedAt = 0
     participant.DoublesStreak = 0
     participant.PreviousPosition = 0

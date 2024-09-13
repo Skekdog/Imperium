@@ -98,9 +98,11 @@ export type Participant = {
     JailCards: number,
     Assets: {Asset},
 
+    IsMoving: boolean,
     LastMovedAt: number,
     PreviousPosition: number,
     Position: number,
+    
     JailedOn: number,
     DoublesStreak: number,
 

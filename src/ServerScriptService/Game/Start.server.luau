@@ -68,7 +68,7 @@ local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 gameClientServer.RollDice.OnServerEvent:Connect(function(plr)
     local participant = round:GetParticipant(plr)
 
-    if round.CurrentParticipant == participant then
+    if round.CurrentParticipant == participant and not participant.IsMoving then
         participant:TryPlayMove()
     end
 end)
