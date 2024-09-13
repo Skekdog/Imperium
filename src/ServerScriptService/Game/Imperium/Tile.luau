@@ -78,6 +78,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, position: numb
     local name = TileUtils.GetName(tileDescription)
     local colour = TileUtils.GetColour(tileDescription)
 
+    tile.Position = position
     tile.TileDescription = tileDescription
     tile.Model = makeTileModel(boardConfiguration, position, name, colour)
 

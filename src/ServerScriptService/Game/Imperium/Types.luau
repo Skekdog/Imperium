@@ -84,6 +84,7 @@ export type TileModel = EdgeTile | CornerTile
 
 export type Tile = {
     TileDescription: TileDescription,
+    Position: number,
     Model: TileModel,
     Asset: Asset?,
 }
@@ -135,7 +136,8 @@ export type Participant = {
 export type Board = {
     Tiles: {Tile},
 
-    FindTileByName: (Board, name: string) -> number,
+    TryFindTileByName: (Board, name: string) -> Tile?,
+    FindTileByName: (Board, name: string) -> Tile,
 }
 
 export type Round = {

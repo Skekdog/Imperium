@@ -57,7 +57,15 @@ local round = Round.new(Classic, tiles, {
     AuctionTime = auctionTime,
 })
 
-ReplicatedStorage.Game.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
+SetWaitingText("Starting soon...", INTERMISSION_DURATION)
+task.wait(INTERMISSION_DURATION)
+
+SetWaitingText(nil, 0)
+round:StartRound()
+
+local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
+
+gameClientServer.RollDice.OnServerEvent:Connect(function(plr)
     local participant = round:GetParticipant(plr)
 
     if round.CurrentParticipant == participant then
@@ -65,8 +73,29 @@ ReplicatedStorage.Game.ClientServer.RollDice.OnServerEvent:Connect(function(plr)
     end
 end)
 
-SetWaitingText("Starting soon...", INTERMISSION_DURATION)
-task.wait(INTERMISSION_DURATION)
+gameClientServer.RespondPropertyPurchase.OnServerEvent:Connect(function(plr, accepted: unknown, propertyName: unknown)
+    if typeof(accepted) ~= "boolean" or typeof(propertyName) ~= "string" then
+        return
+    end
 
-SetWaitingText(nil, 0)
-round:StartRound()
+    local participant = round:GetParticipant(plr)
+    if round.CurrentParticipant ~= participant then
+        return
+    end
+
+    if accepted then
+        local tile = round.Board:TryFindTileByName(propertyName)
+        if not tile or not tile.Asset or tile.Position ~= participant.Position then
+            return
+        end
+        
+        local asset = tile.Asset
+        assert(asset)
+
+        if asset.Owner ~= "Bank" then
+            return
+        end
+
+        participant:PurchaseProperty(asset)
+    end
+end)

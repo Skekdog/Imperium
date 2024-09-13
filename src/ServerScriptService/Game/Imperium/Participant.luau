@@ -142,7 +142,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
         if owner ~= participant then
             if owner == "Bank" then
-                PurchaseProperty(participant, asset)
+                PromptPurchaseProperty(participant, asset)
             else
                 participant:TryPayRent(tile)
             end
@@ -160,7 +160,7 @@ local function MoveBy(participant: Types.Participant, amount: number): ()
 end
 
 local function MoveToTileByName(participant: Types.Participant, name: string, moveDirectly: boolean?): ()
-    MoveTo(participant, participant.Board:FindTileByName(name), moveDirectly)
+    MoveTo(participant, participant.Board:FindTileByName(name).Position, moveDirectly)
 end
 
 local function FindClosestForwardPositionByColour(participant: Types.Participant, colour: string): number?
