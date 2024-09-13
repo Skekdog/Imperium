@@ -77,7 +77,7 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
             break
         end
         hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
-        task.wait(0.1) -- We don't need to wait really because MoveTo is blocking, but why not
+        task.wait() -- We don't need to wait really because MoveTo is blocking, but why not
     until os.time() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION
     
     if not reached then
