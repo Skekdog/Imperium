@@ -12,22 +12,11 @@ local function SendToJail(participant: Types.Participant): ()
     participant.JailedOn = participant.Round.Turn
 end
 
-local function GiveAsset(participant: Types.Participant, asset: Types.Asset): ()
-    table.insert(participant.Assets, asset)
-end
-
-local function RemoveAsset(participant: Types.Participant, asset: Types.Asset): ()
-    local index = table.find(participant.Assets, asset)
-    if index then
-        table.remove(participant.Assets, index)
-    end
-end
-
 local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
     assert(asset.Owner == "Bank", "Asset must be owned by bank")
 
     participant:TransferMoneyTo("Bank", asset.AssetDescription.Price)
-    participant:GiveAsset(asset)
+    asset:TransferTo(participant)
 end
 
 local function PromptPurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
@@ -39,14 +28,6 @@ end
 local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Money += amount
     participant.Player:SetAttribute("Money", participant.Money)
-end
-
-local function TransferAssetTo(participant: Types.Participant, to: Types.AssetOwner, asset: Types.Asset): ()
-    RemoveAsset(participant, asset)
-
-    if to ~= "Bank" then
-        GiveAsset(to, asset)
-    end
 end
 
 local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number): ()
@@ -273,10 +254,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.JailedOn = 0
 
     participant.SendToJail = SendToJail
-    participant.GiveAsset = GiveAsset
-    participant.RemoveAsset = RemoveAsset
     participant.GiveMoney = GiveMoney
-    participant.TransferAssetTo = TransferAssetTo
     participant.TransferMoneyTo = TransferMoneyTo
     participant.MoveTo = MoveTo
     participant.MoveBy = MoveBy

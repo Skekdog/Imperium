@@ -73,7 +73,7 @@ export type Asset = {
     GetDevelopmentCost: (Asset, development: "House" | "Hotel") -> number,
     DevelopProperty: (Asset, development: "House" | "Hotel") -> (),
     SellDevelopment: (Asset) -> (),
-    SellAllDevelopments: (Asset) -> (),
+    TrySellAllDevelopments: (Asset) -> (),
 
     GetRentCost: (Asset, participant: Participant) -> number,
 }
@@ -120,10 +120,7 @@ export type Participant = {
 
     GiveJailCard: (Participant) -> (),
     GiveMoney: (Participant, amount: number) -> (),
-    GiveAsset: (Participant, asset: Asset) -> (),
-    RemoveAsset: (Participant, asset: Asset) -> (),
 
-    TransferAssetTo: (Participant, to: AssetOwner, asset: Asset) -> (),
     TransferMoneyTo: (Participant, to: AssetOwner, amount: number) -> (),
     TransferJailCard: (Participant, to: AssetOwner) -> (),
 

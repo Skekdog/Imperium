@@ -3,8 +3,20 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
+    asset:TrySellAllDevelopments()
+
+    if to ~= "Bank" then
+        table.insert(to.Assets, asset)
+    end
+
+    if asset.Owner ~= "Bank" then
+        local index = table.find(asset.Owner.Assets, asset)
+        if index then
+            table.remove(asset.Owner.Assets, index)
+        end
+    end
+
     asset.Owner = to
-    -- auto sell()
 end
 
 local function GetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel"): number
@@ -59,9 +71,12 @@ local function SellDevelopment(asset: Types.Asset): ()
     owner:GiveMoney(sellPrice)
 end
 
-local function SellAllDevelopments(asset: Types.Asset): ()
+local function TrySellAllDevelopments(asset: Types.Asset): ()
     local owner = asset.Owner
-    assert(typeof(owner) ~= "string", "The bank cannot sell developments")
+    if owner == "Bank" then
+        return
+    end
+    assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
 
     local sellPrice = (GetDevelopmentCost(asset, "House") * asset.Houses) + (GetDevelopmentCost(asset, "Hotel") * asset.Hotels)
     asset.Houses = 0
@@ -75,7 +90,7 @@ local function Mortgage(asset: Types.Asset): ()
     assert(asset.Owner ~= "Bank", "The bank cannot mortgage")
 
     asset.IsMortgaged = true
-    asset:SellAllDevelopments()
+    asset:TrySellAllDevelopments()
     asset.Owner:GiveMoney(GetMortgageValue(asset))
 end
 
@@ -115,7 +130,7 @@ function module.new(description: Types.AssetDescription): Types.Asset
     asset.GetDevelopmentCost = GetDevelopmentCost
     asset.DevelopProperty = DevelopProperty
     asset.SellDevelopment = SellDevelopment
-    asset.SellAllDevelopments = SellAllDevelopments
+    asset.TrySellAllDevelopments = TrySellAllDevelopments
 
     asset.GetRentCost = GetRentCost
 
