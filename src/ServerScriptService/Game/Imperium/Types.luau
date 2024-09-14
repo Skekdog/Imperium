@@ -84,7 +84,8 @@ export type Asset = {
 
 export type EdgeTile = typeof(ServerStorage.Game.Tile)
 export type CornerTile = typeof(ServerStorage.Game.CornerTile)
-export type TileModel = EdgeTile | CornerTile
+export type JailTile = typeof(ServerStorage.Game.JailTile)
+export type TileModel = EdgeTile | CornerTile | JailTile
 
 export type Tile = {
     TileDescription: TileDescription,

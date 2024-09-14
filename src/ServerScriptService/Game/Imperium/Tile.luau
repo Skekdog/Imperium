@@ -17,7 +17,12 @@ local function makeTileModel(boardConfiguration: Types.BoardConfiguration, posit
     local tileSizeZ = ServerStorage.Game.Tile.Base.Size.Z
 
     local model: Types.TileModel
-    if isCorner then
+    if name == "Jail" then
+        local jail = ServerStorage.Game.JailTile:Clone()
+        jail.Name = "Jail"
+
+        model = jail
+    elseif isCorner then
         local corner = ServerStorage.Game.CornerTile:Clone()
         corner.Name = "TileCorner" .. tostring(row)
 

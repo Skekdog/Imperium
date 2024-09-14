@@ -8,9 +8,9 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local function SendToJail(participant: Types.Participant): ()
-    participant:MoveToTileByName("Jail", true)
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
+    participant:MoveToTileByName("Jail", true)
 end
 
 local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
@@ -92,7 +92,10 @@ end
 
 local MAX_MOVE_DURATION = 15
 local MAX_DIRECT_MOVE_DURATION = 8
-local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?): ()
+local MOVEMENT_EPSILON = 2.5
+local JAIL_EPSILON = 1.5
+local CHAR_HEIGHT = 3
+local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
     if not char then
         return
     end
@@ -107,13 +110,26 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
         return
     end
 
-    local targetPosition = tile.Model:GetPivot().Position + Vector3.new(0, 3, 0)
+    local targetPart = tile.Model.PrimaryPart :: BasePart
 
     local startTime = GetTime() - (elapsedTime or 0)
     local reached = false
 
+    local epsilon = MOVEMENT_EPSILON
+    local isJail = tile.Model.Name == "Jail"
+    if isJail then
+        epsilon = JAIL_EPSILON
+        if isJailed then
+            targetPart = (tile.Model :: Types.JailTile).Cell
+        else
+            targetPart = (tile.Model :: Types.JailTile).JustVisiting
+        end
+    end
+
+    local targetPosition = targetPart.Position + Vector3.new(0, CHAR_HEIGHT + targetPart.Size.Y / 2, 0)
+
     repeat
-        if (root.Position - targetPosition).Magnitude < 2.5 then
+        if (root.Position - targetPosition).Magnitude < epsilon then
             reached = true
             break
         end
@@ -149,6 +165,8 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     local tile = participant.Board.Tiles[position]
 
+    local isJailed = participant.JailedOn ~= 0
+
     if not moveDirectly then
         local allTiles = participant.Board.Tiles
         local targetRow = TileMath.GetRowFromPosition(position, #allTiles)
@@ -163,11 +181,11 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
             currentPosition = nextCornerPosition
             currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
 
-            moveCharacter(participant.Player.Character, nextCorner, false, GetTime() - startTime)
+            moveCharacter(participant.Player.Character, nextCorner, false, GetTime() - startTime, isJailed)
         end
-        moveCharacter(participant.Player.Character, tile)
+        moveCharacter(participant.Player.Character, tile, nil, nil, isJailed)
     else
-        moveCharacter(participant.Player.Character, tile, moveDirectly)
+        moveCharacter(participant.Player.Character, tile, moveDirectly, nil, isJailed)
     end
 
     local asset = tile.Asset
@@ -231,7 +249,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
 
     return {
         Result = roll1 + roll2,
-        IsDoubles = roll1 == roll2,
+        IsDoubles = true--roll1 == roll2,
     }
 end
 
@@ -261,7 +279,8 @@ local function TryPlayMove(participant: Types.Participant): ()
             local neededDoubles = participant.Round.BoardConfiguration.DoublesConsecutiveJailAmount
             if participant.DoublesStreak >= neededDoubles then
                 SendNotification(`[PLAYER] rolled doubles {neededDoubles} times in a row and was sent to jail.`, {participant.Player})
-                return SendToJail(participant)
+                SendToJail(participant)
+                return participant.Round:StartNextParticipantTurn()
             end
         else
             participant.DoublesStreak = 0
