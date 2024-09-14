@@ -148,7 +148,6 @@ local function DrawCard(participant: Types.Participant, card: Types.CardDescript
 end
 
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
-    assert(participant.Position ~= position, `Participant {participant.Player} already at position {position}`)
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
     participant.IsMoving = true
