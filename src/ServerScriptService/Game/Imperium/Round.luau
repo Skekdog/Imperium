@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Board = require(script.Parent.Board)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
+local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
 
@@ -57,11 +58,29 @@ local function StartRound(round: Types.Round): ()
     round.Started = true
 
     ReplicatedStorage.Game.ServerClient.SetMovementEnabled:FireAllClients(false)
+
+    SetWaitingText("Starting soon...", 8)
+    local threads = {}
     for _, v in round.Participants do
         v.Player:SetAttribute("Status", "Playing")
-        task.spawn(v.MoveTo, v, 1, true, true)
+        table.insert(threads, task.spawn(v.MoveTo, v, 1, true, true))
     end
-    ReplicatedStorage.Game.ServerClient.StartGame:FireAllClients()
+
+    while true do
+        task.wait()
+
+        local shouldBreak = true
+        for _, v in threads do
+            if coroutine.status(v) ~= "dead" then
+                shouldBreak = false
+                break
+            end
+        end
+
+        if shouldBreak then
+            break
+        end
+    end
 
     StartNextParticipantTurn(round)
 end

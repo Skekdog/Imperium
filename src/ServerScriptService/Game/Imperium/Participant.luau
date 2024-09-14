@@ -179,7 +179,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
-    local position = TileMath.GetWrapAround(participant.Position + (amount + 20), #participant.Board.Tiles)
+    local position = TileMath.GetWrapAround(participant.Position + amount, #participant.Board.Tiles)
     MoveTo(participant, position)
 end
 
