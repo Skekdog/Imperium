@@ -216,7 +216,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
 
-    SendNotification(`[PLAYER] rolled {roll1 + roll2}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
+    SendNotification(`[PLAYER] rolled a {roll1 + roll2}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
 
     return {
         Result = roll1 + roll2,
