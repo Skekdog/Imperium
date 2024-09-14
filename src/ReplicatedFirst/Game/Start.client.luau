@@ -60,7 +60,7 @@ end)
 
 local moneyDisplay = UIManager.WaitForUI("MoneyDisplay") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.MoneyDisplay)}
 local function updateMoney()
-    moneyDisplay.Object.Text = "£" .. Players.LocalPlayer:GetAttribute("Money") :: number
+    moneyDisplay.Object.Text = "£" .. (Players.LocalPlayer:GetAttribute("Money") :: number? or 0)
 end
 moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
 Players.LocalPlayer:GetAttributeChangedSignal("Money"):Connect(updateMoney)

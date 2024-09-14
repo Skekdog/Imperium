@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local TileMath = require(script.Parent.Parent.TileMath)
 local TileUtils = require(script.Parent.TileUtils)
@@ -24,21 +25,45 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
 
     ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, asset.AssetDescription)
 
-    local startTime = os.time()
-    local responded = false
-    ReplicatedStorage.Game.ClientServer.RespondPropertyPurchase.OnServerEvent:Once(function()
-        responded = true
+    local startTime = GetTime()
+    local response: boolean?
+
+    local con: RBXScriptConnection
+    con = ReplicatedStorage.Game.ClientServer.RespondPropertyPurchase.OnServerEvent:Once(function(plr, accepted: unknown, propertyName: unknown)
+        if plr ~= participant.Player then
+            return
+        end
+        if typeof(accepted) ~= "boolean" or typeof(propertyName) ~= "string" then
+            return
+        end
+    
+        local tile = participant.Board:TryFindTileByName(propertyName)
+        if not tile or not tile.Asset or tile.Position ~= participant.Position then
+            return
+        end
+
+        response = accepted
     end)
 
     local duration = participant.Round.GameConfiguration.PlayerTurnTime
     SetTimeMilestone(duration)
-    while not responded and os.time() - startTime < duration do
+    while typeof(response) == "nil" and GetTime() - startTime < duration do
         task.wait()
     end
 
-    if not responded then
+    if response == true then
+        if asset.Owner ~= "Bank" then
+            return
+        end
+
+        participant:PurchaseProperty(asset)
+    elseif response == false then
+        asset:StartAuction(participant.Round)
+    else
         ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, nil)
     end
+
+    con:Disconnect()
 end
 
 local function GiveMoney(participant: Types.Participant, amount: number): ()
@@ -72,7 +97,7 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
 
     local targetPosition = tile.Model:GetPivot().Position + Vector3.new(0, 3, 0)
 
-    local startTime = os.time() - (elapsedTime or 0)
+    local startTime = GetTime() - (elapsedTime or 0)
     local reached = false
 
     repeat
@@ -82,7 +107,7 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
         end
         hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
         task.wait() -- We don't need to wait really because MoveTo is blocking, but why not
-    until os.time() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION
+    until GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION
     
     if not reached then
         root.Position = targetPosition
@@ -119,7 +144,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         local targetRow = TileMath.GetRowFromPosition(position, #allTiles)
         local currentPosition = participant.PreviousPosition
 
-        local startTime = os.time()
+        local startTime = GetTime()
         local currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
         while currentRow ~= targetRow do
             local nextCornerPosition = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, #allTiles), #allTiles)
@@ -128,7 +153,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
             currentPosition = nextCornerPosition
             currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
 
-            moveCharacter(participant.Player.Character, nextCorner, false, os.time() - startTime)
+            moveCharacter(participant.Player.Character, nextCorner, false, GetTime() - startTime)
         end
         moveCharacter(participant.Player.Character, tile)
     else

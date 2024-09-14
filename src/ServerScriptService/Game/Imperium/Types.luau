@@ -63,6 +63,7 @@ export type Asset = {
     Hotels: number,
 
     TransferTo: (Asset, to: AssetOwner) -> (),
+    StartAuction: (Asset, round: Round) -> (),
     
     Mortgage: (Asset) -> (),
     UnMortgage: (Asset) -> (),

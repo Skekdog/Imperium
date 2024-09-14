@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local Tile = require(script.Parent.Imperium.Tile)
+local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
 local Round = require(ServerScriptService.Game.Imperium.Round)
@@ -41,13 +42,13 @@ Players.PlayerAdded:Connect(function(plr)
     plr:SetAttribute("Status", "Spectating")
 end)
 
-local startWait = os.time()
+local startWait = GetTime()
 local players = #Players:GetPlayers()
 
 SetWaitingText("Waiting for players...", MAX_PLAYER_LOAD_WAIT_TIME)
 
 -- Note: we can't use Players.PlayerAdded because then we don't check for max time
-while (players < info.Players) and (os.time() - startWait < MAX_PLAYER_LOAD_WAIT_TIME) do
+while (players < info.Players) and (GetTime() - startWait < MAX_PLAYER_LOAD_WAIT_TIME) do
     task.wait()
     players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
 end
@@ -70,33 +71,5 @@ gameClientServer.RollDice.OnServerEvent:Connect(function(plr)
 
     if round.CurrentParticipant == participant and not participant.IsMoving then
         participant:TryPlayMove()
-    end
-end)
-
-gameClientServer.RespondPropertyPurchase.OnServerEvent:Connect(function(plr, accepted: unknown, propertyName: unknown)
-    if typeof(accepted) ~= "boolean" or typeof(propertyName) ~= "string" then
-        return
-    end
-
-    local participant = round:GetParticipant(plr)
-    if round.CurrentParticipant ~= participant or participant.ValidPropertyPurchaseTurn ~= round.Turn then
-        return
-    end
-    participant.ValidPropertyPurchaseTurn = nil
-
-    if accepted then
-        local tile = round.Board:TryFindTileByName(propertyName)
-        if not tile or not tile.Asset or tile.Position ~= participant.Position then
-            return
-        end
-        
-        local asset = tile.Asset
-        assert(asset)
-
-        if asset.Owner ~= "Bank" then
-            return
-        end
-
-        participant:PurchaseProperty(asset)
     end
 end)

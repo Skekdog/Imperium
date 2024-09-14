@@ -1,3 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -111,6 +114,56 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
     return rentTable.Houses[asset.Houses] or rentTable.Hotels[asset.Hotels] or rentTable.Default
 end
 
+local function StartAuction(asset: Types.Asset, round: Types.Round): ()
+    ReplicatedStorage.Game.ServerClient.StartAuction:FireAllClients(asset.AssetDescription)
+
+    local auctionDuration = round.GameConfiguration.AuctionTime
+    SetWaitingText("Auction in progress...", auctionDuration)
+
+    local highestBid = 0
+    local highestBidder: Types.Participant?
+
+    local endTime = GetTime() + auctionDuration
+
+    local con: RBXScriptConnection
+    con = ReplicatedStorage.Game.ClientServer.MakeBid.OnServerEvent:Connect(function(plr, property: unknown, amount: unknown)
+        if property ~= asset.AssetDescription.Name then
+            return
+        end
+        
+        if typeof(amount) ~= "number" or amount <= highestBid then
+            return
+        end
+
+        local participant = round:GetParticipant(plr)
+        if not participant then
+            return
+        end
+
+        ReplicatedStorage.Game.ServerClient.UpdateAuction:FireAllClients(participant.Player, amount)
+
+        highestBidder = participant
+        highestBid = amount
+
+        endTime = GetTime() + auctionDuration
+        SetWaitingText("Auction in progress...", auctionDuration)
+    end)
+
+    while GetTime() < endTime do
+        task.wait()
+    end
+    
+    ReplicatedStorage.Game.ServerClient.StartAuction:FireAllClients(nil)
+    con:Disconnect()
+
+    if not highestBidder then
+        return
+    end
+
+    highestBidder:TransferMoneyTo("Bank", highestBid)
+    asset:TransferTo(highestBidder)
+end
+
 function module.new(description: Types.AssetDescription): Types.Asset
     local asset = {}
 
@@ -133,6 +186,7 @@ function module.new(description: Types.AssetDescription): Types.Asset
     asset.TrySellAllDevelopments = TrySellAllDevelopments
 
     asset.GetRentCost = GetRentCost
+    asset.StartAuction = StartAuction
 
     return asset
 end
