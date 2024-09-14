@@ -7,7 +7,7 @@ local plr = Players.LocalPlayer
 local start = os.clock()
 local found = false
 task.spawn(function()
-    UIManager.WaitForUI("Playerlist", true)
+    UIManager.WaitForUI("Settings", true)
     found = true
 end)
 

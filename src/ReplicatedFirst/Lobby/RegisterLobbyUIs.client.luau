@@ -5,6 +5,5 @@ if not ReplicatedFirst:GetAttribute("UICanRegister") then
     ReplicatedFirst:GetAttributeChangedSignal("UICanRegister"):Wait()
 end
 
-UIManager.RegisterUI(UIManager.UnregisteredUIs.Playerlist)
 UIManager.RegisterUI(UIManager.UnregisteredUIs.LobbyUI)
 UIManager.RegisterUI(UIManager.UnregisteredUIs.Notification)
