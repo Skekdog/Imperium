@@ -48,7 +48,9 @@ module[7] = {
     Title = "Grand Opera Night. Collect £50 from every player for opening night seats.",
     Effect = function(participant: Types.Participant): ()
         for _, otherParticipant in participant.Round.Participants do
-            otherParticipant:TransferMoneyTo(participant, 50)
+            if otherParticipant ~= participant then
+                otherParticipant:TransferMoneyTo(participant, 50)
+            end
         end
     end,
 }
@@ -71,7 +73,9 @@ module[10] = {
     Title = "It is your birthday. Collect £10 from every player.",
     Effect = function(participant: Types.Participant): ()
         for _, otherParticipant in participant.Round.Participants do
-            otherParticipant:TransferMoneyTo(participant, 10)
+            if otherParticipant ~= participant then
+                otherParticipant:TransferMoneyTo(participant, 10)
+            end
         end
     end,
 }
