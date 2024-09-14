@@ -1,11 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local SendNotification = require(script.Parent.Parent.SendNotification)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Types = require(script.Parent.Types)
 
 local module = {}
 
 local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
+    assert(to ~= asset.Owner, "Can't transfer assets to same participant")
     asset:TrySellAllDevelopments()
 
     if to ~= "Bank" then
@@ -46,13 +48,15 @@ local function DevelopProperty(asset: Types.Asset, development: "House" | "Hotel
     end
 
     local cost = GetDevelopmentCost(asset, development)
-    owner:TransferMoneyTo("Bank", cost)
+    owner:TransferMoneyTo("Bank", cost, true)
 
     if development == "House" then
         asset.Houses += 1
     elseif development == "Hotel" then
         asset.Hotels += 1
     end
+
+    SendNotification(`[PLAYER] bought a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
 end
 
 local function SellDevelopment(asset: Types.Asset): ()
@@ -70,6 +74,8 @@ local function SellDevelopment(asset: Types.Asset): ()
         assert(false, "No development to sell")
     end
 
+    SendNotification(`[PLAYER] sold a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
+
     local sellPrice = GetDevelopmentCost(asset, development) / 2
     owner:GiveMoney(sellPrice)
 end
@@ -80,6 +86,8 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
         return
     end
     assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
+
+    SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Name}.`, {owner.Player})
 
     local sellPrice = (GetDevelopmentCost(asset, "House") * asset.Houses) + (GetDevelopmentCost(asset, "Hotel") * asset.Hotels)
     asset.Houses = 0
@@ -102,7 +110,9 @@ local function UnMortgage(asset: Types.Asset): ()
     assert(asset.Owner ~= "Bank", "The bank cannot unmortgage")
 
     asset.IsMortgaged = false
-    asset.Owner:TransferMoneyTo("Bank", GetUnMortgageCost(asset))
+    asset.Owner:TransferMoneyTo("Bank", GetUnMortgageCost(asset), true)
+
+    SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name}`, {asset.Owner.Player})
 end
 
 local function GetRentCost(asset: Types.Asset, participant: Types.Participant): number
@@ -160,7 +170,9 @@ local function StartAuction(asset: Types.Asset, round: Types.Round): ()
         return
     end
 
-    highestBidder:TransferMoneyTo("Bank", highestBid)
+    SendNotification(`[PLAYER] won the auction for {asset.AssetDescription.Name} at £{highestBid}.`, {highestBidder.Player})
+
+    highestBidder:TransferMoneyTo("Bank", highestBid, true)
     asset:TransferTo(highestBidder)
 end
 

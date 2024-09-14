@@ -126,7 +126,7 @@ export type Participant = {
     GiveJailCard: (Participant) -> (),
     GiveMoney: (Participant, amount: number) -> (),
 
-    TransferMoneyTo: (Participant, to: AssetOwner, amount: number) -> (),
+    TransferMoneyTo: (Participant, to: AssetOwner, amount: number, noNotification: boolean?) -> (),
     TransferJailCard: (Participant, to: AssetOwner) -> (),
 
     DrawCard: (Participant, card: CardDescription) -> (),

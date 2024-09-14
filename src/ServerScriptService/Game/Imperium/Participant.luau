@@ -17,7 +17,7 @@ local function PurchaseProperty(participant: Types.Participant, asset: Types.Ass
     assert(asset.Owner == "Bank", "Asset must be owned by bank")
 
     SendNotification(`[PLAYER] purchased {asset.AssetDescription.Name}.`, {participant.Player})
-    participant:TransferMoneyTo("Bank", asset.AssetDescription.Price)
+    participant:TransferMoneyTo("Bank", asset.AssetDescription.Price, true)
     asset:TransferTo(participant)
 end
 
@@ -72,7 +72,18 @@ local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Player:SetAttribute("Money", participant.Money)
 end
 
-local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number): ()
+local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number, noNotification: boolean?): ()
+    assert(to ~= participant, "Can't transfer money to same participant")
+    if not noNotification then
+        local players = {participant.Player}
+        if to ~= "Bank" then
+            table.insert(players, to.Player)
+        end
+
+        local lt = amount < 0
+        SendNotification(`[PLAYER] {if lt then "received" else "paid"} £{math.abs(amount)} {if lt then "from" else "to"} {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
+    end
+
     GiveMoney(participant, -amount)
     if to ~= "Bank" then
         GiveMoney(to, amount)
@@ -235,9 +246,11 @@ local function TryPlayMove(participant: Types.Participant): ()
     SetTimeMilestone(nil)
     ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
     if participant.JailedOn ~= 0 then
-        if participant.JailedOn <= participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
+        if participant.JailedOn < participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
+            SendNotification(`[PLAYER] is leaving jail after waiting for {participant.Round.BoardConfiguration.JailLength} turns.`, {participant.Player})
             LeaveJail(participant)
         elseif participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
+            SendNotification(`[PLAYER] rolled doubles and is leaving jail.`, {participant.Player})
             LeaveJail(participant)
         end
     else
@@ -245,7 +258,9 @@ local function TryPlayMove(participant: Types.Participant): ()
         if roll.IsDoubles then
             participant.DoublesStreak += 1
 
-            if participant.DoublesStreak >= participant.Round.BoardConfiguration.DoublesConsecutiveJailAmount then
+            local neededDoubles = participant.Round.BoardConfiguration.DoublesConsecutiveJailAmount
+            if participant.DoublesStreak >= neededDoubles then
+                SendNotification(`[PLAYER] rolled doubles {neededDoubles} times in a row and was sent to jail.`, {participant.Player})
                 return SendToJail(participant)
             end
         else
