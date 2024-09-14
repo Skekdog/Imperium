@@ -6,3 +6,5 @@ if not ReplicatedFirst:GetAttribute("UICanRegister") then
 end
 
 UIManager.RegisterUI(UIManager.UnregisteredUIs.Playerlist)
+UIManager.RegisterUI(UIManager.UnregisteredUIs.LobbyUI)
+UIManager.RegisterUI(UIManager.UnregisteredUIs.Notification)

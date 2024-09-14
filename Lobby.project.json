@@ -43,6 +43,19 @@
             "$className": "Lighting",
             "$properties": {
                 "GlobalShadows": false
+            },
+
+            "Blur": {
+                "$className": "BlurEffect",
+                "$properties": {
+                    "Size": 64
+                }
+            }
+        },
+        "Players": {
+            "$className": "Players",
+            "$properties": {
+                "CharacterAutoLoads": false
             }
         },
         "Workspace": {
