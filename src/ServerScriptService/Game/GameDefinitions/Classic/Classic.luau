@@ -81,6 +81,7 @@ module.FreeParkingBonusInitial = 0
 module.Tiles = {
     {
         Name = "Go" :: string?,
+        Colour = nil :: string?,
         AssetDescription = nil :: Types.AssetDescription?,
         OnEnter = nil :: ((Types.TileDescription, Types.Participant) -> ())?,
     },
@@ -98,6 +99,7 @@ module.Tiles = {
     },
     {
         Name = "Community Chest",
+        Colour = "Community Chest",
         OnEnter = DrawCard
     },
     {
@@ -138,6 +140,7 @@ module.Tiles = {
     },
     {
         Name = "Chance",
+        Colour = "Chance",
         OnEnter = DrawCard
     },
     {
@@ -233,6 +236,7 @@ module.Tiles = {
     },
     {
         Name = "Community Chest",
+        Colour = "Community Chest",
         OnEnter = DrawCard
     },
     {
@@ -276,6 +280,7 @@ module.Tiles = {
     },
     {
         Name = "Chance",
+        Colour = "Chance",
         OnEnter = DrawCard
     },
     {
@@ -384,6 +389,7 @@ module.Tiles = {
     },
     {
         Name = "Community Chest",
+        Colour = "Community Chest",
         OnEnter = DrawCard
     },
     {
@@ -408,6 +414,7 @@ module.Tiles = {
     },
     {
         Name = "Chance",
+        Colour = "Chance",
         OnEnter = DrawCard
     },
     {

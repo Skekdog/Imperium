@@ -45,6 +45,7 @@ export type AssetDescription = {
 
 export type TileDescription = {
     Name: string?,
+    Colour: string?,
     AssetDescription: AssetDescription?,
     OnEnter: ((TileDescription, Participant) -> ())?,
 }
