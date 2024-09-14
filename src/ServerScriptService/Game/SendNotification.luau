@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-return function(msg: string): ()
-    ReplicatedStorage.Game.ServerClient.SendNotification:FireAllClients(msg)
+-- Formatted as "blah blah {PLAYER} blah blah {PLAYER}"
+return function(msg: string, players: {Player}?): ()
+    ReplicatedStorage.Game.ServerClient.SendNotification:FireAllClients(msg, players)
 end

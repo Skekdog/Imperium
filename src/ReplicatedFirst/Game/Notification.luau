@@ -1,4 +1,5 @@
 local TweenService = game:GetService("TweenService")
+local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local SettingsManager = require(script.Parent.Parent.Shared.SettingsManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -48,6 +49,11 @@ local function makeLabel(text: string)
 	task.delay(2, fade, label, true)
 end
 
-return function(msg: string)
+return function(msg: string, players: {Player}?)
+	if players then
+		for _, v in players do
+			msg = msg:gsub("{PLAYER}", GetPlayerName(v))
+		end
+	end
 	makeLabel(msg)
 end
