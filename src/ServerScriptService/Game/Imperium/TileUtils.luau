@@ -11,6 +11,15 @@ function module.GetName(tile: Types.TileDescription): string
     end
 end
 
+function module.GetIcon(tile: Types.TileDescription): string?
+    if tile.Icon then
+        return tile.Icon
+    elseif tile.AssetDescription then
+        return tile.AssetDescription.Icon
+    end
+    return
+end
+
 function module.GetColour(tile: Types.TileDescription): "Default" | string
     if tile.Colour then
         return tile.Colour

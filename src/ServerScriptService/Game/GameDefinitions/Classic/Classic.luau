@@ -29,6 +29,25 @@ local function TaxTile(tile: Types.TileDescription, participant: Types.Participa
     end
 end
 
+local ChanceTile: Types.TileDescription = {
+    Name = "Chance",
+    Icon = "rbxassetid://132370212979970",
+    Colour = "Chance",
+    OnEnter = DrawCard,
+}
+
+local CommunityChestTile: Types.TileDescription = {
+    Name = "Community Chest",
+    Icon = "rbxassetid://93730445736567",
+    Colour = "Community Chest",
+    OnEnter = DrawCard,
+}
+
+local TaxIcon = "rbxassetid://83973123711431"
+local GoIcon = "rbxassetid://135653151798874"
+local GoToJailIcon = "rbxassetid://114111426528418"
+local FreeParkingIcon = "rbxassetid://138390415994185"
+
 local function GetRentForUtility(asset: Types.Asset, participant: Types.Participant): number
     local roll = math.abs(participant.Position - participant.PreviousPosition)
 
@@ -80,11 +99,9 @@ module.FreeParkingBonusInitial = 0
 
 module.Tiles = {
     {
-        Name = "Go" :: string?,
-        Colour = nil :: string?,
-        AssetDescription = nil :: Types.AssetDescription?,
-        OnEnter = nil :: ((Types.TileDescription, Types.Participant) -> ())?,
-    },
+        Name = "Go",
+        Icon = GoIcon,
+    } :: Types.TileDescription,
     {
         AssetDescription = {
             Name = "Old Kent Road",
@@ -97,11 +114,7 @@ module.Tiles = {
             },
         }
     },
-    {
-        Name = "Community Chest",
-        Colour = "Community Chest",
-        OnEnter = DrawCard
-    },
+    CommunityChestTile,
     {
         AssetDescription = {
             Name = "Whitechapel Road",
@@ -116,6 +129,7 @@ module.Tiles = {
     },
     {
         Name = "Income Tax",
+        Icon = TaxIcon,
         OnEnter = TaxTile
     },
     {
@@ -138,11 +152,7 @@ module.Tiles = {
             },
         }
     },
-    {
-        Name = "Chance",
-        Colour = "Chance",
-        OnEnter = DrawCard
-    },
+    ChanceTile,
     {
         AssetDescription = {
             Name = "Euston Road",
@@ -168,7 +178,8 @@ module.Tiles = {
         }
     },
     {
-        Name = "Jail"
+        Name = "Jail",
+        Icon = "",
     },
     {
         AssetDescription = {
@@ -234,11 +245,7 @@ module.Tiles = {
             },
         }
     },
-    {
-        Name = "Community Chest",
-        Colour = "Community Chest",
-        OnEnter = DrawCard
-    },
+    CommunityChestTile,
     {
         AssetDescription = {
             Name = "Marlborough Street",
@@ -264,7 +271,8 @@ module.Tiles = {
         }
     },
     {
-        Name = "Free Parking"
+        Name = "Free Parking",
+        Icon = FreeParkingIcon,
     },
     {
         AssetDescription = {
@@ -278,11 +286,7 @@ module.Tiles = {
             },
         }
     },
-    {
-        Name = "Chance",
-        Colour = "Chance",
-        OnEnter = DrawCard
-    },
+    ChanceTile,
     {
         AssetDescription = {
             Name = "Fleet Street",
@@ -361,7 +365,8 @@ module.Tiles = {
     },
     {
         Name = "Go to Jail",
-        OnEnter = GoToJail
+        OnEnter = GoToJail,
+        Icon = GoToJailIcon,
     },
     {
         AssetDescription = {
@@ -387,11 +392,7 @@ module.Tiles = {
             },
         }
     },
-    {
-        Name = "Community Chest",
-        Colour = "Community Chest",
-        OnEnter = DrawCard
-    },
+    CommunityChestTile,
     {
         AssetDescription = {
             Name = "Bond Street",
@@ -412,11 +413,7 @@ module.Tiles = {
             Rent = GetRentForStation,
         }
     },
-    {
-        Name = "Chance",
-        Colour = "Chance",
-        OnEnter = DrawCard
-    },
+    ChanceTile,
     {
         AssetDescription = {
             Name = "Park Lane",
@@ -431,7 +428,8 @@ module.Tiles = {
     },
     {
         Name = "Super Tax",
-        OnEnter = TaxTile
+        OnEnter = TaxTile,
+        Icon = TaxIcon,
     },
     {
         AssetDescription = {

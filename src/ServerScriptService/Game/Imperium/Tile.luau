@@ -6,7 +6,7 @@ local Types = require(script.Parent.Types)
 
 local module = {}
 
-local function makeTileModel(boardConfiguration: Types.BoardConfiguration, position: number, name: string, colour: string): Types.TileModel
+local function makeTileModel(boardConfiguration: Types.BoardConfiguration, position: number, name: string, colour: string, icon: string): Types.TileModel
     local tilesPerRow = TileMath.GetTilesPerRow(#boardConfiguration.Tiles)
     local row = TileMath.GetRowFromPosition(position, #boardConfiguration.Tiles)
 
@@ -22,6 +22,7 @@ local function makeTileModel(boardConfiguration: Types.BoardConfiguration, posit
         corner.Name = "TileCorner" .. tostring(row)
 
         corner.Base.BaseUI.Title.Text = name
+        corner.Base.BaseUI.Icon.Image = icon
 
         model = corner
     else
@@ -31,7 +32,8 @@ local function makeTileModel(boardConfiguration: Types.BoardConfiguration, posit
         edge.Title.TitleUI.TextLabel.Text = name
         edge.Title.Color = boardConfiguration.Colours[colour] or boardConfiguration.Colours.Default
 
-        edge.Base.BaseUI.Owner.Text = ""
+        edge.BaseUIPart.BaseUI.Icon.Image = icon
+        edge.BaseUIPart.BaseUI.Owner.Text = ""
 
         model = edge
     end
@@ -77,10 +79,11 @@ function module.new(boardConfiguration: Types.BoardConfiguration, position: numb
 
     local name = TileUtils.GetName(tileDescription)
     local colour = TileUtils.GetColour(tileDescription)
+    local icon = TileUtils.GetIcon(tileDescription)
 
     tile.Position = position
     tile.TileDescription = tileDescription
-    tile.Model = makeTileModel(boardConfiguration, position, name, colour)
+    tile.Model = makeTileModel(boardConfiguration, position, name, colour, icon or "")
 
     if tile.TileDescription.AssetDescription then
         tile.Asset = Asset.new(tile.TileDescription.AssetDescription)

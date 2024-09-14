@@ -26,7 +26,7 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     assert(board)
 
     local tileModel = board:FindTileByName(asset.AssetDescription.Name).Model :: Types.EdgeTile
-    tileModel.Base.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player)
+    tileModel.BaseUIPart.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player):gsub(" ", "\n")
 
     asset.Owner = to
 end

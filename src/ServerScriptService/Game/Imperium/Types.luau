@@ -35,6 +35,7 @@ export type GameConfiguration = {
 export type AssetDescription = {
     Name: string,
     Colour: string,
+    Icon: string?,
     Price: number,
     Rent: ((Asset, Participant) -> number) | {
         Default: number,
@@ -46,6 +47,7 @@ export type AssetDescription = {
 export type TileDescription = {
     Name: string?,
     Colour: string?,
+    Icon: string?,
     AssetDescription: AssetDescription?,
     OnEnter: ((TileDescription, Participant) -> ())?,
 }
