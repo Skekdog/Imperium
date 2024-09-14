@@ -1,18 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UIManager = require(script.Parent.Parent.Shared.UIManager)
-local ui = UIManager.WaitForUI("RollDice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RollDice)}
-local payFineUI = UIManager.WaitForUI("PayFine")
-local useGetOutOfJailFreeCardUI = UIManager.WaitForUI("UseGetOutOfJailFreeCard")
+local MakeMove = require(script.Parent.MakeMove)
 
 return function(): ()
-    ui:ToggleVisible(false)
-    payFineUI:ToggleVisible(false)
-    useGetOutOfJailFreeCardUI:ToggleVisible(false)
-
-    if ReplicatedStorage:GetAttribute("CurrentPlayer") ~= Players.LocalPlayer.Name then
-        return
+    MakeMove()
+    if ReplicatedStorage:GetAttribute("CurrentPlayer") :: string == Players.LocalPlayer.Name then
+        ReplicatedStorage.Game.ClientServer.RollDice:FireServer()
     end
-
-    ReplicatedStorage.Game.ClientServer.RollDice:FireServer()
 end

@@ -250,7 +250,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
 
     return {
         Result = roll1 + roll2,
-        IsDoubles = true--roll1 == roll2,
+        IsDoubles = roll1 == roll2,
     }
 end
 
@@ -266,10 +266,10 @@ local function TryPlayMove(participant: Types.Participant): ()
     SetTimeMilestone(nil)
     ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
     if participant.JailedOn ~= 0 then
-        if participant.JailedOn < participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
+        if participant.JailedOn <= participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
             SendNotification(`[PLAYER] is leaving jail after waiting for {participant.Round.BoardConfiguration.JailLength} turns.`, {participant.Player})
             LeaveJail(participant)
-        elseif false then --participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
+        elseif participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
             SendNotification(`[PLAYER] rolled doubles and is leaving jail.`, {participant.Player})
             LeaveJail(participant)
         end
@@ -321,6 +321,24 @@ local function TryPayRent(participant: Types.Participant, tile: Types.Tile): ()
     participant:TransferMoneyTo(asset.Owner, asset:GetRentCost(participant))
 end
 
+local function TryUseJailCard(participant: Types.Participant): ()
+    if participant.JailCards > 0 and participant.JailedOn ~= 0 then
+        participant:TransferJailCard("Bank")
+
+        SendNotification(`[PLAYER] used a Get Out of Jail Free card.`, {participant.Player})
+        LeaveJail(participant)
+    end
+end
+
+local function TryPayFine(participant: Types.Participant): ()
+    if participant.JailedOn ~= 0 and participant.Money >= participant.Round.BoardConfiguration.JailFine then
+        participant:TransferMoneyTo("Bank", participant.Round.BoardConfiguration.JailFine, true)
+
+        SendNotification(`[PLAYER] paid a fine of £{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
+        LeaveJail(participant)
+    end
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -353,6 +371,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.LeaveJail = LeaveJail
     participant.TryPayRent = TryPayRent
     participant.DrawCard = DrawCard
+    participant.TryUseJailCard = TryUseJailCard
+    participant.TryPayFine = TryPayFine
 
     participant.PurchaseProperty = PurchaseProperty
     participant.PromptPurchaseProperty = PromptPurchaseProperty

@@ -4,8 +4,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Notification = require(script.Parent.Notification)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
+local PayFine = require(script.Parent.PayFine)
 local RollDice = require(script.Parent.RollDice)
 local ToggleMovementEnabled = require(script.Parent.ToggleMovementEnabled)
+local UseGetOutOfJailFreeCard = require(script.Parent.UseGetOutOfJailFreeCard)
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game").ServerClient
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
@@ -27,8 +29,15 @@ end)
 ReplicatedStorage:GetAttributeChangedSignal("FineAmount"):Connect(function()
     payFine.Object.Text = `Pay Fine (£{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
 end)
+player:GetAttributeChangedSignal("GetOutOfJailFreeCards"):Connect(function()
+    useCard.Object.Text = `Use Card ({player:GetAttribute("GetOutOfJailFreeCards") :: number})`
+end)
+payFine.Object.Text = `Pay Fine (£{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
+useCard.Object.Text = `Use Card ({player:GetAttribute("GetOutOfJailFreeCards") :: number})`
 
 rollDice.Object.Activated:Connect(RollDice)
+payFine.Object.Activated:Connect(PayFine)
+useCard.Object.Activated:Connect(UseGetOutOfJailFreeCard)
 
 local buyPropertyUI = UIManager.WaitForUI("BuyProperty") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.BuyProperty)}
 local acceptBuyCon: RBXScriptConnection?

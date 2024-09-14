@@ -115,6 +115,8 @@ export type Participant = {
 
     RollDice: (Participant) -> DiceRollResult,
     TryPlayMove: (Participant) -> (),
+    TryUseJailCard: (Participant) -> (),
+    TryPayFine: (Participant) -> (),
 
     MoveToTileByName: (Participant, name: string, moveDirectly: boolean?) -> (),
     MoveTo: (Participant, position: number, moveDirectly: boolean?, initialMove: boolean?) -> (),

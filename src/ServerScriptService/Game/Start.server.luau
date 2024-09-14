@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local Tile = require(script.Parent.Imperium.Tile)
+local Types = require(script.Parent.Imperium.Types)
 local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
@@ -66,10 +67,33 @@ round:StartRound()
 
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 
-gameClientServer.RollDice.OnServerEvent:Connect(function(plr)
+local function canPlayMove(plr: Player): Types.Participant?
     local participant = round:GetParticipant(plr)
 
     if round.CurrentParticipant == participant and not participant.IsMoving then
+        return participant
+    else
+        return nil
+    end
+end
+
+gameClientServer.RollDice.OnServerEvent:Connect(function(plr)
+    local participant = canPlayMove(plr)
+    if participant then
         participant:TryPlayMove()
+    end
+end)
+
+gameClientServer.UseGetOutOfJailFreeCard.OnServerEvent:Connect(function(plr)
+    local participant = canPlayMove(plr)
+    if participant then
+        participant:TryUseJailCard()
+    end
+end)
+
+gameClientServer.PayFine.OnServerEvent:Connect(function(plr)
+    local participant = canPlayMove(plr)
+    if participant then
+        participant:TryPayFine()
     end
 end)
