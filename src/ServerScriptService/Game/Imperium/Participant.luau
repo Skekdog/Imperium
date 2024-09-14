@@ -249,7 +249,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
 
     return {
         Result = roll1 + roll2,
-        IsDoubles = true--roll1 == roll2,
+        IsDoubles = roll1 == roll2,
     }
 end
 

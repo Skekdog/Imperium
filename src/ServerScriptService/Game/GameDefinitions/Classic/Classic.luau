@@ -88,7 +88,7 @@ module.PassGoMoney = 200
 
 module.JailFine = 50
 module.JailLength = 3
-module.DoublesConsecutiveJailAmount = 2
+module.DoublesConsecutiveJailAmount = 3
 
 module.CanLeaveJailByRollingDoubles = true
 module.AllowJailedRentCollection = true
