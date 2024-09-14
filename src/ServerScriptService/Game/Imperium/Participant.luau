@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local TileMath = require(script.Parent.Parent.TileMath)
-local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -78,8 +77,8 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
     end
 end
 
-local MAX_MOVE_DURATION = 45
-local MAX_DIRECT_MOVE_DURATION = 10
+local MAX_MOVE_DURATION = 15
+local MAX_DIRECT_MOVE_DURATION = 8
 local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?): ()
     if not char then
         return
@@ -137,8 +136,6 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     local tile = participant.Board.Tiles[position]
 
-    print(`Moved to {TileUtils.GetName(tile.TileDescription)}`)
-
     if not moveDirectly then
         local allTiles = participant.Board.Tiles
         local targetRow = TileMath.GetRowFromPosition(position, #allTiles)
@@ -182,7 +179,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 end
 
 local function MoveBy(participant: Types.Participant, amount: number): ()
-    local position = TileMath.GetWrapAround(participant.Position + amount, #participant.Board.Tiles)
+    local position = TileMath.GetWrapAround(participant.Position + (amount + 20), #participant.Board.Tiles)
     MoveTo(participant, position)
 end
 
