@@ -49,11 +49,20 @@ local function makeLabel(text: string)
 	task.delay(2, fade, label, true)
 end
 
+local function replacePlayers(str: string, players: {Player}): string
+    local i = 1
+    -- Replace [PLAYER] with the corresponding player name from the table
+    str = string.gsub(str, "%[PLAYER%]", function()
+        local playerName = GetPlayerName(players[i])
+        i = i + 1
+        return playerName or "[PLAYER]"
+    end)
+    return str
+end
+
 return function(msg: string, players: {Player}?)
 	if players then
-		for _, v in players do
-			msg = msg:gsub("{PLAYER}", GetPlayerName(v))
-		end
+		msg = replacePlayers(msg, players)
 	end
 	makeLabel(msg)
 end

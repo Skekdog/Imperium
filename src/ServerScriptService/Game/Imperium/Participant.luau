@@ -16,6 +16,7 @@ end
 local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
     assert(asset.Owner == "Bank", "Asset must be owned by bank")
 
+    SendNotification(`[PLAYER] purchased {asset.AssetDescription.Name}.`, {participant.Player})
     participant:TransferMoneyTo("Bank", asset.AssetDescription.Price)
     asset:TransferTo(participant)
 end
@@ -215,7 +216,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
 
-    SendNotification(`\{PLAYER} rolled {roll1 + roll2}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
+    SendNotification(`[PLAYER] rolled {roll1 + roll2}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
 
     return {
         Result = roll1 + roll2,
