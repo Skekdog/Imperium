@@ -34,7 +34,15 @@ module.AvailableSettings = {
 		Default = "Dark",
 		Callback = function(val) -- Can't directly reference this because cyclic dependency!
 			require(script.Parent.ThemesManager).UpdateTheme(val)
-		end,
+		end :: any,
+	},
+	{
+		Name = "Player Names",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "Choose whether to show display names, usernames, or both.",
+		PossibleValues = {"Display Name", "Username", "Both"},
+		Default = "Display Name",
 	},
 	{
 		Name = "Sidebar Alignment",
