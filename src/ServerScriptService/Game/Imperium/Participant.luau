@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local SendNotification = require(script.Parent.Parent.SendNotification)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local TileMath = require(script.Parent.Parent.TileMath)
 local Types = require(script.Parent.Types)
@@ -213,6 +215,8 @@ end
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
+
+    SendNotification(`{GetPlayerName(participant.Player)} rolled {roll1 + roll2}.` .. if roll1 == roll2 then " Doubles!" else "")
 
     return {
         Result = roll1 + roll2,

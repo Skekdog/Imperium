@@ -3,7 +3,7 @@ local SettingsManager = require(script.Parent.Parent.Shared.SettingsManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
-local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.Notification)
+local ui = UIManager.WaitForUI("Notification").Object :: typeof(UIManager.UnregisteredUIs.Notification)
 
 local global = ui.Global
 
