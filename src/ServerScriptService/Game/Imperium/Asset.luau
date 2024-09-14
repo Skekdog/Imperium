@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.SendNotification)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
@@ -20,6 +21,12 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
             table.remove(asset.Owner.Assets, index)
         end
     end
+
+    local board = if asset.Owner ~= "Bank" then asset.Owner.Board elseif to ~= "Bank" then to.Board else nil
+    assert(board)
+
+    local tileModel = board:FindTileByName(asset.AssetDescription.Name).Model :: Types.EdgeTile
+    tileModel.Base.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player)
 
     asset.Owner = to
 end
