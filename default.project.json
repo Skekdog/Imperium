@@ -31,27 +31,16 @@
             "Game": {"$path": "Assets/Game"},
             "Lobby": {"$path": "Assets/Lobby"}
         },
-        "TextChatService": {
-            "$className": "TextChatService",
-            "ChatWindowConfiguration": {
-                "$className": "ChatWindowConfiguration",
-                "$properties": {
-                    "Tags": ["StyledUI"],
-                    "Attributes": {"Style": {"String": "Primary"}}
-                }
-            },
-            "ChatInputBarConfiguration": {
-                "$className": "ChatInputBarConfiguration",
-                "$properties": {
-                    "Tags": ["StyledUI"],
-                    "Attributes": {"Style": {"String": "Secondary"}}
-                }
-            }
-        },
         "Lighting": {
             "$className": "Lighting",
             "$properties": {
                 "GlobalShadows": false
+            }
+        },
+        "TextChatService": {
+            "$className": "TextChatService",
+            "$properties": {
+                "ChatVersion": "TextChatService"
             }
         },
         "Workspace": {

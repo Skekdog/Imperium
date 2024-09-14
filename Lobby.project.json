@@ -24,19 +24,8 @@
         },
         "TextChatService": {
             "$className": "TextChatService",
-            "ChatWindowConfiguration": {
-                "$className": "ChatWindowConfiguration",
-                "$properties": {
-                    "Tags": ["StyledUI"],
-                    "Attributes": {"Style": {"String": "Primary"}}
-                }
-            },
-            "ChatInputBarConfiguration": {
-                "$className": "ChatInputBarConfiguration",
-                "$properties": {
-                    "Tags": ["StyledUI"],
-                    "Attributes": {"Style": {"String": "Secondary"}}
-                }
+            "$properties": {
+                "ChatVersion": "TextChatService"
             }
         },
         "Lighting": {
