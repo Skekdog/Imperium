@@ -109,6 +109,8 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
 
     Random.new():Shuffle(round.Participants)
 
+    ReplicatedStorage:SetAttribute("FineAmount", boardConfiguration.JailFine)
+
     round.CurrentParticipant = round.Participants[#round.Participants]
 
     return round

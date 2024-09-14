@@ -21,7 +21,8 @@
                 "Attributes": {
                     "TimeMilestone": {"Float64": 0},
                     "CurrentPlayer": {"String": ""},
-                    "WaitingText": {"String": "Waiting for players..."}
+                    "WaitingText": {"String": "Waiting for players..."},
+                    "FineAmount": {"Float64": 50}
                 }
             }
         },

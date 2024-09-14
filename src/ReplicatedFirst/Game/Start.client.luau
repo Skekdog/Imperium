@@ -11,9 +11,21 @@ local gameServerClient = ReplicatedStorage:WaitForChild("Game").ServerClient
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
+local player = Players.LocalPlayer
+
 local rollDice = UIManager.WaitForUI("RollDice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RollDice)}
+local payFine = UIManager.WaitForUI("PayFine") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.PayFine)}
+local useCard = UIManager.WaitForUI("UseGetOutOfJailFreeCard") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.UseGetOutOfJailFreeCard)}
 gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
-    rollDice:ToggleVisible(name == Players.LocalPlayer.Name)
+    local isPlayer = name == player.Name
+    local isJailed = player:GetAttribute("IsJailed") :: boolean
+    rollDice:ToggleVisible(isPlayer)
+    payFine:ToggleVisible(isPlayer and isJailed and player:GetAttribute("Money") :: number >= ReplicatedStorage:GetAttribute("FineAmount") :: number)
+    useCard:ToggleVisible(isPlayer and isJailed and player:GetAttribute("GetOutOfJailFreeCards") :: number > 0)
+end)
+
+ReplicatedStorage:GetAttributeChangedSignal("FineAmount"):Connect(function()
+    payFine.Object.Text = `Pay Fine (£{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
 end)
 
 rollDice.Object.Activated:Connect(RollDice)
@@ -61,10 +73,10 @@ end)
 
 local moneyDisplay = UIManager.WaitForUI("MoneyDisplay") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.MoneyDisplay)}
 local function updateMoney()
-    moneyDisplay.Object.Text = "£" .. (Players.LocalPlayer:GetAttribute("Money") :: number? or 0)
+    moneyDisplay.Object.Text = "£" .. (player:GetAttribute("Money") :: number? or 0)
 end
 moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
-Players.LocalPlayer:GetAttributeChangedSignal("Money"):Connect(updateMoney)
+player:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
 
 gameServerClient.SendNotification.OnClientEvent:Connect(Notification)

@@ -10,6 +10,7 @@ local module = {}
 local function SendToJail(participant: Types.Participant): ()
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
+    participant.Player:SetAttribute("IsJailed", true)
     participant:MoveToTileByName("Jail", true)
 end
 
@@ -249,12 +250,13 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
 
     return {
         Result = roll1 + roll2,
-        IsDoubles = roll1 == roll2,
+        IsDoubles = true--roll1 == roll2,
     }
 end
 
 local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
     participant.JailedOn = 0
+    participant.Player:SetAttribute("IsJailed", false)
     if not skipTurn then
         participant:TryPlayMove()
     end
@@ -267,7 +269,7 @@ local function TryPlayMove(participant: Types.Participant): ()
         if participant.JailedOn < participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
             SendNotification(`[PLAYER] is leaving jail after waiting for {participant.Round.BoardConfiguration.JailLength} turns.`, {participant.Player})
             LeaveJail(participant)
-        elseif participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
+        elseif false then --participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
             SendNotification(`[PLAYER] rolled doubles and is leaving jail.`, {participant.Player})
             LeaveJail(participant)
         end
@@ -294,10 +296,12 @@ end
 
 local function GiveJailCard(participant: Types.Participant): ()
     participant.JailCards += 1
+    participant.Player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
 end
 
 local function TransferJailCard(participant: Types.Participant, to: Types.AssetOwner): ()
     participant.JailCards -= 1
+    participant.Player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
 
     if to ~= "Bank" then
         to:GiveJailCard()
@@ -354,6 +358,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.PromptPurchaseProperty = PromptPurchaseProperty
 
     player:SetAttribute("Money", participant.Money)
+    player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
+    player:SetAttribute("IsJailed", participant.JailedOn ~= 0)
 
     return participant
 end
