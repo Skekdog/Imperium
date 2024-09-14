@@ -2,6 +2,7 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Notification = require(script.Parent.Notification)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local RollDice = require(script.Parent.RollDice)
 local ToggleMovementEnabled = require(script.Parent.ToggleMovementEnabled)
@@ -65,3 +66,5 @@ end
 moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
 Players.LocalPlayer:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
+
+gameServerClient.SendNotification.OnClientEvent:Connect(Notification)
