@@ -145,7 +145,18 @@ function module.GetLobby(userId: number): LobbyTypes.Lobby?
     return lobbies[userId]
 end
 
-function module.GetAllLobbies(): {LobbyTypes.ClientLobby}
+function module.GetAllLobbies(): {LobbyTypes.Lobby}
+    local allLobbies = {}
+
+    for _, lobby in lobbies do
+        assert(lobby)
+        table.insert(allLobbies, lobby)
+    end
+
+    return allLobbies
+end
+
+function module.GetAllLobbiesAsClient(): {LobbyTypes.ClientLobby}
     local allLobbies: {LobbyTypes.ClientLobby} = {}
 
     for _, lobby in lobbies do

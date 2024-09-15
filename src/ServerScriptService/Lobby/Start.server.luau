@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lobby = require(script.Parent.Lobby)
 local LobbyTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Lobby.LobbyTypes)
@@ -136,5 +137,16 @@ clientServer.GetAvailableSettings.OnServerInvoke = function(plr)
 end
 
 clientServer.GetAllLobbies.OnServerInvoke = function(plr)
-    return Lobby.GetAllLobbies()
+    return Lobby.GetAllLobbiesAsClient()
 end
+
+Players.PlayerRemoving:Connect(function(plr)
+    local lobby = Lobby.GetLobby(plr.UserId)
+    if lobby then
+        lobby:Disband()
+    else
+        for _, v in Lobby.GetAllLobbies() do
+            v:RemovePlayer(plr)
+        end
+    end
+end)   
