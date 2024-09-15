@@ -42,6 +42,11 @@
                 "GlobalShadows": false
             }
         },
+        "StarterPlayer": {
+            "$properties": {
+                "CharacterWalkSpeed": 32
+            }
+        },
         "Workspace": {
             "$className": "Workspace",
             "$properties": {

@@ -52,6 +52,12 @@
             "$properties": {
                 "StreamingEnabled": false
             }
+        },
+        "StarterPlayer": {
+            "$className": "StarterPlayer",
+            "$properties": {
+                "CharacterWalkSpeed": 32
+            }
         }
     }
 }
