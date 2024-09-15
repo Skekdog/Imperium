@@ -200,7 +200,7 @@ local function createLobbySlot(lobby: LobbyTypes.ClientLobby): ()
     end
 end
 
-local function switchView(view: "Browser" | "HostView"): ()
+local function switchView(view: "Browser" | "HostView" | "None"): ()
     hostView.Visible = view == "HostView"
     browser.Visible = view == "Browser"
     create.Visible = view == "Browser"
@@ -333,6 +333,12 @@ for _, setting in settings do
 end
 
 ReplicatedStorage.Shared.ServerClient.SendNotification.OnClientEvent:Connect(Notification)
+
+serverClient.ToggleUI.OnClientEvent:Connect(function(state: boolean)
+    UIManager.WaitForUI("Settings"):ToggleVisible(state)
+    UIManager.WaitForUI("Sidebar"):ToggleVisible(state)
+    switchView("None")
+end)
 
 for _, v in clientServer.GetAllLobbies:InvokeServer() do
     createLobbySlot(v)

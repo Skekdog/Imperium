@@ -26,11 +26,19 @@ clientServer.LeaveLobby.OnServerEvent:Connect(function(plr, userId: unknown)
         return
     end
 
+    if Lobby.IsTeleporting(plr) then
+        return
+    end
+
     lobby:RemovePlayer(plr)
 end)
 
 clientServer.CreateLobby.OnServerEvent:Connect(function(plr, password: unknown)
     if typeof(password) ~= "string" then
+        return
+    end
+
+    if Lobby.IsTeleporting(plr) then
         return
     end
 
@@ -48,6 +56,10 @@ clientServer.KickPlayer.OnServerEvent:Connect(function(plr, target: unknown)
     end
 
     if lobby.Owner ~= plr then
+        return
+    end
+
+    if Lobby.IsTeleporting(plr) then
         return
     end
 

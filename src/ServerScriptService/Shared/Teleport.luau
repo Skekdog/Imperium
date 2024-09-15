@@ -13,7 +13,7 @@ export type GameInfo = {
     AuctionTime: number,
 }
 
-return function(players: {Player}, place: "Game" | "Lobby", gameInfo: GameInfo?): ()
+return function(players: {Player}, place: "Game" | "Lobby", gameInfo: GameInfo?, callback: ((success: boolean, TeleportAsyncResult) -> ())?): ()
     task.spawn(function()
         local accessCode, privateId = TeleportService:ReserveServer(if place == "Game" then gamePlaceId else lobbyPlaceId)
 
@@ -25,6 +25,9 @@ return function(players: {Player}, place: "Game" | "Lobby", gameInfo: GameInfo?)
             gameInfoStore:SetAsync(privateId, gameInfo, 180)
         end
     
-        SafeTeleport(if place == "Game" then gamePlaceId else lobbyPlaceId, players, options)
+        local success, result = SafeTeleport(if place == "Game" then gamePlaceId else lobbyPlaceId, players, options)
+        if callback then
+            callback(success, result)
+        end
     end)
 end

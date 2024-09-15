@@ -10,6 +10,12 @@ local MAX_PLAYERS = 8
 
 local lobbies: {[number]: LobbyTypes.Lobby?} = {}
 
+local teleportingPlayers: {Player} = {}
+
+local function IsTeleporting(plr: Player): boolean
+    return not not table.find(teleportingPlayers, plr)
+end
+
 local function Kick(lobby: LobbyTypes.Lobby, plr: Player): ()
     if plr ~= lobby.Owner then
         SendNotification("You have been kicked from [PLAYER]'s lobby.", {lobby.Owner}, {plr})
@@ -26,8 +32,24 @@ local function Start(lobby: LobbyTypes.Lobby): ()
         Board = lobby.Settings["Board"],
     }
 
+    local allPlayers = lobby.Players
+    for _, plr in allPlayers do
+        serverClient.ToggleUI:FireClient(plr, false)
+        table.insert(teleportingPlayers, plr)
+    end
+
     SendNotification("[PLAYER] has started the game. Please wait.", {lobby.Owner}, lobby.Players)
-    Teleport(lobby.Players, "Game", info)
+    Teleport(lobby.Players, "Game", info, function(success)
+        if not success then
+            for _, v in allPlayers do
+                local index = table.find(teleportingPlayers, v)
+                if index then
+                    serverClient.ToggleUI:FireClient(v, true)
+                    table.remove(teleportingPlayers, table.find(teleportingPlayers, v))
+                end
+            end
+        end
+    end)
 
     lobbies[lobby.Owner.UserId] = nil
     serverClient.LobbyRemoved:FireAllClients(lobby.Owner.UserId)
@@ -72,6 +94,10 @@ local function TryJoin(lobby: LobbyTypes.Lobby, plr: Player, password: unknown):
 
     if table.find(lobby.Players, plr) then
         return "you are already in this lobby"
+    end
+
+    if IsTeleporting(plr) then
+        return "you are already joining a game"
     end
 
     lobby:AddPlayer(plr)
@@ -129,6 +155,8 @@ function module.GetAllLobbies(): {LobbyTypes.ClientLobby}
 
     return allLobbies
 end
+
+module.IsTeleporting = IsTeleporting
 
 function module.new(host: Player, password: string): LobbyTypes.Lobby
     local lobby = {}
