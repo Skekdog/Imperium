@@ -125,7 +125,8 @@ local function createLobbySlot(lobby: LobbyTypes.ClientLobby): ()
     local slot: LobbySlot
     local parent: Instance
     if lobby.Owner == Players.LocalPlayer then
-        slot = hostView.LobbyOverview :: any
+        slot = hostView.LobbyOverview :: any;
+        (slot :: any).Password.Text = lobby.Password
         parent = hostView
     elseif lobby.Private then
         slot = browser.PrivateLobbyTemplate:Clone() :: any

@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LobbyTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Lobby.LobbyTypes)
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
@@ -102,12 +103,13 @@ local function GetAllSettings(lobby: LobbyTypes.Lobby): LobbyTypes.Settings
     return lobby.Settings
 end
 
-local function GetClientLobby(lobby: LobbyTypes.Lobby): LobbyTypes.ClientLobby
+local function GetClientLobby(lobby: LobbyTypes.Lobby, to: Player?): LobbyTypes.ClientLobby
     return {
         Owner = lobby.Owner,
         Players = lobby.Players,
         Settings = lobby.Settings,
         Private = lobby.Password ~= "",
+        Password = if to == lobby.Owner then lobby.Password else nil,
     }
 end
 
@@ -160,7 +162,10 @@ function module.new(host: Player, password: string): LobbyTypes.Lobby
     end
 
     lobbies[host.UserId] = lobby
-    serverClient.LobbyAdded:FireAllClients(lobby:GetClientLobby())
+
+    for _, player in Players:GetPlayers() do
+        serverClient.LobbyAdded:FireClient(player, lobby:GetClientLobby(player))
+    end
 
     return lobby
 end

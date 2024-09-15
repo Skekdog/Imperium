@@ -32,7 +32,7 @@ export type Lobby = {
     SetSetting: (Lobby, setting: string, value: string | number) -> (),
     GetAllSettings: (Lobby) -> Settings,
 
-    GetClientLobby: (Lobby) -> ClientLobby,
+    GetClientLobby: (Lobby, to: Player?) -> ClientLobby,
 }
 
 export type ClientLobby = {
@@ -40,6 +40,7 @@ export type ClientLobby = {
     Players: {Player},
     Settings: Settings,
     Private: boolean,
+    Password: string?,
 }
 
 return {}
