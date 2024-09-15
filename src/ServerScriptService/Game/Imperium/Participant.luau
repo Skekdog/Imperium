@@ -15,6 +15,8 @@ local function SendToJail(participant: Types.Participant): ()
     participant.JailedOn = participant.Round.Turn
     participant.Player:SetAttribute("IsJailed", true)
     participant:MoveToTileByName("Jail", true)
+
+    PlaySound("LockingUp")
 end
 
 local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
@@ -74,6 +76,10 @@ end
 local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Money += amount
     participant.Player:SetAttribute("Money", participant.Money)
+
+    if amount > 0 then
+        PlaySound("MoneyGained", participant.Player)
+    end
 end
 
 local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number, noNotification: boolean?): ()
