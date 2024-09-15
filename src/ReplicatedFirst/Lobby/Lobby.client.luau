@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
@@ -92,6 +93,7 @@ local function addPlayer(slot: LobbySlot, plr: Player): ()
         end)
 
         button.Activated:Connect(function()
+            PlayClickSound()
             clientServer.KickPlayer:FireServer(plr)
         end)
     end
@@ -182,6 +184,7 @@ local function createLobbySlot(lobby: LobbyTypes.ClientLobby): ()
 
     if lobby.Owner ~= Players.LocalPlayer then
         slot.Join.Activated:Connect(function()
+            PlayClickSound()
             if id == currentLobby then
                 return clientServer.LeaveLobby:FireServer(id)
             end
@@ -270,11 +273,13 @@ serverClient.PlayerRemoved.OnClientEvent:Connect(removePlayerFromLobby)
 serverClient.SettingUpdated.OnClientEvent:Connect(updateSettingForLobby)
 
 ui.Object.Create.TextButton.Activated:Connect(function()
+    PlayClickSound()
     clientServer.CreateLobby:FireServer(ui.Object.Create.Password.Text)
     switchView("HostView")
 end)
 
 hostView.Start.Activated:Connect(function()
+    PlayClickSound()
     clientServer.StartLobby:FireServer()
 end)
 
@@ -322,6 +327,7 @@ for _, setting in settings do
             option.Parent = selectionSetting.Options
 
             option.Activated:Connect(function()
+                PlayClickSound()
                 clientServer.UpdateSetting:FireServer(setting.Name, v)
             end)
         end

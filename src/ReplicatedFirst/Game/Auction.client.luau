@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
 local auctionPropertyUI = UIManager.WaitForUI("AuctionProperty") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.AuctionProperty)}
@@ -37,6 +38,7 @@ for _, v in object.Increments:GetChildren() do
     end
 
     v.Activated:Connect(function()
+        PlayClickSound()
         makeBid(v.Text)
     end)
 end
