@@ -245,6 +245,7 @@ local function FindClosestForwardPositionByColour(participant: Types.Participant
 end
 
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
+    PlaySound("DiceRoll")
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
 
