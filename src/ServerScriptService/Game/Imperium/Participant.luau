@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
-local SendNotification = require(script.Parent.Parent.SendNotification)
+local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local TileMath = require(script.Parent.Parent.TileMath)
 local Types = require(script.Parent.Types)

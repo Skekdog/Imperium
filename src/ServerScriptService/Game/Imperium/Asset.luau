@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
-local SendNotification = require(script.Parent.Parent.SendNotification)
+local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Types = require(script.Parent.Types)
 
