@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local TileMath = require(script.Parent.Parent.TileMath)
@@ -8,6 +9,8 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local function SendToJail(participant: Types.Participant): ()
+    PlaySound("Siren")
+
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
     participant.Player:SetAttribute("IsJailed", true)
