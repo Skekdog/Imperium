@@ -31,13 +31,11 @@
             "Game": {"$path": "Assets/Game"}
         },
         "TextChatService": {
-            "$className": "TextChatService",
             "$properties": {
                 "ChatVersion": "TextChatService"
             }
         },
         "Lighting": {
-            "$path": "src/Lighting",
             "$properties": {
                 "GlobalShadows": false
             }
@@ -48,7 +46,6 @@
             }
         },
         "Workspace": {
-            "$className": "Workspace",
             "$properties": {
                 "StreamingEnabled": false
             }

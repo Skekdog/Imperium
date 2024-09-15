@@ -38,19 +38,16 @@
             }
         },
         "TextChatService": {
-            "$className": "TextChatService",
             "$properties": {
                 "ChatVersion": "TextChatService"
             }
         },
         "Workspace": {
-            "$className": "Workspace",
             "$properties": {
                 "StreamingEnabled": false
             }
         },
         "StarterPlayer": {
-            "$className": "StarterPlayer",
             "$properties": {
                 "CharacterWalkSpeed": 32
             }

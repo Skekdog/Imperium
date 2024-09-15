@@ -23,7 +23,6 @@
             "Lobby": {"$path": "Assets/Lobby"}
         },
         "TextChatService": {
-            "$className": "TextChatService",
             "$properties": {
                 "ChatVersion": "TextChatService"
             }
@@ -35,19 +34,16 @@
             }
         },
         "Players": {
-            "$className": "Players",
             "$properties": {
                 "CharacterAutoLoads": false
             }
         },
         "Workspace": {
-            "$className": "Workspace",
             "$properties": {
                 "StreamingEnabled": false
             }
         },
         "StarterPlayer": {
-            "$className": "StarterPlayer",
             "$properties": {
                 "CharacterWalkSpeed": 32
             }
