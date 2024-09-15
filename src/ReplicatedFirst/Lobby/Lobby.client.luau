@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
 local serverClient = ReplicatedStorage.Lobby.ServerClient
@@ -105,6 +106,27 @@ local function removePlayer(slot: LobbySlot, plr: Player): ()
     slot.Capacity.Text = `{#slot.Players:GetChildren() - 3} / {tostring(MAX_PLAYERS)}`
 end
 
+local function setHostSettingsView(setting: string, value: string | number): ()
+    local option = hostView.Settings:FindFirstChild(setting) :: typeof(hostView.Settings.InputSettingTemplate) | typeof(hostView.Settings.SelectionSettingTemplate)?
+
+    if not option then
+        return
+    end
+
+    local input = (option :: any):FindFirstChild("Input")
+    if input then
+        input.Text = tostring(value)
+    else
+        local selections = (option :: any):FindFirstChild("Options") :: typeof(hostView.Settings.SelectionSettingTemplate.Options)
+        local selection = selections:FindFirstChild(tostring(value))
+
+        if not selection or not selection:IsA("TextButton") then
+            return
+        end
+        UIAnimation.TransitionUnderline(selections.Underline, selection)
+    end
+end
+
 local function updateSetting(slot: LobbySlot, setting: string, value: string | number): ()
     local element = slot.Configuration:FindFirstChild(setting) :: typeof(slot.Configuration.SettingTemplate)?
     if not element then
@@ -117,6 +139,10 @@ local function updateSetting(slot: LobbySlot, setting: string, value: string | n
     element.Visible = true
     element.Name = setting
     element.Parent = slot.Configuration
+
+    if slot.Parent == (hostView :: any) then
+        setHostSettingsView(setting, value)
+    end
 end
 
 local function createLobbySlot(lobby: LobbyTypes.ClientLobby): ()
@@ -230,11 +256,18 @@ local function removePlayerFromLobby(lobbyId: number, plr: Player): ()
     end
 end
 
+local function updateSettingForLobby(lobbyId: number, setting: string, value: string | number): ()
+    local lobby = lobbies[lobbyId]
+    if lobby then
+        updateSetting(lobby, setting, value)
+    end
+end
+
 serverClient.LobbyAdded.OnClientEvent:Connect(createLobbySlot)
 serverClient.LobbyRemoved.OnClientEvent:Connect(removeLobbySlot)
 serverClient.PlayerAdded.OnClientEvent:Connect(addPlayerToLobby)
 serverClient.PlayerRemoved.OnClientEvent:Connect(removePlayerFromLobby)
-serverClient.SettingUpdated.OnClientEvent:Connect(updateSetting)
+serverClient.SettingUpdated.OnClientEvent:Connect(updateSettingForLobby)
 
 ui.Object.Create.TextButton.Activated:Connect(function()
     clientServer.CreateLobby:FireServer(ui.Object.Create.Password.Text)
@@ -245,21 +278,58 @@ hostView.Start.Activated:Connect(function()
     clientServer.StartLobby:FireServer()
 end)
 
+local settingsOverview = hostView.Settings
 local settings: LobbyTypes.AvailableSettings = clientServer.GetAvailableSettings:InvokeServer()
-for setting: string, value: {string} | number in settings :: any do
-    if typeof(value) == "number" then
-        local inputElement = hostView.Settings.InputSettingTemplate:Clone()
-        inputElement.Title.Text = setting
-        inputElement.Input.Text = tostring(value)
-        inputElement.Parent = hostView.Settings
+for _, setting in settings do
+    if setting.PossibleValues == "number" then
+        local inputSetting = settingsOverview.InputSettingTemplate:Clone()
 
-        inputElement.Input.FocusLost:Connect(function()
-            clientServer.UpdateSetting:FireServer(setting, inputElement.Input.Text)
+        inputSetting.Name = setting.Name
+        inputSetting.Title.Text = setting.Name
+        
+        local placeholderText
+        if setting.Min and setting.Max then
+            placeholderText = `{setting.Min} - {setting.Max}`
+        elseif setting.Min then
+            placeholderText = `{setting.Min}+`
+        elseif setting.Max then
+            placeholderText = `{setting.Max}-`
+        else
+            placeholderText = ""
+        end
+
+        inputSetting.Input.PlaceholderText = placeholderText
+
+        inputSetting.Visible = true
+        inputSetting.Parent = settingsOverview
+
+        inputSetting.Input.FocusLost:Connect(function()
+            clientServer.UpdateSetting:FireServer(setting.Name, tonumber(inputSetting.Input.Text))
         end)
-    elseif typeof(value) == "table" then
-        local selectElement = hostView.Settings.SelectionSettingTemplate:Clone()
-        selectElement.Title.Text = setting
+    else
+        local selectionSetting = settingsOverview.SelectionSettingTemplate:Clone()
+
+        selectionSetting.Name = setting.Name
+        selectionSetting.Title.Text = setting.Name
+
+        for i, v in setting.PossibleValues do
+            local option = selectionSetting.Options.OptionTemplate:Clone()
+
+            option.Name = v
+            option.Text = v
+            option.Visible = true
+            option.Position = UDim2.fromScale((i-1) / #setting.PossibleValues, 0)
+            option.Parent = selectionSetting.Options
+
+            option.Activated:Connect(function()
+                clientServer.UpdateSetting:FireServer(setting.Name, v)
+            end)
+        end
+
+        selectionSetting.Visible = true
+        selectionSetting.Parent = settingsOverview
     end
+    setHostSettingsView(setting.Name, setting.Default)
 end
 
 ReplicatedStorage.Shared.ServerClient.SendNotification.OnClientEvent:Connect(Notification)

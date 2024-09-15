@@ -7,12 +7,14 @@ export type Settings = {
     ["Board"]: string,
 }
 
-export type AvailableSettings = {
-    ["Turn Time"]: number,
-    ["Auction Time"]: number,
-    ["Map"]: {Map},
-    ["Board"]: {Board},
+export type Setting = {
+    Name: string,
+    Default: string | number,
+    PossibleValues: {string} | "number",
+    Max: number?,
+    Min: number?,
 }
+export type AvailableSettings = {Setting}
 
 export type Lobby = {
     Owner: Player,
