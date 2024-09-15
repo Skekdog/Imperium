@@ -32,16 +32,9 @@
             "Lobby": {"$path": "Assets/Lobby"}
         },
         "Lighting": {
-            "$className": "Lighting",
+            "$path": "src/Lighting",
             "$properties": {
                 "GlobalShadows": false
-            },
-
-            "Blur": {
-                "$className": "BlurEffect",
-                "$properties": {
-                    "Size": 64
-                }
             }
         },
         "TextChatService": {
