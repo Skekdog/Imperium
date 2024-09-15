@@ -52,6 +52,9 @@
             "$properties": {
                 "StreamingEnabled": false
             }
+        },
+        "SoundService": {
+            "$path": "src/SoundService"
         }
     }
 }

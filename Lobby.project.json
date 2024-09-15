@@ -58,6 +58,9 @@
             "$properties": {
                 "CharacterWalkSpeed": 32
             }
+        },
+        "SoundService": {
+            "$path": "src/SoundService"
         }
     }
 }
