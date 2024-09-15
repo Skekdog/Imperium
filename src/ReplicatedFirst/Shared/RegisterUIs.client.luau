@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 
 local UIManager = require(ReplicatedFirst.Shared.UIManager)
 
@@ -50,6 +51,8 @@ end)
 ReplicatedStorage:WaitForChild("Shared").ServerClient.OpenSettings.OnClientEvent:Connect(function()
 	UIManager.WaitForUI("Settings"):ToggleVisible(true)
 end)
+
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 
 -- If we do not have this event, then the server fires various data sync events before the client begins listening, resulting in desync. This is a (bad) fix.
 task.wait(1)
