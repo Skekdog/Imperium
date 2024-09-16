@@ -41,13 +41,13 @@ local function StartNextParticipantTurn(round: Types.Round): ()
     end)
 end
 
-local function GetParticipant(round: Types.Round, player: Player): Types.Participant
+local function TryGetParticipant(round: Types.Round, player: Player): Types.Participant?
     for _, participant in round.Participants do
         if participant.Player == player then
             return participant
         end
     end
-    error(`Participant {player} not found`)
+    return
 end
 
 local function StartRound(round: Types.Round): ()
@@ -87,6 +87,7 @@ end
 
 local function RemoveParticipant(round: Types.Round, participant: Types.Participant): ()
     table.remove(round.Participants, table.find(round.Participants, participant))
+    participant.IsInGame = false
     participant.Player:SetAttribute("Status", "Spectating")
     participant.Player:SetAttribute("IsJailed", false)
 
@@ -116,7 +117,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.Participants = {}
 
     round.StartNextParticipantTurn = StartNextParticipantTurn
-    round.GetParticipant = GetParticipant
+    round.TryGetParticipant = TryGetParticipant
     round.StartRound = StartRound
     round.RemoveParticipant = RemoveParticipant
 

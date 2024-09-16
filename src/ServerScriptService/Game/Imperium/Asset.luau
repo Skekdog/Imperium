@@ -154,7 +154,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round): ()
             return
         end
 
-        local participant = round:GetParticipant(plr)
+        local participant = round:TryGetParticipant(plr)
         if not participant then
             return
         end

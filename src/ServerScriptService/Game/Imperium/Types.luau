@@ -99,6 +99,7 @@ export type Participant = {
     Player: Player,
     Round: Round,
     Board: Board,
+    IsInGame: boolean,
 
     Money: number,
     JailCards: number,
@@ -166,7 +167,7 @@ export type Round = {
     CurrentParticipant: Participant?,
 
     StartRound: (Round) -> (),
-    GetParticipant: (Round, player: Player) -> Participant,
+    TryGetParticipant: (Round, player: Player) -> Participant?,
     StartNextParticipantTurn: (Round) -> (),
 
     RemoveParticipant: (Round, participant: Participant) -> (),

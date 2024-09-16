@@ -343,7 +343,9 @@ local function TryPlayMove(participant: Types.Participant): ()
         MoveBy(participant, roll.Result)
     end
 
-    participant.Round:StartNextParticipantTurn()
+    if participant.IsInGame then
+        participant.Round:StartNextParticipantTurn()
+    end
 end
 
 local function GiveJailCards(participant: Types.Participant, amount: number): ()
@@ -441,6 +443,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.BankruptcyWarning = BankruptcyWarning
     participant.GoBankrupt = GoBankrupt
     participant.GetTheDub = GetTheDub
+
+    participant.IsInGame = true
 
     player:SetAttribute("Money", participant.Money)
     player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)

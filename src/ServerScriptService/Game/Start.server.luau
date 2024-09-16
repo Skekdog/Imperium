@@ -71,12 +71,16 @@ round:StartRound()
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 
 local function canPlayMove(plr: Player): Types.Participant?
-    local participant = round:GetParticipant(plr)
+    local participant = round:TryGetParticipant(plr)
+
+    if not participant then
+        return
+    end
 
     if round.CurrentParticipant == participant and not participant.IsMoving then
         return participant
     else
-        return nil
+        return
     end
 end
 
