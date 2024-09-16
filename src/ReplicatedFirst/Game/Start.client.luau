@@ -88,4 +88,4 @@ moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
 player:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
 
-ReplicatedStorage.Shared.ServerClient.SendNotification.OnClientEvent:Connect(Notification)
+ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)

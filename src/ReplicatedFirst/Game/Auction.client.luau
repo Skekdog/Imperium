@@ -6,7 +6,8 @@ local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local auctionPropertyUI = UIManager.WaitForUI("AuctionProperty") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.AuctionProperty)}
 local object = auctionPropertyUI.Object
 
-ReplicatedStorage.Game.ServerClient.StartAuction.OnClientEvent:Connect(function(description: {Name: string}?)
+local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
+gameServerClient:WaitForChild("StartAuction").OnClientEvent:Connect(function(description: {Name: string}?)
     if not description then
         return auctionPropertyUI:ToggleVisible(false)
     end
@@ -16,7 +17,7 @@ ReplicatedStorage.Game.ServerClient.StartAuction.OnClientEvent:Connect(function(
     auctionPropertyUI:ToggleVisible(true)
 end)
 
-ReplicatedStorage.Game.ServerClient.UpdateAuction.OnClientEvent:Connect(function(highestBidder: Player, highestBid: number)
+gameServerClient:WaitForChild("UpdateAuction").OnClientEvent:Connect(function(highestBidder: Player, highestBid: number)
     object.CurrentBid.Text = "£" .. highestBid
     object.CurrentWinner.Text = GetPlayerName(highestBidder)
 end)
@@ -29,7 +30,7 @@ local function makeBid(text: string)
     local highestBid = tonumber(object.CurrentBid.Text:sub(3))
     assert(highestBid, "Invalid highest bid: " .. object.CurrentBid.Text)
 
-    ReplicatedStorage.Game.ClientServer.MakeBid:FireServer(property, highestBid + amount)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("MakeBid"):FireServer(property, highestBid + amount)
 end
 
 for _, v in object.Increments:GetChildren() do

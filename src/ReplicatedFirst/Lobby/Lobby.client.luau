@@ -338,7 +338,7 @@ for _, setting in settings do
     setHostSettingsView(setting.Name, setting.Default)
 end
 
-ReplicatedStorage.Shared.ServerClient.SendNotification.OnClientEvent:Connect(Notification)
+ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
 
 serverClient.ToggleUI.OnClientEvent:Connect(function(state: boolean)
     UIManager.WaitForUI("Settings"):ToggleVisible(state)
