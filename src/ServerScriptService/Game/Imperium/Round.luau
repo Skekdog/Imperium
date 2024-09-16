@@ -87,6 +87,13 @@ end
 
 local function RemoveParticipant(round: Types.Round, participant: Types.Participant): ()
     table.remove(round.Participants, table.find(round.Participants, participant))
+    participant.Player:SetAttribute("Status", "Spectating")
+    participant.Player:SetAttribute("IsJailed", false)
+
+    for _, v in participant.Assets do
+        v:StartAuction(round)
+    end
+
     if #round.Participants == 1 then
         round.Participants[1]:GetTheDub()
     elseif round.CurrentParticipant == participant and #round.Participants > 1 then

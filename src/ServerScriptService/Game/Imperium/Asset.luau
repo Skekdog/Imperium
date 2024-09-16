@@ -94,11 +94,13 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     end
     assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
 
-    SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Name}.`, {owner.Player})
-
     local sellPrice = (GetDevelopmentCost(asset, "House") * asset.Houses) + (GetDevelopmentCost(asset, "Hotel") * asset.Hotels)
     asset.Houses = 0
     asset.Hotels = 0
+
+    if sellPrice > 0 then
+        SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Name}.`, {owner.Player})
+    end
 
     owner:GiveMoney(sellPrice)
 end

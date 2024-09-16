@@ -94,14 +94,7 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
         asset:TransferTo(to)
     end
 
-    participant.Player:SetAttribute("Status", "Spectating")
-    participant.Player:SetAttribute("IsJailed", false)
-
-    local char = participant.Player.Character
-    if char then
-        participant.Player.Character = nil
-        char:Destroy()
-    end
+    participant.Round:RemoveParticipant(participant)
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean

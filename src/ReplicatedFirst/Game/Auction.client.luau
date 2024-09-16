@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local IsSpectating = require(script.Parent.IsSpectating)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -8,7 +9,7 @@ local object = auctionPropertyUI.Object
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 gameServerClient:WaitForChild("StartAuction").OnClientEvent:Connect(function(description: {Name: string}?)
-    if not description then
+    if not description or IsSpectating() then
         return auctionPropertyUI:ToggleVisible(false)
     end
     object.PropertyName.Text = description.Name
