@@ -11,6 +11,7 @@ export type GameInfo = {
     Players: number,
     TurnDuration: number,
     AuctionTime: number,
+    BankruptcyTime: number,
 }
 
 return function(players: {Player}, place: "Game" | "Lobby", gameInfo: GameInfo?, callback: ((success: boolean, TeleportAsyncResult) -> ())?): ()

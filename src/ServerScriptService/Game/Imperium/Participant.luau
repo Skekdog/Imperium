@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HasMoneyFor = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.HasMoneyFor)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
@@ -82,8 +83,54 @@ local function GiveMoney(participant: Types.Participant, amount: number): ()
     end
 end
 
+local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner): ()
+    SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, {participant.Player})
+    participant:TransferMoneyTo(to, participant.Money, true)
+    participant:TransferJailCards(to, participant.JailCards)
+    for _, asset in participant.Assets do
+        asset:TransferTo(to)
+    end
+
+    participant.Player:SetAttribute("Status", "Spectating")
+    participant.Player:SetAttribute("IsJailed", false)
+
+    local char = participant.Player.Character
+    if char then
+        participant.Player.Character = nil
+        char:Destroy()
+    end
+end
+
+local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
+    local players = {participant.Player}
+    if to ~= "Bank" then
+        table.insert(players, to.Player)
+    end
+    SendNotification(`[PLAYER] needs another £{targetAmount - participant.Money} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
+    
+    local start = GetTime()
+    local maxTime = start + participant.Round.GameConfiguration.BankruptcyTime
+    SetTimeMilestone(participant.Round.GameConfiguration.BankruptcyTime)
+    while true and GetTime() < maxTime and participant.Money < targetAmount do
+        task.wait()
+    end
+
+    if participant.Money < targetAmount then
+        GoBankrupt(participant, to)
+        return false
+    end
+
+    return true
+end
+
 local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number, noNotification: boolean?): ()
     assert(to ~= participant, "Can't transfer money to same participant")
+    if not HasMoneyFor(amount, participant) then
+        local survived = BankruptcyWarning(participant, amount, to)
+        if not survived then
+            return
+        end
+    end
     if not noNotification then
         local players = {participant.Player}
         if to ~= "Bank" then
@@ -303,17 +350,18 @@ local function TryPlayMove(participant: Types.Participant): ()
     participant.Round:StartNextParticipantTurn()
 end
 
-local function GiveJailCard(participant: Types.Participant): ()
-    participant.JailCards += 1
+local function GiveJailCards(participant: Types.Participant, amount: number): ()
+    participant.JailCards += amount
     participant.Player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
 end
 
-local function TransferJailCard(participant: Types.Participant, to: Types.AssetOwner): ()
-    participant.JailCards -= 1
+local function TransferJailCards(participant: Types.Participant, to: Types.AssetOwner, amount: number): ()
+    assert(participant.JailCards >= amount, "Not enough jail cards")
+    participant.JailCards -= amount
     participant.Player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
 
     if to ~= "Bank" then
-        to:GiveJailCard()
+        to:GiveJailCards(amount)
     end
 end
 
@@ -332,7 +380,7 @@ end
 
 local function TryUseJailCard(participant: Types.Participant): ()
     if participant.JailCards > 0 and participant.JailedOn ~= 0 then
-        participant:TransferJailCard("Bank")
+        participant:TransferJailCards("Bank", 1)
 
         SendNotification(`[PLAYER] used a Get Out of Jail Free card.`, {participant.Player})
         LeaveJail(participant)
@@ -375,8 +423,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.TryPlayMove = TryPlayMove
     participant.MoveToTileByName = MoveToTileByName
     participant.FindClosestForwardPositionByColour = FindClosestForwardPositionByColour
-    participant.GiveJailCard = GiveJailCard
-    participant.TransferJailCard = TransferJailCard
+    participant.GiveJailCards = GiveJailCards
+    participant.TransferJailCards = TransferJailCards
     participant.LeaveJail = LeaveJail
     participant.TryPayRent = TryPayRent
     participant.DrawCard = DrawCard
@@ -385,6 +433,9 @@ function module.new(player: Player, round: Types.Round): Types.Participant
 
     participant.PurchaseProperty = PurchaseProperty
     participant.PromptPurchaseProperty = PromptPurchaseProperty
+
+    participant.BankruptcyWarning = BankruptcyWarning
+    participant.GoBankrupt = GoBankrupt
 
     player:SetAttribute("Money", participant.Money)
     player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)

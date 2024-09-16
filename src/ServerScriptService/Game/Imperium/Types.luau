@@ -30,6 +30,7 @@ export type BoardConfiguration = {
 export type GameConfiguration = {
     AuctionTime: number,
     PlayerTurnTime: number,
+    BankruptcyTime: number,
 }
 
 export type AssetDescription = {
@@ -129,16 +130,19 @@ export type Participant = {
 
     TryPayRent: (Participant, Tile) -> (),
 
-    GiveJailCard: (Participant) -> (),
+    GiveJailCards: (Participant, amount: number) -> (),
     GiveMoney: (Participant, amount: number) -> (),
 
     TransferMoneyTo: (Participant, to: AssetOwner, amount: number, noNotification: boolean?) -> (),
-    TransferJailCard: (Participant, to: AssetOwner) -> (),
+    TransferJailCards: (Participant, to: AssetOwner, amount: number) -> (),
 
     DrawCard: (Participant, card: CardDescription) -> (),
 
     PurchaseProperty: (Participant, asset: Asset) -> (),
     PromptPurchaseProperty: (Participant, asset: Asset) -> (),
+
+    BankruptcyWarning: (Participant, targetAmount: number, to: AssetOwner) -> (),
+    GoBankrupt: (Participant, to: AssetOwner) -> (),
 }
 
 export type Board = {

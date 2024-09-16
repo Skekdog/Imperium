@@ -76,14 +76,24 @@ local function GetRentForStation(asset: Types.Asset, participant: Types.Particip
             ownedStations += 1
         end
     end
-    return ownedStations * 25
+
+    if ownedStations == 1 then
+        return 25
+    elseif ownedStations == 2 then
+        return 50
+    elseif ownedStations == 3 then
+        return 100
+    elseif ownedStations == 4 then
+        return 200
+    end
+    return 50 * ownedStations
 end
 
 module.Name = "Classic"
 module.Colours = Colours
 
 module.StartingJailCards = 0
-module.StartingMoney = 1500
+module.StartingMoney = 15
 module.PassGoMoney = 200
 
 module.JailFine = 50

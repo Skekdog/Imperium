@@ -28,6 +28,7 @@ if not info then
         Players = if RunService:IsStudio() then 1 else 8,
         TurnDuration = 15,
         AuctionTime = 15,
+        BankruptcyTime = 10,
     }
     info = temp
 end
@@ -36,8 +37,9 @@ assert(info)
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
 
-local turnTime = info.TurnDuration
-local auctionTime = info.AuctionTime
+local turnTime = info.TurnDuration or 15
+local auctionTime = info.AuctionTime or 15
+local bankruptcyTime = info.BankruptcyTime or 60
 
 Players.PlayerAdded:Connect(function(plr)
     plr:SetAttribute("Status", "Spectating")
@@ -57,6 +59,7 @@ end
 local round = Round.new(Classic, tiles, {
     PlayerTurnTime = turnTime,
     AuctionTime = auctionTime,
+    BankruptcyTime = bankruptcyTime,
 })
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)
