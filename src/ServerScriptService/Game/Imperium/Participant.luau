@@ -1,9 +1,12 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HasMoneyFor = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.HasMoneyFor)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
+local Teleport = require(script.Parent.Parent.Parent.Shared.Teleport)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
+local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local TileMath = require(script.Parent.Parent.TileMath)
 local Types = require(script.Parent.Types)
 
@@ -396,6 +399,14 @@ local function TryPayFine(participant: Types.Participant): ()
     end
 end
 
+local function GetTheDub(participant: Types.Participant): ()
+    SendNotification(`[PLAYER] won the game!`, {participant.Player})
+    SetWaitingText("Returning to lobby...", 15)
+
+    task.wait(15)
+    Teleport(Players:GetPlayers(), "Lobby")
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -436,6 +447,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
 
     participant.BankruptcyWarning = BankruptcyWarning
     participant.GoBankrupt = GoBankrupt
+    participant.GetTheDub = GetTheDub
 
     player:SetAttribute("Money", participant.Money)
     player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)

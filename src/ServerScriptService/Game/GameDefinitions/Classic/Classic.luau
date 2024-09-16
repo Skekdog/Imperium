@@ -93,12 +93,12 @@ module.Name = "Classic"
 module.Colours = Colours
 
 module.StartingJailCards = 0
-module.StartingMoney = 15
+module.StartingMoney = 1500
 module.PassGoMoney = 200
 
 module.JailFine = 50
 module.JailLength = 3
-module.DoublesConsecutiveJailAmount = 0
+module.DoublesConsecutiveJailAmount = 3
 
 module.CanLeaveJailByRollingDoubles = true
 module.AllowJailedRentCollection = true

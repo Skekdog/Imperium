@@ -143,6 +143,8 @@ export type Participant = {
 
     BankruptcyWarning: (Participant, targetAmount: number, to: AssetOwner) -> (),
     GoBankrupt: (Participant, to: AssetOwner) -> (),
+
+    GetTheDub: (Participant) -> (),
 }
 
 export type Board = {
@@ -166,6 +168,8 @@ export type Round = {
     StartRound: (Round) -> (),
     GetParticipant: (Round, player: Player) -> Participant,
     StartNextParticipantTurn: (Round) -> (),
+
+    RemoveParticipant: (Round, participant: Participant) -> (),
 }
 
 return {}

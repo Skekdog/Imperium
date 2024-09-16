@@ -85,6 +85,15 @@ local function StartRound(round: Types.Round): ()
     StartNextParticipantTurn(round)
 end
 
+local function RemoveParticipant(round: Types.Round, participant: Types.Participant): ()
+    table.remove(round.Participants, table.find(round.Participants, participant))
+    if #round.Participants == 1 then
+        round.Participants[1]:GetTheDub()
+    elseif round.CurrentParticipant == participant and #round.Participants > 1 then
+        StartNextParticipantTurn(round)
+    end
+end
+
 function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     local round = {}
 
@@ -102,6 +111,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.GetParticipant = GetParticipant
     round.StartRound = StartRound
+    round.RemoveParticipant = RemoveParticipant
 
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))
