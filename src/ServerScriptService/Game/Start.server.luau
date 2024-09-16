@@ -6,6 +6,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local Tile = require(script.Parent.Imperium.Tile)
 local Types = require(script.Parent.Imperium.Types)
+local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
@@ -26,20 +27,18 @@ local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateS
 if not info then
     local temp = {
         Players = if RunService:IsStudio() then 1 else 8,
-        TurnDuration = 15,
-        AuctionTime = 15,
-        BankruptcyTime = 60,
-    }
+        TurnTime = GameConfiguration.TurnTime.Default,
+        AuctionTime = GameConfiguration.AuctionTime.Default,
+        BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
+        Map = "Happy Home",
+        Board = "Classic (UK)",
+    } :: Teleport.GameInfo
     info = temp
 end
 assert(info)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
-
-local turnTime = info.TurnDuration or 15
-local auctionTime = info.AuctionTime or 15
-local bankruptcyTime = info.BankruptcyTime or 60
 
 Players.PlayerAdded:Connect(function(plr)
     plr:SetAttribute("Status", "Spectating")
@@ -57,9 +56,9 @@ while (players < info.Players) and (GetTime() - startWait < MAX_PLAYER_LOAD_WAIT
 end
 
 local round = Round.new(Classic, tiles, {
-    PlayerTurnTime = turnTime,
-    AuctionTime = auctionTime,
-    BankruptcyTime = bankruptcyTime,
+    PlayerTurnTime = info.TurnTime,
+    AuctionTime = info.AuctionTime,
+    BankruptcyTime = info.BankruptcyTime,
 })
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)

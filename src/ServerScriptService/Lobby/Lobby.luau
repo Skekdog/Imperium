@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LobbyTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Lobby.LobbyTypes)
+local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 
@@ -24,14 +25,12 @@ local function Kick(lobby: LobbyTypes.Lobby, plr: Player): ()
 end
 
 local function Start(lobby: LobbyTypes.Lobby): ()
-    local info: Teleport.GameInfo = {
+    local info = {
         Players = #lobby.Players,
-        TurnDuration = lobby.Settings["Turn Time"],
-        AuctionTime = lobby.Settings["Auction Time"],
-        BankruptcyTime = lobby.Settings["Bankruptcy Time"],
-        Map = lobby.Settings["Map"],
-        Board = lobby.Settings["Board"],
-    }
+    } :: Teleport.GameInfo
+    for i, v in lobby.Settings do
+        info[i] = v
+    end
 
     local allPlayers = lobby.Players
     for _, plr in allPlayers do
@@ -126,7 +125,7 @@ local function SetSetting(lobby: LobbyTypes.Lobby, setting: string, value: strin
     serverClient.SettingUpdated:FireAllClients(lobby.Owner.UserId, setting, value)
 end
 
-local function GetAllSettings(lobby: LobbyTypes.Lobby): LobbyTypes.Settings
+local function GetAllSettings(lobby: LobbyTypes.Lobby): GameConfiguration.SerialisedSettings
     return lobby.Settings
 end
 
@@ -176,13 +175,11 @@ function module.new(host: Player, password: string): LobbyTypes.Lobby
     lobby.Owner = host
     lobby.Password = password
     lobby.Players = {host}
-    lobby.Settings = {
-        ["Turn Time"] = 15,
-        ["Auction Time"] = 15,
-        ["Bankruptcy Time"] = 60,
-        ["Map"] = "Happy Home",
-        ["Board"] = "Classic (UK)",
-    }
+    lobby.Settings = {} :: GameConfiguration.SerialisedSettings
+
+    for _, v in GameConfiguration do
+        lobby.Settings[v.Name] = v.Default
+    end
 
     lobby.Kick = Kick
     lobby.Start = Start

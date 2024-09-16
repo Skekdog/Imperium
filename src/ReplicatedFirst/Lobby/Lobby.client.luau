@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LobbyTypes = require(script.Parent.LobbyTypes)
+local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
@@ -136,7 +137,7 @@ local function updateSetting(slot: LobbySlot, setting: string, value: string | n
     end
     assert(element)
 
-    element.Title.Text = setting
+    element.Title.Text = GameConfiguration[setting].DisplayName
     element.Value.Text = tostring(value)
     element.Visible = true
     element.Name = setting
@@ -284,13 +285,12 @@ hostView.Start.Activated:Connect(function()
 end)
 
 local settingsOverview = hostView.Settings
-local settings: LobbyTypes.AvailableSettings = clientServer.GetAvailableSettings:InvokeServer()
-for _, setting in settings do
+for _, setting in GameConfiguration do
     if setting.PossibleValues == "number" then
         local inputSetting = settingsOverview.InputSettingTemplate:Clone()
 
         inputSetting.Name = setting.Name
-        inputSetting.Title.Text = setting.Name
+        inputSetting.Title.Text = setting.DisplayName
         
         local placeholderText
         if setting.Min and setting.Max then

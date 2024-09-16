@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lobby = require(script.Parent.Lobby)
-local LobbyTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Lobby.LobbyTypes)
+local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 
 local clientServer = ReplicatedStorage.Lobby.ClientServer
 clientServer.JoinLobby.OnServerInvoke = function(plr, userId: unknown, password: unknown): "Success" | string
@@ -74,36 +74,9 @@ clientServer.StartLobby.OnServerEvent:Connect(function(plr)
     end
 end)
 
-local availableSettings: LobbyTypes.AvailableSettings = {
-    {
-        Name = "Map",
-        Default = "Happy Home",
-        PossibleValues = {"Happy Home"},
-    },
-    {
-        Name = "Board",
-        Default = "Classic (UK)",
-        PossibleValues = {"Classic (UK)"},
-    },
-    {
-        Name = "Turn Time",
-        Default = 15,
-        PossibleValues = "number",
-        Max = 60,
-        Min = 5,
-    },
-    {
-        Name = "Auction Time",
-        Default = 10,
-        PossibleValues = "number",
-        Max = 30,
-        Min = 5,
-    }
-}
-
 clientServer.UpdateSetting.OnServerEvent:Connect(function(plr, setting: unknown, value: unknown)
-    local definition: LobbyTypes.Setting?
-    for _, v in availableSettings do
+    local definition: GameConfiguration.Setting
+    for _, v in GameConfiguration do
         if v.Name == setting then
             definition = v
             break
@@ -131,10 +104,6 @@ clientServer.UpdateSetting.OnServerEvent:Connect(function(plr, setting: unknown,
 
     lobby:SetSetting(definition.Name, value)
 end)
-
-clientServer.GetAvailableSettings.OnServerInvoke = function(plr)
-    return availableSettings
-end
 
 clientServer.GetAllLobbies.OnServerInvoke = function(plr)
     return Lobby.GetAllLobbiesAsClient()

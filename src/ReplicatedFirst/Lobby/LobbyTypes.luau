@@ -1,27 +1,9 @@
-export type Map = "Happy Home"
-export type Board = "Classic (UK)"
-export type Settings = {
-    ["Turn Time"]: number,
-    ["Auction Time"]: number,
-    ["Bankruptcy Time"]: number,
-    ["Map"]: string,
-    ["Board"]: string,
-}
-
-export type Setting = {
-    Name: string,
-    Default: string | number,
-    PossibleValues: {string} | "number",
-    Max: number?,
-    Min: number?,
-}
-export type AvailableSettings = {Setting}
-
+local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
 export type Lobby = {
     Owner: Player,
     Password: string,
     Players: {Player},
-    Settings: Settings,
+    Settings: GameConfiguration.SerialisedSettings,
 
     Kick: (Lobby, plr: Player) -> (),
     Start: (Lobby) -> (),
@@ -33,7 +15,7 @@ export type Lobby = {
     TryJoin: (Lobby, plr: Player, password: unknown) -> "Success" | string,
 
     SetSetting: (Lobby, setting: string, value: string | number) -> (),
-    GetAllSettings: (Lobby) -> Settings,
+    GetAllSettings: (Lobby) -> GameConfiguration.SerialisedSettings,
 
     GetClientLobby: (Lobby, to: Player?) -> ClientLobby,
 }
@@ -41,7 +23,7 @@ export type Lobby = {
 export type ClientLobby = {
     Owner: Player,
     Players: {Player},
-    Settings: Settings,
+    Settings: GameConfiguration.SerialisedSettings,
     Private: boolean,
     Password: string?,
 }
