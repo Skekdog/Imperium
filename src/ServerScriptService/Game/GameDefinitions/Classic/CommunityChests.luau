@@ -33,7 +33,7 @@ module[4] = {
 module[5] = {
     Title = "Get out of jail free. This card may be kept until needed or sold/traded.",
     Effect = function(participant: Types.Participant): ()
-        participant:GiveJailCard()
+        participant:GiveJailCards(1)
     end,
 }
 

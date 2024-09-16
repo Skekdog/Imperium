@@ -28,6 +28,7 @@ local function Start(lobby: LobbyTypes.Lobby): ()
         Players = #lobby.Players,
         TurnDuration = lobby.Settings["Turn Time"],
         AuctionTime = lobby.Settings["Auction Time"],
+        BankruptcyTime = lobby.Settings["Bankruptcy Time"],
         Map = lobby.Settings["Map"],
         Board = lobby.Settings["Board"],
     }
@@ -178,6 +179,7 @@ function module.new(host: Player, password: string): LobbyTypes.Lobby
     lobby.Settings = {
         ["Turn Time"] = 15,
         ["Auction Time"] = 15,
+        ["Bankruptcy Time"] = 60,
         ["Map"] = "Happy Home",
         ["Board"] = "Classic (UK)",
     }

@@ -28,7 +28,7 @@ if not info then
         Players = if RunService:IsStudio() then 1 else 8,
         TurnDuration = 15,
         AuctionTime = 15,
-        BankruptcyTime = 10,
+        BankruptcyTime = 60,
     }
     info = temp
 end

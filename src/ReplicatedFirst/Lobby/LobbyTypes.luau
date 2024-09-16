@@ -3,6 +3,7 @@ export type Board = "Classic (UK)"
 export type Settings = {
     ["Turn Time"]: number,
     ["Auction Time"]: number,
+    ["Bankruptcy Time"]: number,
     ["Map"]: string,
     ["Board"]: string,
 }
