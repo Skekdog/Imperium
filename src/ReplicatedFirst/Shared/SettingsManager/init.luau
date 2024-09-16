@@ -52,7 +52,7 @@ module.AvailableSettings = {
 		PossibleValues = {"Left", "Right"},
 		Default = "Right",
 		Callback = function(val)
-			require(ReplicatedFirst.Shared.UIScripts.SetSidebarAlignment)(val)
+			require(ReplicatedFirst.Shared.SetSidebarAlignment)(val)
 		end
 	},
 	{

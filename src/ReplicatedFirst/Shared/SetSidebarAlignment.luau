@@ -1,5 +1,5 @@
-local UIAnimation = require(script.Parent.Parent.UIAnimation)
-local UIManager = require(script.Parent.Parent.UIManager)
+local UIAnimation = require(script.Parent.UIAnimation)
+local UIManager = require(script.Parent.UIManager)
 
 return function(alignment: "Left" | "Right"): ()
     local ui = UIManager.WaitForUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)

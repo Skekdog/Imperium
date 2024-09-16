@@ -1,5 +1,5 @@
 local Players = game:GetService("Players")
-local UIManager = require(script.Parent.Parent.Parent.Shared.UIManager)
+local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local list = ui.List
