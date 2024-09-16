@@ -24,4 +24,8 @@ function module.SellHotel(name: string): ()
     
 end
 
+function module.SellAll(name: string): ()
+    
+end
+
 return module
