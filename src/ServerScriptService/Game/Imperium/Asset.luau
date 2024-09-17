@@ -63,11 +63,11 @@ local function TryGetDevelopmentSellValue(asset: Types.Asset, development: "Hous
 end
 
 local function GetMortgageValue(asset: Types.Asset): number
-    return asset.AssetDescription.Price / 2
+    return math.round(asset.AssetDescription.Price / 2)
 end
 
 local function GetUnMortgageCost(asset: Types.Asset): number
-    return (asset.AssetDescription.Price / 2) * 1.1
+    return math.round((asset.AssetDescription.Price / 2) * 1.1)
 end
 
 local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Hotel"): ()
@@ -148,22 +148,33 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
 end
 
 local function TryMortgage(asset: Types.Asset): ()
-    assert(not asset.IsMortgaged, "Asset is already mortgaged")
     assert(asset.Owner ~= "Bank", "The bank cannot mortgage")
+
+    if asset.IsMortgaged then
+        return
+    end
 
     asset.IsMortgaged = true
     asset:TrySellAllDevelopments()
-    asset.Owner:GiveMoney(GetMortgageValue(asset))
+
+    local value = GetMortgageValue(asset)
+    asset.Owner:GiveMoney(value)
+    SendNotification(`[PLAYER] mortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
+    updateAsset(asset.Owner, asset, asset.Owner.Round)
 end
 
 local function TryUnMortgage(asset: Types.Asset): ()
-    assert(asset.IsMortgaged, "Asset is not mortgaged")
     assert(asset.Owner ~= "Bank", "The bank cannot unmortgage")
 
-    asset.IsMortgaged = false
-    asset.Owner:TransferMoneyTo("Bank", GetUnMortgageCost(asset), true)
+    if not asset.IsMortgaged then
+        return
+    end
 
-    SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name}`, {asset.Owner.Player})
+    asset.IsMortgaged = false
+
+    local value = GetUnMortgageCost(asset)
+    asset.Owner:TransferMoneyTo("Bank", value, true)
+    SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
     updateAsset(asset.Owner, asset, asset.Owner.Round)
 end
 
