@@ -84,6 +84,7 @@ export type Asset = {
     TryDevelopProperty: (Asset, development: "House" | "Hotel") -> (),
     TrySellDevelopment: (Asset) -> (),
     TrySellAllDevelopments: (Asset) -> (),
+    CanMakeDevelopment: (Asset, development: "House" | "Hotel") -> (boolean, number),
 
     GetRentCost: (Asset, participant: Participant) -> number,
 
@@ -155,6 +156,7 @@ export type Participant = {
     GetTheDub: (Participant) -> (),
 
     HasMonopoly: (Participant, colour: string) -> boolean,
+    CanAfford: (Participant, amount: number) -> boolean,
 }
 
 export type Board = {

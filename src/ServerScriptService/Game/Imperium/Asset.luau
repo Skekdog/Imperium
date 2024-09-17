@@ -29,11 +29,6 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
 
     asset:TrySellAllDevelopments()
 
-    if to ~= "Bank" then
-        updateAsset(to, asset, round)
-        table.insert(to.Assets, asset)
-    end
-
     if asset.Owner ~= "Bank" then
         removeAsset(asset.Owner, asset)
         local index = table.find(asset.Owner.Assets, asset)
@@ -42,12 +37,24 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
         end
     end
 
+    asset.Owner = to -- Important that we do it here otherwise updateAsset() will not account for a new monopoly
+
+    local colour = asset.AssetDescription.Colour
+
+    if to ~= "Bank" then
+        table.insert(to.Assets, asset)
+
+        for _, tile in round.Board.Tiles do
+            if tile.Asset and tile.Asset.Owner == to and tile.Asset.AssetDescription.Colour == colour then
+                updateAsset(to, tile.Asset, round)
+            end
+        end
+    end
+
     local board = round.Board
 
     local tileModel = board:FindTileByName(asset.AssetDescription.Name).Model :: Types.EdgeTile
     tileModel.BaseUIPart.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player):gsub(" ", "\n")
-
-    asset.Owner = to
 end
 
 local function TryGetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number?
@@ -70,20 +77,39 @@ local function GetUnMortgageCost(asset: Types.Asset): number
     return math.round((asset.AssetDescription.Price / 2) * 1.1)
 end
 
+local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Hotel"): (boolean, number)
+    if asset.Owner == "Bank" then
+        return false, 0
+    end
+
+    if development == "House" and asset.Houses >= 4 then
+        return false, 0
+    elseif development == "Hotel" and (asset.Hotels >= 1 or asset.Houses < 4) then
+        return false, 0
+    end
+
+    if not asset.Owner:HasMonopoly(asset.AssetDescription.Colour) then
+        return false, 0
+    end
+
+    local cost = TryGetDevelopmentCost(asset, development, asset.Owner.Round.BoardConfiguration)
+    if not cost or not asset.Owner:CanAfford(cost) then
+        return false, 0
+    end
+
+    return true, cost
+end
+
 local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Hotel"): ()
     local owner = asset.Owner
     assert(typeof(owner) ~= "string", "The bank cannot buy developments")
-    
-    if development == "House" and asset.Houses >= 4 then
-        return
-    elseif development == "Hotel" and (asset.Hotels >= 1 or asset.Houses < 4) then
+
+    local canMake, cost = CanMakeDevelopment(asset, development)
+
+    if not canMake then
         return
     end
 
-    local cost = TryGetDevelopmentCost(asset, development, owner.Round.BoardConfiguration)
-    if not cost then
-        return
-    end
     owner:TransferMoneyTo("Bank", cost, true)
 
     if development == "House" then
@@ -260,10 +286,12 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         view.MortgageValue = GetMortgageValue(asset)
     end
 
-    if asset.Houses == 4 then
-        view.HotelPrice = TryGetDevelopmentCost(asset, "Hotel", round.BoardConfiguration)
-    elseif asset.Hotels < 1 then
-        view.HousePrice = TryGetDevelopmentCost(asset, "House", round.BoardConfiguration)
+    local canMakeHotel, hotelCost = CanMakeDevelopment(asset, "Hotel")
+    local canMakeHouse, houseCost = CanMakeDevelopment(asset, "House")
+    if canMakeHotel then
+        view.HotelPrice = hotelCost
+    elseif canMakeHouse then
+        view.HousePrice = houseCost
     end
 
     local sellAllValue = 0
@@ -322,6 +350,8 @@ function module.new(description: Types.AssetDescription): Types.Asset
 
     asset.GetClientAssetView = GetClientAssetView
     asset.TryGetDevelopmentSellValue = TryGetDevelopmentSellValue
+
+    asset.CanMakeDevelopment = CanMakeDevelopment
 
     return asset
 end

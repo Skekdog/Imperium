@@ -415,6 +415,10 @@ local function HasMonopoly(participant: Types.Participant, colour: string): bool
     return true
 end
 
+local function CanAfford(participant: Types.Participant, amount: number): boolean
+    return participant.Money >= amount
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -458,6 +462,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.GetTheDub = GetTheDub
 
     participant.HasMonopoly = HasMonopoly
+    participant.CanAfford = CanAfford
 
     participant.IsInGame = true
 
