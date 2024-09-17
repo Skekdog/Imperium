@@ -92,6 +92,17 @@ end
 module.Name = "Classic"
 module.Colours = Colours
 
+module.HousePrices = {
+    ["Brown"] = 50,
+    ["Light Blue"] = 50,
+    ["Pink"] = 100,
+    ["Orange"] = 100,
+    ["Red"] = 150,
+    ["Yellow"] = 150,
+    ["Green"] = 200,
+    ["Dark Blue"] = 200,
+}
+
 module.StartingJailCards = 0
 module.StartingMoney = 1500
 module.PassGoMoney = 200

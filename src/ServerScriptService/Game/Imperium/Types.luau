@@ -12,6 +12,8 @@ export type BoardConfiguration = {
     Tiles: {TileDescription},
     Colours: {[string]: Color3, Default: Color3},
 
+    HousePrices: {[string]: number},
+
     StartingJailCards: number,
     StartingMoney: number,
     PassGoMoney: number,
@@ -77,8 +79,8 @@ export type Asset = {
     GetMortgageValue: (Asset) -> number,
     GetUnMortgageCost: (Asset) -> number,
 
-    GetDevelopmentCost: (Asset, development: "House" | "Hotel") -> number,
-    GetDevelopmentSellValue: (Asset, development: "House" | "Hotel") -> number,
+    GetDevelopmentCost: (Asset, development: "House" | "Hotel", boardConfiguration: BoardConfiguration) -> number,
+    GetDevelopmentSellValue: (Asset, development: "House" | "Hotel", boardConfiguration: BoardConfiguration) -> number,
     DevelopProperty: (Asset, development: "House" | "Hotel") -> (),
     SellDevelopment: (Asset) -> (),
     TrySellAllDevelopments: (Asset) -> (),

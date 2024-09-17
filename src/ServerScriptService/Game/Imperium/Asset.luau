@@ -10,7 +10,6 @@ local module = {}
 
 local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     assert(to ~= asset.Owner, "Can't transfer assets to same participant")
-    asset:TrySellAllDevelopments()
 
     local round: Types.Round
     if asset.Owner ~= "Bank" then
@@ -19,6 +18,8 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
         assert(to ~= "Bank")
         round = to.Round
     end
+
+    asset:TrySellAllDevelopments()
 
     local assetView = asset:GetClientAssetView(round)
 
@@ -43,12 +44,12 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     asset.Owner = to
 end
 
-local function GetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel"): number
-    return asset.AssetDescription.Price / (if development == "House" then 2 else 4)
+local function GetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number
+    return boardConfiguration.HousePrices[asset.AssetDescription.Colour]
 end
 
-local function GetDevelopmentSellValue(asset: Types.Asset, development: "House" | "Hotel"): number
-    return (asset.AssetDescription.Price / (if development == "House" then 2 else 4)) / 2
+local function GetDevelopmentSellValue(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number
+    return GetDevelopmentCost(asset, development, boardConfiguration) / 2
 end
 
 local function GetMortgageValue(asset: Types.Asset): number
@@ -70,7 +71,7 @@ local function DevelopProperty(asset: Types.Asset, development: "House" | "Hotel
         assert(asset.Houses == 4, "Cannot buy hotels without 4 houses")
     end
 
-    local cost = GetDevelopmentCost(asset, development)
+    local cost = GetDevelopmentCost(asset, development, owner.Round.BoardConfiguration)
     owner:TransferMoneyTo("Bank", cost, true)
 
     if development == "House" then
@@ -99,7 +100,7 @@ local function SellDevelopment(asset: Types.Asset): ()
 
     SendNotification(`[PLAYER] sold a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
 
-    local sellPrice = GetDevelopmentCost(asset, development) / 2
+    local sellPrice = GetDevelopmentCost(asset, development, owner.Round.BoardConfiguration) / 2
     owner:GiveMoney(sellPrice)
 end
 
@@ -110,7 +111,8 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     end
     assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
 
-    local sellPrice = (GetDevelopmentCost(asset, "House") * asset.Houses) + (GetDevelopmentCost(asset, "Hotel") * asset.Hotels)
+    local boardConfiguration = owner.Round.BoardConfiguration
+    local sellPrice = (GetDevelopmentCost(asset, "House", boardConfiguration) * asset.Houses) + (GetDevelopmentCost(asset, "Hotel", boardConfiguration) * asset.Hotels)
     asset.Houses = 0
     asset.Hotels = 0
 
@@ -217,14 +219,14 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
     end
 
     if asset.Houses == 4 then
-        view.HotelPrice = GetDevelopmentCost(asset, "Hotel")
+        view.HotelPrice = GetDevelopmentCost(asset, "Hotel", round.BoardConfiguration)
     elseif asset.Hotels < 1 then
-        view.HousePrice = GetDevelopmentCost(asset, "House")
+        view.HousePrice = GetDevelopmentCost(asset, "House", round.BoardConfiguration)
     end
 
     local sellAllValue = 0
     if asset.Houses > 0 then
-        local value = GetDevelopmentSellValue(asset, "House")
+        local value = GetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
         for i = 0, asset.Houses do
             sellAllValue += value
         end
@@ -234,7 +236,7 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         end
     end
     if asset.Hotels > 0 then
-        local value = GetDevelopmentSellValue(asset, "Hotel")
+        local value = GetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
         for i = 0, asset.Hotels do
             sellAllValue += value
         end
