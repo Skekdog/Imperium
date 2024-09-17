@@ -8,6 +8,14 @@ local Types = require(script.Parent.Types)
 
 local module = {}
 
+local function updateAsset(participant: Types.Participant, asset: Types.Asset, round: Types.Round): ()
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset"):FireClient(participant.Player, asset:GetClientAssetView(round))
+end
+
+local function removeAsset(participant: Types.Participant, asset: Types.Asset): ()
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset"):FireClient(participant.Player, asset.AssetDescription.Name)
+end
+
 local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     assert(to ~= asset.Owner, "Can't transfer assets to same participant")
 
@@ -21,15 +29,13 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
 
     asset:TrySellAllDevelopments()
 
-    local assetView = asset:GetClientAssetView(round)
-
     if to ~= "Bank" then
-        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset"):FireClient(to.Player, assetView)
+        updateAsset(to, asset, round)
         table.insert(to.Assets, asset)
     end
 
     if asset.Owner ~= "Bank" then
-        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset"):FireClient(asset.Owner.Player, assetView.Name)
+        removeAsset(asset.Owner, asset)
         local index = table.find(asset.Owner.Assets, asset)
         if index then
             table.remove(asset.Owner.Assets, index)
@@ -38,18 +44,22 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
 
     local board = round.Board
 
-    local tileModel = board:FindTileByName(assetView.Name).Model :: Types.EdgeTile
+    local tileModel = board:FindTileByName(asset.AssetDescription.Name).Model :: Types.EdgeTile
     tileModel.BaseUIPart.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player):gsub(" ", "\n")
 
     asset.Owner = to
 end
 
-local function GetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number
+local function TryGetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number?
     return boardConfiguration.HousePrices[asset.AssetDescription.Colour]
 end
 
-local function GetDevelopmentSellValue(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number
-    return GetDevelopmentCost(asset, development, boardConfiguration) / 2
+local function TryGetDevelopmentSellValue(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number?
+    local cost = TryGetDevelopmentCost(asset, development, boardConfiguration)
+    if cost then
+        return cost / 2
+    end
+    return
 end
 
 local function GetMortgageValue(asset: Types.Asset): number
@@ -60,18 +70,20 @@ local function GetUnMortgageCost(asset: Types.Asset): number
     return (asset.AssetDescription.Price / 2) * 1.1
 end
 
-local function DevelopProperty(asset: Types.Asset, development: "House" | "Hotel"): ()
+local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Hotel"): ()
     local owner = asset.Owner
     assert(typeof(owner) ~= "string", "The bank cannot buy developments")
     
-    if development == "House" then
-        assert(asset.Houses < 4, "Cannot buy more than 4 houses")
-    elseif development == "Hotel" then
-        assert(asset.Hotels < 1, "Cannot buy more than 1 hotel")
-        assert(asset.Houses == 4, "Cannot buy hotels without 4 houses")
+    if development == "House" and asset.Houses >= 4 then
+        return
+    elseif development == "Hotel" and (asset.Hotels >= 1 or asset.Houses < 4) then
+        return
     end
 
-    local cost = GetDevelopmentCost(asset, development, owner.Round.BoardConfiguration)
+    local cost = TryGetDevelopmentCost(asset, development, owner.Round.BoardConfiguration)
+    if not cost then
+        return
+    end
     owner:TransferMoneyTo("Bank", cost, true)
 
     if development == "House" then
@@ -81,9 +93,10 @@ local function DevelopProperty(asset: Types.Asset, development: "House" | "Hotel
     end
 
     SendNotification(`[PLAYER] bought a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
+    updateAsset(owner, asset, owner.Round)
 end
 
-local function SellDevelopment(asset: Types.Asset): ()
+local function TrySellDevelopment(asset: Types.Asset): ()
     local owner = asset.Owner
     assert(typeof(owner) ~= "string", "The bank cannot sell developments")
 
@@ -95,13 +108,17 @@ local function SellDevelopment(asset: Types.Asset): ()
         development = "House"
         asset.Houses -= 1
     else
-        assert(false, "No development to sell")
+        return
+    end
+
+    local sellPrice = TryGetDevelopmentSellValue(asset, development, owner.Round.BoardConfiguration)
+    if not sellPrice then
+        return
     end
 
     SendNotification(`[PLAYER] sold a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
-
-    local sellPrice = GetDevelopmentCost(asset, development, owner.Round.BoardConfiguration) / 2
     owner:GiveMoney(sellPrice)
+    updateAsset(owner, asset, owner.Round)
 end
 
 local function TrySellAllDevelopments(asset: Types.Asset): ()
@@ -112,7 +129,13 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
 
     local boardConfiguration = owner.Round.BoardConfiguration
-    local sellPrice = (GetDevelopmentCost(asset, "House", boardConfiguration) * asset.Houses) + (GetDevelopmentCost(asset, "Hotel", boardConfiguration) * asset.Hotels)
+    local houseCost = TryGetDevelopmentSellValue(asset, "House", boardConfiguration)
+    local hotelCost = TryGetDevelopmentSellValue(asset, "Hotel", boardConfiguration)
+    if not houseCost or not hotelCost then
+        return
+    end
+
+    local sellPrice = (houseCost * asset.Houses) + (hotelCost * asset.Hotels)
     asset.Houses = 0
     asset.Hotels = 0
 
@@ -121,9 +144,10 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     end
 
     owner:GiveMoney(sellPrice)
+    updateAsset(owner, asset, owner.Round)
 end
 
-local function Mortgage(asset: Types.Asset): ()
+local function TryMortgage(asset: Types.Asset): ()
     assert(not asset.IsMortgaged, "Asset is already mortgaged")
     assert(asset.Owner ~= "Bank", "The bank cannot mortgage")
 
@@ -132,7 +156,7 @@ local function Mortgage(asset: Types.Asset): ()
     asset.Owner:GiveMoney(GetMortgageValue(asset))
 end
 
-local function UnMortgage(asset: Types.Asset): ()
+local function TryUnMortgage(asset: Types.Asset): ()
     assert(asset.IsMortgaged, "Asset is not mortgaged")
     assert(asset.Owner ~= "Bank", "The bank cannot unmortgage")
 
@@ -140,6 +164,7 @@ local function UnMortgage(asset: Types.Asset): ()
     asset.Owner:TransferMoneyTo("Bank", GetUnMortgageCost(asset), true)
 
     SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name}`, {asset.Owner.Player})
+    updateAsset(asset.Owner, asset, asset.Owner.Round)
 end
 
 local function GetRentCost(asset: Types.Asset, participant: Types.Participant): number
@@ -219,28 +244,32 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
     end
 
     if asset.Houses == 4 then
-        view.HotelPrice = GetDevelopmentCost(asset, "Hotel", round.BoardConfiguration)
+        view.HotelPrice = TryGetDevelopmentCost(asset, "Hotel", round.BoardConfiguration)
     elseif asset.Hotels < 1 then
-        view.HousePrice = GetDevelopmentCost(asset, "House", round.BoardConfiguration)
+        view.HousePrice = TryGetDevelopmentCost(asset, "House", round.BoardConfiguration)
     end
 
     local sellAllValue = 0
     if asset.Houses > 0 then
-        local value = GetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
-        for i = 0, asset.Houses do
-            sellAllValue += value
-        end
-
-        if asset.Hotels < 1 then
-            view.SellHouseValue = value
+        local value = TryGetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
+        if value then
+            for i = 0, asset.Houses do
+                sellAllValue += value
+            end
+    
+            if asset.Hotels < 1 then
+                view.SellHouseValue = value
+            end
         end
     end
     if asset.Hotels > 0 then
-        local value = GetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
-        for i = 0, asset.Hotels do
-            sellAllValue += value
+        local value = TryGetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
+        if value then
+            for i = 0, asset.Hotels do
+                sellAllValue += value
+            end
+            view.SellHotelValue = value
         end
-        view.SellHotelValue = value
     end
 
     if sellAllValue > 0 then
@@ -260,22 +289,22 @@ function module.new(description: Types.AssetDescription): Types.Asset
     asset.Hotels = 0
 
     asset.TransferTo = TransferTo
-    asset.Mortgage = Mortgage
-    asset.UnMortgage = UnMortgage
+    asset.TryMortgage = TryMortgage
+    asset.TryUnMortgage = TryUnMortgage
 
     asset.GetMortgageValue = GetMortgageValue
     asset.GetUnMortgageCost = GetUnMortgageCost
 
-    asset.GetDevelopmentCost = GetDevelopmentCost
-    asset.DevelopProperty = DevelopProperty
-    asset.SellDevelopment = SellDevelopment
+    asset.TryGetDevelopmentCost = TryGetDevelopmentCost
+    asset.TryDevelopProperty = TryDevelopProperty
+    asset.TrySellDevelopment = TrySellDevelopment
     asset.TrySellAllDevelopments = TrySellAllDevelopments
 
     asset.GetRentCost = GetRentCost
     asset.StartAuction = StartAuction
 
     asset.GetClientAssetView = GetClientAssetView
-    asset.GetDevelopmentSellValue = GetDevelopmentSellValue
+    asset.TryGetDevelopmentSellValue = TryGetDevelopmentSellValue
 
     return asset
 end

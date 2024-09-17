@@ -103,3 +103,82 @@ gameClientServer.PayFine.OnServerEvent:Connect(function(plr)
         participant:TryPayFine()
     end
 end)
+
+local function getAsset(plr: Player, name: string): Types.Asset?
+    local participant = round:TryGetParticipant(plr)
+    if not participant then
+        return
+    end
+    
+    for _, v in participant.Assets do
+        if v.AssetDescription.Name == name then
+            return v
+        end
+    end
+    return
+end
+
+gameClientServer.BuyDevelopment.OnServerEvent:Connect(function(plr, property: unknown, development: unknown)
+    if typeof(property) ~= "string" or (development ~= "House" and development ~= "Hotel") then
+        return
+    end
+
+    local asset = getAsset(plr, property)
+    if not asset then
+        return
+    end
+
+    asset:TryDevelopProperty(development)
+end)
+
+gameClientServer.SellDevelopment.OnServerEvent:Connect(function(plr, property: unknown)
+    if typeof(property) ~= "string" then
+        return
+    end
+
+    local asset = getAsset(plr, property)
+    if not asset then
+        return
+    end
+
+    asset:TrySellDevelopment()
+end)
+
+gameClientServer.SellAllDevelopments.OnServerEvent:Connect(function(plr, property: unknown)
+    if typeof(property) ~= "string" then
+        return
+    end
+
+    local asset = getAsset(plr, property)
+    if not asset then
+        return
+    end
+
+    asset:TrySellAllDevelopments()
+end)
+
+gameClientServer.MortgageProperty.OnServerEvent:Connect(function(plr, property: unknown)
+    if typeof(property) ~= "string" then
+        return
+    end
+
+    local asset = getAsset(plr, property)
+    if not asset then
+        return
+    end
+
+    asset:TryMortgage()
+end)
+
+gameClientServer.UnmortgageProperty.OnServerEvent:Connect(function(plr, property: unknown)
+    if typeof(property) ~= "string" then
+        return
+    end
+
+    local asset = getAsset(plr, property)
+    if not asset then
+        return
+    end
+
+    asset:TryUnMortgage()
+end)

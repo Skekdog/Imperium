@@ -73,16 +73,16 @@ export type Asset = {
     TransferTo: (Asset, to: AssetOwner) -> (),
     StartAuction: (Asset, round: Round) -> (),
     
-    Mortgage: (Asset) -> (),
-    UnMortgage: (Asset) -> (),
+    TryMortgage: (Asset) -> (),
+    TryUnMortgage: (Asset) -> (),
 
     GetMortgageValue: (Asset) -> number,
     GetUnMortgageCost: (Asset) -> number,
 
-    GetDevelopmentCost: (Asset, development: "House" | "Hotel", boardConfiguration: BoardConfiguration) -> number,
-    GetDevelopmentSellValue: (Asset, development: "House" | "Hotel", boardConfiguration: BoardConfiguration) -> number,
-    DevelopProperty: (Asset, development: "House" | "Hotel") -> (),
-    SellDevelopment: (Asset) -> (),
+    TryGetDevelopmentCost: (Asset, development: "House" | "Hotel", boardConfiguration: BoardConfiguration) -> number?,
+    TryGetDevelopmentSellValue: (Asset, development: "House" | "Hotel", boardConfiguration: BoardConfiguration) -> number?,
+    TryDevelopProperty: (Asset, development: "House" | "Hotel") -> (),
+    TrySellDevelopment: (Asset) -> (),
     TrySellAllDevelopments: (Asset) -> (),
 
     GetRentCost: (Asset, participant: Participant) -> number,

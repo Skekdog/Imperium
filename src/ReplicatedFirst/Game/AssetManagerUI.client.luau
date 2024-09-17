@@ -28,10 +28,61 @@ local function bindToClick(button: TextButton, callback: () -> ())
     clickCons[button] = button.Activated:Connect(callback)
 end
 
-bindToClick(actions.Close, function()
+local function closeActions(): ()
     currentAsset = nil
     actions.Visible = false
-end)
+end
+
+local function updateView(asset: ClientTypes.ClientAssetView): ()
+    local name = asset.Name
+    if currentAsset ~= name then
+        return
+    end
+
+    for _, v in actions:GetChildren() do
+        if v:IsA("TextButton") and v.Name ~= "Close" then
+            v.Visible = false
+        end
+    end
+
+    if asset.SellAllValue then
+        actions.SellAll.Text = `Sell All (£{asset.SellAllValue})`
+        actions.SellAll.Visible = true
+        bindToClick(actions.SellAll, function() AssetManagement.SellAll(name) end)
+    end
+
+    if asset.SellHotelValue then
+        actions.SellDevelopment.Text = `Sell Hotel (£{asset.SellHotelValue})`
+        actions.SellDevelopment.Visible = true
+        bindToClick(actions.SellDevelopment, function() AssetManagement.SellHotel(name) end)
+    elseif asset.SellHouseValue then
+        actions.SellDevelopment.Text = `Sell House (£{asset.SellHouseValue})`
+        actions.SellDevelopment.Visible = true
+        bindToClick(actions.SellDevelopment, function() AssetManagement.SellHouse(name) end)
+    end
+
+    if asset.HousePrice then
+        actions.BuyDevelopment.Text = `Buy House (£{asset.HousePrice})`
+        actions.BuyDevelopment.Visible = true
+        bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHouse(name) end)
+    elseif asset.HotelPrice then
+        actions.BuyDevelopment.Text = `Buy Hotel (£{asset.HotelPrice})`
+        actions.BuyDevelopment.Visible = true
+        bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHotel(name) end)
+    end
+
+    if asset.UnMortgageCost then
+        actions.Mortgage.Text = `Unmortgage (£{asset.UnMortgageCost})`
+        actions.Mortgage.Visible = true
+        bindToClick(actions.Mortgage, function() AssetManagement.Unmortgage(name) end)
+    elseif asset.MortgageValue then
+        actions.Mortgage.Text = `Mortgage (£{asset.MortgageValue})`
+        actions.Mortgage.Visible = true
+        bindToClick(actions.Mortgage, function() AssetManagement.Mortgage(name) end)
+    end
+end
+
+bindToClick(actions.Close, closeActions)
 
 ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset").OnClientEvent:Connect(function(asset: ClientTypes.ClientAssetView)
     local name = asset.Name
@@ -49,55 +100,16 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
     button.Visible = true
     button.Parent = assetList
 
+    updateView(asset)
+
     button.Activated:Connect(function()
         if currentAsset == name then
-            actions.Visible = false
-            return
+            return closeActions()
         end
         actions.Visible = true
         currentAsset = name
 
-        for _, v in actions:GetChildren() do
-            if v:IsA("TextButton") and v.Name ~= "Close" then
-                v.Visible = false
-            end
-        end
-
-        if asset.SellAllValue then
-            actions.SellAll.Text = `Sell All (£{asset.SellAllValue})`
-            actions.SellAll.Visible = true
-            bindToClick(actions.SellAll, function() AssetManagement.SellAll(name) end)
-        end
-
-        if asset.SellHotelValue then
-            actions.SellDevelopment.Text = `Sell Hotel (£{asset.SellHotelValue})`
-            actions.SellDevelopment.Visible = true
-            bindToClick(actions.SellDevelopment, function() AssetManagement.SellHotel(name) end)
-        elseif asset.SellHouseValue then
-            actions.SellDevelopment.Text = `Sell House (£{asset.SellHouseValue})`
-            actions.SellDevelopment.Visible = true
-            bindToClick(actions.SellDevelopment, function() AssetManagement.SellHouse(name) end)
-        end
-
-        if asset.HousePrice then
-            actions.BuyDevelopment.Text = `Buy House (£{asset.HousePrice})`
-            actions.BuyDevelopment.Visible = true
-            bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHouse(name) end)
-        elseif asset.HotelPrice then
-            actions.BuyDevelopment.Text = `Buy Hotel (£{asset.HotelPrice})`
-            actions.BuyDevelopment.Visible = true
-            bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHotel(name) end)
-        end
-
-        if asset.UnMortgageCost then
-            actions.Mortgage.Text = `Unmortgage (£{asset.UnMortgageCost})`
-            actions.Mortgage.Visible = true
-            bindToClick(actions.Mortgage, function() AssetManagement.Unmortgage(name) end)
-        elseif asset.MortgageValue then
-            actions.Mortgage.Text = `Mortgage (£{asset.MortgageValue})`
-            actions.Mortgage.Visible = true
-            bindToClick(actions.Mortgage, function() AssetManagement.Mortgage(name) end)
-        end
+        updateView(asset)
     end)
 end)
 
