@@ -1,31 +1,33 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local module = {}
 
+local clientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
 function module.Mortgage(name: string): ()
-    print("mortgage", name)
+    clientServer:WaitForChild("MortgageProperty"):FireServer(name)
 end
 
 function module.Unmortgage(name: string): ()
-    print("unmortgage", name)
+    clientServer:WaitForChild("UnmortgageProperty"):FireServer(name)
 end
 
 function module.BuyHouse(name: string): ()
-    print("buy house", name)
+    clientServer:WaitForChild("BuyDevelopment"):FireServer(name, "House")
 end
 
 function module.BuyHotel(name: string): ()
-    print("buy hotel", name)
+    clientServer:WaitForChild("BuyDevelopment"):FireServer(name, "Hotel")
 end
 
 function module.SellHouse(name: string): ()
-    print("sell house", name)
+    clientServer:WaitForChild("SellDevelopment"):FireServer(name, "House")
 end
 
 function module.SellHotel(name: string): ()
-    print("sell hotel", name)
+    clientServer:WaitForChild("SellDevelopment"):FireServer(name, "Hotel")
 end
 
 function module.SellAll(name: string): ()
-    print("sell all", name)
+    clientServer:WaitForChild("SellAllDevelopments"):FireServer(name)
 end
 
 return module
