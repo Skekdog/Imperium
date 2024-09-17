@@ -153,6 +153,8 @@ export type Participant = {
     GoBankrupt: (Participant, to: AssetOwner) -> (),
 
     GetTheDub: (Participant) -> (),
+
+    HasMonopoly: (Participant, colour: string) -> boolean,
 }
 
 export type Board = {

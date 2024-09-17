@@ -184,7 +184,13 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
     end
 
     local rentTable = asset.AssetDescription.Rent
-    return rentTable.Houses[asset.Houses] or rentTable.Hotels[asset.Hotels] or rentTable.Default
+    local rent = rentTable.Houses[asset.Houses] or rentTable.Hotels[asset.Hotels] or rentTable.Default
+
+    if asset.Owner ~= "Bank" and asset.Owner:HasMonopoly(asset.AssetDescription.Colour) then
+        rent *= 2
+    end
+
+    return rent
 end
 
 local function StartAuction(asset: Types.Asset, round: Types.Round): ()

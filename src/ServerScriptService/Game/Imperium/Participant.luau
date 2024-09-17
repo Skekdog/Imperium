@@ -8,6 +8,7 @@ local Teleport = require(script.Parent.Parent.Parent.Shared.Teleport)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local TileMath = require(script.Parent.Parent.TileMath)
+local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -402,6 +403,18 @@ local function GetTheDub(participant: Types.Participant): ()
     Teleport(Players:GetPlayers(), "Lobby")
 end
 
+local function HasMonopoly(participant: Types.Participant, colour: string): boolean
+    for _, tile in participant.Board.Tiles do
+        if tile.Asset and TileUtils.GetColour(tile.TileDescription) == colour then
+            if tile.Asset.Owner ~= participant then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -443,6 +456,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.BankruptcyWarning = BankruptcyWarning
     participant.GoBankrupt = GoBankrupt
     participant.GetTheDub = GetTheDub
+
+    participant.HasMonopoly = HasMonopoly
 
     participant.IsInGame = true
 
