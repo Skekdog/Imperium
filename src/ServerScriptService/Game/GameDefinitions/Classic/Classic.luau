@@ -104,7 +104,7 @@ module.HousePrices = {
 }
 
 module.StartingJailCards = 0
-module.StartingMoney = 15000
+module.StartingMoney = 1500
 module.PassGoMoney = 200
 
 module.JailFine = 50
