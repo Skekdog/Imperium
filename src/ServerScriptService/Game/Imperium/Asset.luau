@@ -228,7 +228,10 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         for i = 0, asset.Houses do
             sellAllValue += value
         end
-        view.SellHouseValue = value
+
+        if asset.Hotels < 1 then
+            view.SellHouseValue = value
+        end
     end
     if asset.Hotels > 0 then
         local value = GetDevelopmentSellValue(asset, "Hotel")
