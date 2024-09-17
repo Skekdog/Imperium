@@ -37,6 +37,7 @@ local function StartNextParticipantTurn(round: Types.Round): ()
         if lastMovedAt ~= nextParticipant.LastMovedAt then
             return
         end
+        ReplicatedStorage.Game.ServerClient.BeginTurn:FireClient(nextParticipant.Player, "")
         nextParticipant:TryPlayMove()
     end)
 end
