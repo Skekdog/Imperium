@@ -3,6 +3,7 @@ local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
+local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -11,21 +12,32 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     assert(to ~= asset.Owner, "Can't transfer assets to same participant")
     asset:TrySellAllDevelopments()
 
+    local round: Types.Round
+    if asset.Owner ~= "Bank" then
+        round = asset.Owner.Round
+    else
+        assert(to ~= "Bank")
+        round = to.Round
+    end
+
+    local assetView = asset:GetClientAssetView(round)
+
     if to ~= "Bank" then
+        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset"):FireClient(to.Player, assetView)
         table.insert(to.Assets, asset)
     end
 
     if asset.Owner ~= "Bank" then
+        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset"):FireClient(asset.Owner.Player, assetView.Name)
         local index = table.find(asset.Owner.Assets, asset)
         if index then
             table.remove(asset.Owner.Assets, index)
         end
     end
 
-    local board = if asset.Owner ~= "Bank" then asset.Owner.Board elseif to ~= "Bank" then to.Board else nil
-    assert(board)
+    local board = round.Board
 
-    local tileModel = board:FindTileByName(asset.AssetDescription.Name).Model :: Types.EdgeTile
+    local tileModel = board:FindTileByName(assetView.Name).Model :: Types.EdgeTile
     tileModel.BaseUIPart.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player):gsub(" ", "\n")
 
     asset.Owner = to
@@ -33,6 +45,10 @@ end
 
 local function GetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel"): number
     return asset.AssetDescription.Price / (if development == "House" then 2 else 4)
+end
+
+local function GetDevelopmentSellValue(asset: Types.Asset, development: "House" | "Hotel"): number
+    return (asset.AssetDescription.Price / (if development == "House" then 2 else 4)) / 2
 end
 
 local function GetMortgageValue(asset: Types.Asset): number
@@ -185,6 +201,50 @@ local function StartAuction(asset: Types.Asset, round: Types.Round): ()
     asset:TransferTo(highestBidder)
 end
 
+local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types.ClientAssetView
+    local tile = round.Board:TryFindTileByName(asset.AssetDescription.Name)
+    assert(tile, "Asset is not on a tile")
+
+    local view = {
+        Name = asset.AssetDescription.Name,
+        Colour = TileUtils.GetColor3(tile.TileDescription, round),
+    }
+
+    if asset.IsMortgaged then
+        view.UnMortgageCost = GetUnMortgageCost(asset)
+    else
+        view.MortgageValue = GetMortgageValue(asset)
+    end
+
+    if asset.Houses == 4 then
+        view.HotelPrice = GetDevelopmentCost(asset, "Hotel")
+    elseif asset.Hotels < 1 then
+        view.HousePrice = GetDevelopmentCost(asset, "House")
+    end
+
+    local sellAllValue = 0
+    if asset.Houses > 0 then
+        local value = GetDevelopmentSellValue(asset, "House")
+        for i = 0, asset.Houses do
+            sellAllValue += value
+        end
+        view.SellHouseValue = value
+    end
+    if asset.Hotels > 0 then
+        local value = GetDevelopmentSellValue(asset, "Hotel")
+        for i = 0, asset.Hotels do
+            sellAllValue += value
+        end
+        view.SellHotelValue = value
+    end
+
+    if sellAllValue > 0 then
+        view.SellAllValue = sellAllValue
+    end
+
+    return view
+end
+
 function module.new(description: Types.AssetDescription): Types.Asset
     local asset = {}
 
@@ -208,6 +268,9 @@ function module.new(description: Types.AssetDescription): Types.Asset
 
     asset.GetRentCost = GetRentCost
     asset.StartAuction = StartAuction
+
+    asset.GetClientAssetView = GetClientAssetView
+    asset.GetDevelopmentSellValue = GetDevelopmentSellValue
 
     return asset
 end

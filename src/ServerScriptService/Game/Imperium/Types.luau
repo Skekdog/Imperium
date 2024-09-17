@@ -1,4 +1,5 @@
 local ServerStorage = game:GetService("ServerStorage")
+local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 type Turn = number
 export type AssetOwner = Participant | "Bank"
 export type DiceRollResult = {
@@ -58,6 +59,7 @@ export type CardDescription = {
     Effect: (Participant) -> (),
 }
 
+export type ClientAssetView = ClientTypes.ClientAssetView
 export type Asset = {
     AssetDescription: AssetDescription,
 
@@ -76,11 +78,14 @@ export type Asset = {
     GetUnMortgageCost: (Asset) -> number,
 
     GetDevelopmentCost: (Asset, development: "House" | "Hotel") -> number,
+    GetDevelopmentSellValue: (Asset, development: "House" | "Hotel") -> number,
     DevelopProperty: (Asset, development: "House" | "Hotel") -> (),
     SellDevelopment: (Asset) -> (),
     TrySellAllDevelopments: (Asset) -> (),
 
     GetRentCost: (Asset, participant: Participant) -> number,
+
+    GetClientAssetView: (Asset, round: Round) -> ClientAssetView,
 }
 
 export type EdgeTile = typeof(ServerStorage.Game.Tile)

@@ -30,4 +30,9 @@ function module.GetColour(tile: Types.TileDescription): "Default" | string
     end
 end
 
+function module.GetColor3(tile: Types.TileDescription, round: Types.Round): Color3
+    local colour = module.GetColour(tile)
+    return round.BoardConfiguration.Colours[colour] or round.BoardConfiguration.Colours.Default
+end
+
 return module
