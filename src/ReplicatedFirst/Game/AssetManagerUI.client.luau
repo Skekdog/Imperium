@@ -102,7 +102,7 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
 
     updateView(asset)
 
-    button.Activated:Connect(function()
+    bindToClick(button, function()
         if currentAsset == name then
             return closeActions()
         end
