@@ -95,6 +95,7 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
         asset:TransferTo(to)
     end
 
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
     participant.Round:RemoveParticipant(participant)
 end
 

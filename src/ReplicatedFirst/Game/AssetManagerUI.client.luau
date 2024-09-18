@@ -124,3 +124,7 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
         actions.Visible = false
     end
 end)
+
+ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt").OnClientEvent:Connect(function()
+    ui:ToggleVisible(false)
+end)
