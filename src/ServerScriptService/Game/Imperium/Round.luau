@@ -92,6 +92,15 @@ local function RemoveParticipant(round: Types.Round, participant: Types.Particip
     participant.Player:SetAttribute("Status", "Spectating")
     participant.Player:SetAttribute("IsJailed", false)
 
+    local plr = participant.Player
+    local char = plr.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Health = 0
+        end
+    end
+
     for _, v in participant.Assets do
         v:StartAuction(round)
     end
