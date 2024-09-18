@@ -26,7 +26,7 @@ local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateS
 
 if not info then
     local temp = {
-        Players = if RunService:IsStudio() then 1 else 8,
+        Players = if RunService:IsStudio() then 2 else 8,
         TurnTime = GameConfiguration.TurnTime.Default,
         AuctionTime = GameConfiguration.AuctionTime.Default,
         BankruptcyTime = GameConfiguration.BankruptcyTime.Default,

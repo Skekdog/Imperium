@@ -19,7 +19,18 @@ local rollDice = UIManager.WaitForUI("RollDice") :: UIManager.UI & {Object: type
 local payFine = UIManager.WaitForUI("PayFine") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.PayFine)}
 local useCard = UIManager.WaitForUI("UseGetOutOfJailFreeCard") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.UseGetOutOfJailFreeCard)}
 gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
-    local isPlayer = name == player.Name
+    local plr = Players:FindFirstChild(name)
+    if not plr or not plr:IsA("Player") then
+        return
+    end
+
+    local isPlayer = plr == player
+
+    local char = plr.Character
+    if char then
+        workspace.CurrentCamera.CameraSubject = char:FindFirstChildOfClass("Humanoid")
+    end
+
     local isJailed = player:GetAttribute("IsJailed") :: boolean
     rollDice:ToggleVisible(isPlayer)
     payFine:ToggleVisible(isPlayer and isJailed and player:GetAttribute("Money") :: number >= ReplicatedStorage:GetAttribute("FineAmount") :: number)
