@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HasMoneyFor = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.HasMoneyFor)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
+local ProfileManager = require(script.Parent.Parent.Parent.Shared.ProfileManager)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Parent.Shared.Teleport)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
@@ -399,6 +400,14 @@ end
 local function GetTheDub(participant: Types.Participant): ()
     SendNotification(`[PLAYER] won the game!`, {participant.Player})
     SetWaitingText("Returning to lobby...", 15)
+
+    local plr = participant.Player
+    local profile = ProfileManager.GetProfile(plr)
+
+    if profile then
+        plr:SetAttribute("Wins", profile.Wins + 1)
+        ProfileManager.UpdateProfile(participant.Player, "Wins", profile.Wins + 1)
+    end
 
     task.wait(15)
     Teleport(Players:GetPlayers(), "Lobby")
