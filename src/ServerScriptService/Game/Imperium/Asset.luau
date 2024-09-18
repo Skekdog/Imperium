@@ -19,6 +19,10 @@ end
 local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     assert(to ~= asset.Owner, "Can't transfer assets to same participant")
 
+    if to ~= "Bank" and not to.IsInGame then
+        return
+    end
+
     local round: Types.Round
     if asset.Owner ~= "Bank" then
         round = asset.Owner.Round
