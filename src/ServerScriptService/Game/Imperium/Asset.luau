@@ -183,6 +183,11 @@ local function TryMortgage(asset: Types.Asset): ()
     asset.IsMortgaged = true
     asset:TrySellAllDevelopments()
 
+    local tile = asset.Owner.Round.Board:TryFindTileByName(asset.AssetDescription.Name)
+    assert(tile, "Asset is not on a tile");
+
+    (tile.Model :: Types.EdgeTile).Title.TitleUI.TextLabel.Text = `{asset.AssetDescription.Name}\n(MORTGAGED)`
+
     local value = GetMortgageValue(asset)
     asset.Owner:GiveMoney(value)
     SendNotification(`[PLAYER] mortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
@@ -197,6 +202,11 @@ local function TryUnMortgage(asset: Types.Asset): ()
     end
 
     asset.IsMortgaged = false
+
+    local tile = asset.Owner.Round.Board:TryFindTileByName(asset.AssetDescription.Name)
+    assert(tile, "Asset is not on a tile");
+
+    (tile.Model :: Types.EdgeTile).Title.TitleUI.TextLabel.Text = `{asset.AssetDescription.Name}`
 
     local value = GetUnMortgageCost(asset)
     asset.Owner:TransferMoneyTo("Bank", value, true)
