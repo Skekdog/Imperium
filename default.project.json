@@ -17,14 +17,7 @@
         "ReplicatedStorage": {
             "Shared": {"$path": "src/ReplicatedStorage/Shared"},
             "Game": {"$path": "src/ReplicatedStorage/Game"},
-            "Lobby": {"$path": "src/ReplicatedStorage/Lobby"},
-            "$properties": {
-                "Attributes": {
-                    "TimeMilestone": {"Float64": 0},
-                    "CurrentPlayer": {"String": ""},
-                    "WaitingText": {"String": "Waiting for players..."}
-                }
-            }
+            "Lobby": {"$path": "src/ReplicatedStorage/Lobby"}
         },
         "ServerStorage": {
             "Shared": {"$path": "Assets/Shared"},

@@ -14,7 +14,7 @@ local function setWaitingText(): ()
         return
     end
 
-    object.Turn.Text = text
+    object.Frame.Turn.Text = text
 end
 ReplicatedStorage:GetAttributeChangedSignal("WaitingText"):Connect(setWaitingText)
 setWaitingText()
@@ -27,11 +27,15 @@ ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
 
     local player = Players:FindFirstChild(name)
     if not player or not player:IsA("Player") then
-        object.Turn.Text = "Unknown Player's Turn"
+        object.Frame.Turn.Text = "Unknown Player's Turn"
         return
     end
 
-    object.Turn.Text = `{GetPlayerName(player)}'s Turn`
+    object.Frame.Turn.Text = `{GetPlayerName(player)}'s Turn`
+end)
+
+ReplicatedStorage:GetAttributeChangedSignal("GoingBankrupt"):Connect(function()
+    object.Bankruptcy.Visible = ReplicatedStorage:GetAttribute("GoingBankrupt") :: boolean
 end)
 
 task.spawn(function()
@@ -40,11 +44,11 @@ task.spawn(function()
 
         local milestone = ReplicatedStorage:GetAttribute("TimeMilestone") :: number?
         if not milestone then
-            object.Timer.Visible = false
+            object.Frame.Timer.Visible = false
             continue
         end
 
-        object.Timer.Visible = true
+        object.Frame.Timer.Visible = true
 
         local diff = math.round(milestone - workspace:GetServerTimeNow())
 
@@ -52,6 +56,6 @@ task.spawn(function()
             diff = 0
         end
 
-        object.Timer.Text = `{diff}s`
+        object.Frame.Timer.Text = `{diff}s`
     end
 end)

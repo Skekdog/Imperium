@@ -107,12 +107,14 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
     end
     SendNotification(`[PLAYER] needs another £{targetAmount - participant.Money} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
     
+    ReplicatedStorage:SetAttribute("GoingBankrupt", true)
     local start = GetTime()
     local maxTime = start + participant.Round.GameConfiguration.BankruptcyTime
     SetTimeMilestone(participant.Round.GameConfiguration.BankruptcyTime)
     while true and GetTime() < maxTime and participant.Money < targetAmount do
         task.wait()
     end
+    ReplicatedStorage:SetAttribute("GoingBankrupt", false)
 
     if participant.Money < targetAmount then
         GoBankrupt(participant, to)

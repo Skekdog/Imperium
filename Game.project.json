@@ -22,7 +22,8 @@
                     "TimeMilestone": {"Float64": 0},
                     "CurrentPlayer": {"String": ""},
                     "WaitingText": {"String": "Waiting for players..."},
-                    "FineAmount": {"Float64": 50}
+                    "FineAmount": {"Float64": 50},
+                    "GoingBankrupt": {"Bool": false}
                 }
             }
         },
