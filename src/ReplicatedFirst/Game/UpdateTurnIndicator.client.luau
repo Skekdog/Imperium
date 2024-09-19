@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local GetPlayerName = require(ReplicatedFirst.Shared.GetPlayerName)
 local UIManager = require(ReplicatedFirst.Shared.UIManager)
 
@@ -35,7 +36,10 @@ ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
 end)
 
 ReplicatedStorage:GetAttributeChangedSignal("GoingBankrupt"):Connect(function()
-    object.Bankruptcy.Visible = ReplicatedStorage:GetAttribute("GoingBankrupt") :: boolean
+    local goingBankrupt = ReplicatedStorage:GetAttribute("GoingBankrupt") :: boolean
+    UIAnimation.Animate(object.Bankruptcy, TweenInfo.new(0.1), {
+        Position = UDim2.fromScale(0.5, if goingBankrupt then 1 else 0.7)
+    })
 end)
 
 task.spawn(function()
