@@ -1,4 +1,5 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
+local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -40,8 +41,23 @@ assert(info)
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
 
+PhysicsService:RegisterCollisionGroup("Characters")
+PhysicsService:CollisionGroupSetCollidable("Characters", "Characters", false)
+local function disableCollision(part: Instance): ()
+    if part:IsA("BasePart") then
+        part.CollisionGroup = "Characters"
+    end
+end
+
 Players.PlayerAdded:Connect(function(plr)
     plr:SetAttribute("Status", "Spectating")
+    plr.CharacterAdded:Connect(function(char)
+        for _, v in char:GetDescendants() do
+            disableCollision(v)
+        end
+
+        char.DescendantAdded:Connect(disableCollision)
+    end)
 end)
 
 local startWait = GetTime()
