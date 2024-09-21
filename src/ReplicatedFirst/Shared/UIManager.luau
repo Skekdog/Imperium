@@ -89,7 +89,11 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				object.Visible = newVisible
 			end
 
-			if ignoreOtherUIs or self.Layer ~= "Popup" or self.Object:GetAttribute("IgnoreStacking") then
+			if ignoreOtherUIs or self.Layer ~= "Popup" then
+				return
+			end
+			if object:GetAttribute("IgnoreStacking") then
+				object.ZIndex = 10000
 				return
 			end
 
@@ -103,7 +107,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			local highestIndex = 0
 			for _, ui in registeredUIs do
 				if ui.Layer == "Popup" and highestIndex < ui.Object.ZIndex and ui.Visible then
-					highestIndex = ui.Object.ZIndex
+					highestIndex = if not ui.Object:GetAttribute("IgnoreStacking") then ui.Object.ZIndex else highestIndex
 					if ui ~= self and mode == "Closed" and not ui.Object:GetAttribute("IgnoreStacking") then
 						ui:ToggleVisible(false, true)
 					end

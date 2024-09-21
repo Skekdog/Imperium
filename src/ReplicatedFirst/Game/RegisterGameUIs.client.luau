@@ -5,13 +5,16 @@ if not ReplicatedFirst:GetAttribute("UICanRegister") then
     ReplicatedFirst:GetAttributeChangedSignal("UICanRegister"):Wait()
 end
 
-UIManager.RegisterUI(UIManager.UnregisteredUIs.Playerlist)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.CurrentTurnIndicator)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.RollDice)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.BuyProperty)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.AuctionProperty)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.MoneyDisplay)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.Notification)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.PayFine)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.UseGetOutOfJailFreeCard)
-UIManager.RegisterUI(UIManager.UnregisteredUIs.AssetManager)
+local reg = UIManager.RegisterUI
+local un = UIManager.UnregisteredUIs
+reg(un.Playerlist)
+reg(un.CurrentTurnIndicator)
+reg(un.RollDice)
+reg(un.BuyProperty)
+reg(un.AuctionProperty)
+reg(un.MoneyDisplay)
+reg(un.Notification)
+reg(un.PayFine)
+reg(un.UseGetOutOfJailFreeCard)
+reg(un.AssetManager)
+reg(un.EventLog)

@@ -60,9 +60,24 @@ local function replacePlayers(str: string, players: {Player}): string
     return str
 end
 
+local function makeLog(msg: string): ()
+	local eventLog = UIManager.TryGetUI("EventLog") :: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.EventLog)})?
+	if not eventLog then
+		return
+	end
+
+	local label = eventLog.Object.ScrollingFrame.EventTemplate:Clone()
+	label.Text = msg
+	label.Visible = true
+	label.LayoutOrder = #eventLog.Object.ScrollingFrame:GetChildren()
+
+	label.Parent = eventLog.Object.ScrollingFrame
+end
+
 return function(msg: string, players: {Player}?)
 	if players then
 		msg = replacePlayers(msg, players)
 	end
 	makeLabel(msg)
+	makeLog(msg)
 end

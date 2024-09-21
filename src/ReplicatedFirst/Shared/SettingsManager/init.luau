@@ -135,6 +135,15 @@ module.AvailableSettings = {
 		SpecifyToggle = true,
 		Default = {Keycodes = {Enum.KeyCode.G, Enum.KeyCode.ButtonR3}, Toggled = true},
 	},
+	{
+		Name = "EventLog",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Opens the event log.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = true,
+		Default = {Keycodes = {Enum.KeyCode.B, Enum.KeyCode.ButtonR1}, Toggled = true},
+	}
 } :: {SettingDefinition}
 
 
