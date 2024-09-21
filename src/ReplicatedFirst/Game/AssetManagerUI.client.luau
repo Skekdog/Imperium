@@ -28,9 +28,19 @@ local function bindToClick(button: TextButton, callback: () -> ())
     clickCons[button] = button.Activated:Connect(callback)
 end
 
+local function setHighlightedAsset(button: typeof(assetList.ButtonTemplate)?): ()
+    for _, v in assetList:GetChildren() do
+        if v:IsA("TextButton") then
+            local vButton = v :: typeof(assetList.ButtonTemplate)
+            vButton.UIStroke.Enabled = vButton == button
+        end
+    end
+end
+
 local function closeActions(): ()
     currentAsset = nil
     actions.Visible = false
+    setHighlightedAsset()
 end
 
 local function updateView(asset: ClientTypes.ClientAssetView): ()
@@ -90,12 +100,7 @@ local function selectAsset(button: typeof(assetList.ButtonTemplate), name: strin
         return closeActions()
     end
 
-    for _, v in assetList:GetChildren() do
-        if v:IsA("TextButton") then
-            local vButton = v :: typeof(assetList.ButtonTemplate)
-            vButton.UIStroke.Enabled = vButton == button
-        end
-    end
+    setHighlightedAsset(button)
 
     actions.Visible = true
     currentAsset = name
