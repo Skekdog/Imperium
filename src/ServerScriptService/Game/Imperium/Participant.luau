@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local ProfileManager = require(script.Parent.Parent.Parent.Shared.ProfileManager)
@@ -223,7 +224,29 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
     end
 end
 
-local function DrawCard(participant: Types.Participant, card: Types.CardDescription): ()
+local function DrawCard(participant: Types.Participant, card: Types.CardDescription, cardType: Types.CardType): ()
+    local position = participant.Board.Tiles[participant.Position].Model:GetPivot()
+
+    local model = (ServerStorage.Game:FindFirstChild(cardType .. " Card") :: Types.CardModel):Clone()
+    model.Size = Vector3.new()
+    model:PivotTo(position + Vector3.new(0, 10, 0))
+
+    model.Gui.Description.Text = card.Title
+
+    local gui2 = model.Gui:Clone()
+    gui2.Face = Enum.NormalId.Back
+    gui2.Parent = model
+
+    model.Parent = workspace:FindFirstChild("Cards") or Instance.new("Folder", workspace) :: any
+    model.Parent.Name = "Cards"
+
+    PlaySound("DrawCard")
+    SendNotification(`[PLAYER] drew a {cardType} card: {card.Title}`, {participant.Player})
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateCard"):FireClient(participant.Player, model)
+
+    task.wait(6)
+    model:Destroy()
+    
     card.Effect(participant)
 end
 

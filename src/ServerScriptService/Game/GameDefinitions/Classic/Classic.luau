@@ -14,7 +14,7 @@ local function DrawCard(tile: Types.TileDescription, participant: Types.Particip
     assert(deck, `Failed to draw card for tile {tile.Name}`)
 
     local card = deck[math.random(1, #deck)]
-    participant:DrawCard(card)
+    participant:DrawCard(card, tile.Name :: Types.CardType)
 end
 
 local function GoToJail(tile: Types.TileDescription, participant: Types.Participant): ()

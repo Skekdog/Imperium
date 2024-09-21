@@ -56,6 +56,8 @@ export type TileDescription = {
     OnEnter: ((TileDescription, Participant) -> ())?,
 }
 
+export type CardType = "Chance" | "Community Chest"
+export type CardModel = typeof(ServerStorage.Game["Chance Card"]) -- Intersection type causes typechecker fuckyness so only use ChanceCard. They're the same structure anyway
 export type CardDescription = {
     Title: string,
     Effect: (Participant) -> (),
@@ -145,7 +147,7 @@ export type Participant = {
     TransferMoneyTo: (Participant, to: AssetOwner, amount: number, noNotification: boolean?) -> (),
     TransferJailCards: (Participant, to: AssetOwner, amount: number) -> (),
 
-    DrawCard: (Participant, card: CardDescription) -> (),
+    DrawCard: (Participant, card: CardDescription, cardType: CardType) -> (),
 
     PurchaseProperty: (Participant, asset: Asset) -> (),
     PromptPurchaseProperty: (Participant, asset: Asset) -> (),
