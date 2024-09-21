@@ -14,13 +14,28 @@ local Types = require(script.Parent.Types)
 
 local module = {}
 
+local function animateJailBars(round: Types.Round, locked: boolean): ()
+    local jailTile = round.Board:FindTileByName("Jail") :: Types.Tile & {Model: Types.JailTile}
+    local model = jailTile.Model
+    local bars = model.Bars
+    local base = model.Base
+
+    ReplicatedStorage.Game.ServerClient.AnimateJailBars:FireAllClients(bars, if locked then base.BarsLocked.WorldCFrame else base.BarsUnlocked.WorldCFrame)
+end
+
 local function SendToJail(participant: Types.Participant): ()
-    PlaySound("Siren")
+    local sound = PlaySound("Siren")
+    if sound then
+        task.delay(sound.TimeLength, PlaySound, "Siren" :: "Siren")
+    end
 
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
     participant.Player:SetAttribute("IsJailed", true)
+
+    animateJailBars(participant.Round, false)
     participant:MoveToTileByName("Jail", true)
+    animateJailBars(participant.Round, true)
 
     PlaySound("LockingUp")
 end
@@ -314,6 +329,16 @@ end
 local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
     participant.JailedOn = 0
     participant.Player:SetAttribute("IsJailed", false)
+
+    animateJailBars(participant.Round, false)
+    task.wait(1)
+
+    for _, v in participant.Round.Participants do
+        if v.JailedOn ~= 0 then
+            animateJailBars(participant.Round, true)
+        end
+    end
+
     if not skipTurn then
         participant:TryPlayMove()
     end

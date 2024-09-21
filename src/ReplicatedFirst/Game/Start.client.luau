@@ -2,6 +2,7 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local AnimateJailBars = require(script.Parent.AnimateJailBars)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local PayFine = require(script.Parent.PayFine)
@@ -99,4 +100,5 @@ moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
 player:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
 
+ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateJailBars").OnClientEvent:Connect(AnimateJailBars)
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
