@@ -64,17 +64,17 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
     if asset.HousePrice then
         actions.BuyDevelopment.Text = `Buy House (£{asset.HousePrice})`
         actions.BuyDevelopment.Visible = true
-        bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHouse(name) end)
+        bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHouse(name, asset.HousePrice) end)
     elseif asset.HotelPrice then
         actions.BuyDevelopment.Text = `Buy Hotel (£{asset.HotelPrice})`
         actions.BuyDevelopment.Visible = true
-        bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHotel(name) end)
+        bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHotel(name, asset.HotelPrice) end)
     end
 
     if asset.UnMortgageCost then
         actions.Mortgage.Text = `Unmortgage (£{asset.UnMortgageCost})`
         actions.Mortgage.Visible = true
-        bindToClick(actions.Mortgage, function() AssetManagement.Unmortgage(name) end)
+        bindToClick(actions.Mortgage, function() AssetManagement.Unmortgage(name, asset.UnMortgageCost) end)
     elseif asset.MortgageValue then
         actions.Mortgage.Text = `Mortgage (£{asset.MortgageValue})`
         actions.Mortgage.Visible = true

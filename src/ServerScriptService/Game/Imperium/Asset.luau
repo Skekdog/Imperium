@@ -81,7 +81,7 @@ local function GetUnMortgageCost(asset: Types.Asset): number
     return math.round((asset.AssetDescription.Price / 2) * 1.1)
 end
 
-local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Hotel"): (boolean, number)
+local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Hotel", ignoreCost: boolean?): (boolean, number)
     if asset.Owner == "Bank" then
         return false, 0
     end
@@ -101,7 +101,7 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
     end
 
     local cost = TryGetDevelopmentCost(asset, development, asset.Owner.Round.BoardConfiguration)
-    if not cost or not asset.Owner:CanAfford(cost) then
+    if (not ignoreCost) and (not cost or not asset.Owner:CanAfford(cost)) then
         return false, 0
     end
 
@@ -304,8 +304,8 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         view.MortgageValue = GetMortgageValue(asset)
     end
 
-    local canMakeHotel, hotelCost = CanMakeDevelopment(asset, "Hotel")
-    local canMakeHouse, houseCost = CanMakeDevelopment(asset, "House")
+    local canMakeHotel, hotelCost = CanMakeDevelopment(asset, "Hotel", true)
+    local canMakeHouse, houseCost = CanMakeDevelopment(asset, "House", true)
     if canMakeHotel then
         view.HotelPrice = hotelCost
     elseif canMakeHouse then
