@@ -84,6 +84,25 @@ end
 
 bindToClick(actions.Close, closeActions)
 
+local function selectAsset(button: typeof(assetList.ButtonTemplate), name: string, asset: ClientTypes.ClientAssetView): ()
+    if currentAsset == name then
+        button.UIStroke.Enabled = false
+        return closeActions()
+    end
+
+    for _, v in assetList:GetChildren() do
+        if v:IsA("TextButton") then
+            local vButton = v :: typeof(assetList.ButtonTemplate)
+            vButton.UIStroke.Enabled = vButton == button
+        end
+    end
+
+    actions.Visible = true
+    currentAsset = name
+
+    updateView(asset)
+end
+
 ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset").OnClientEvent:Connect(function(asset: ClientTypes.ClientAssetView)
     local name = asset.Name
 
@@ -103,13 +122,7 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
     updateView(asset)
 
     bindToClick(button, function()
-        if currentAsset == name then
-            return closeActions()
-        end
-        actions.Visible = true
-        currentAsset = name
-
-        updateView(asset)
+        selectAsset(button, name, asset)
     end)
 end)
 
