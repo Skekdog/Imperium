@@ -43,7 +43,7 @@
         },
         "StarterPlayer": {
             "$properties": {
-                "CharacterWalkSpeed": 32
+                "CharacterWalkSpeed": 48
             }
         },
         "Workspace": {
