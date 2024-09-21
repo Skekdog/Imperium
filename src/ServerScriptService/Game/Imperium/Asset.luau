@@ -259,7 +259,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round): ()
         end
 
         local participant = round:TryGetParticipant(plr)
-        if not participant then
+        if not participant or not participant:CanAfford(amount) then
             return
         end
 
