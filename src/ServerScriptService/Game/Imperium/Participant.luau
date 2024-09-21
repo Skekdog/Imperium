@@ -49,6 +49,9 @@ end
 
 local function PromptPurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
     assert(asset.Owner == "Bank", "Asset must be owned by bank")
+    if not participant:CanAfford(asset.AssetDescription.Price) then
+        return asset:StartAuction(participant.Round)
+    end
 
     ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, asset.AssetDescription)
 
