@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HasMoneyFor = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.HasMoneyFor)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local ProfileManager = require(script.Parent.Parent.Parent.Shared.ProfileManager)
@@ -141,7 +140,7 @@ end
 
 local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number, noNotification: boolean?): ()
     assert(to ~= participant, "Can't transfer money to same participant")
-    if not HasMoneyFor(amount, participant) then
+    if not participant:CanAfford(amount) then
         local survived = BankruptcyWarning(participant, amount, to)
         if not survived then
             return
