@@ -63,6 +63,12 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
         if plr ~= participant.Player then
             return
         end
+
+        if not participant:CanAfford(asset.AssetDescription.Price) then
+            response = false -- If they do something async and they can no longer afford we want to start an auction
+            return
+        end
+
         if typeof(accepted) ~= "boolean" or typeof(propertyName) ~= "string" then
             return
         end
