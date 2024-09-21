@@ -8,7 +8,7 @@ return function(bars: Model, targetCFrame: CFrame): ()
     local con
     con = RunService.Heartbeat:Connect(function()
         local elapsedTime = tick() - startTime
-        local alpha = math.min(elapsedTime / DURATION, 1) ^ 3
+        local alpha = math.min(elapsedTime / DURATION, 1) ^ 6
 
         local newCFrame = startCFrame:Lerp(targetCFrame, alpha)
         bars:PivotTo(newCFrame)
