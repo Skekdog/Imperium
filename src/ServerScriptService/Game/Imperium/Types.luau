@@ -170,6 +170,8 @@ export type Board = {
 
     TryFindTileByName: (Board, name: string) -> Tile?,
     FindTileByName: (Board, name: string) -> Tile,
+
+    GetAllAssetsInColourGroup: (Board, colourGroup: string) -> {Asset},
 }
 
 export type Round = {

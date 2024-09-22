@@ -9,7 +9,6 @@ local Teleport = require(script.Parent.Parent.Parent.Shared.Teleport)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local TileMath = require(script.Parent.Parent.TileMath)
-local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -472,11 +471,9 @@ local function GetTheDub(participant: Types.Participant): ()
 end
 
 local function HasMonopoly(participant: Types.Participant, colour: string): boolean
-    for _, tile in participant.Board.Tiles do
-        if tile.Asset and TileUtils.GetColour(tile.TileDescription) == colour then
-            if tile.Asset.Owner ~= participant then
-                return false
-            end
+    for _, asset in participant.Board:GetAllAssetsInColourGroup(colour) do
+        if asset.Owner ~= participant then
+            return false
         end
     end
 

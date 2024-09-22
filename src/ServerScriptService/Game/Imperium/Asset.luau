@@ -16,6 +16,14 @@ local function removeAsset(participant: Types.Participant, asset: Types.Asset): 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset"):FireClient(participant.Player, asset.AssetDescription.Name)
 end
 
+local function updateAssetsInParticipantColourGroup(participant: Types.Participant, colourGroup: string, round: Types.Round): ()
+    for _, asset in participant.Assets do
+        if asset.AssetDescription.Colour == colourGroup then
+            updateAsset(participant, asset, round)
+        end
+    end
+end
+
 local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     assert(to ~= asset.Owner, "Can't transfer assets to same participant")
 
@@ -33,26 +41,21 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
 
     asset:TrySellAllDevelopments()
 
+    local colour = asset.AssetDescription.Colour
     if asset.Owner ~= "Bank" then
         removeAsset(asset.Owner, asset)
         local index = table.find(asset.Owner.Assets, asset)
         if index then
             table.remove(asset.Owner.Assets, index)
         end
+        updateAssetsInParticipantColourGroup(asset.Owner, colour, round)
     end
 
     asset.Owner = to -- Important that we do it here otherwise updateAsset() will not account for a new monopoly
 
-    local colour = asset.AssetDescription.Colour
-
     if to ~= "Bank" then
         table.insert(to.Assets, asset)
-
-        for _, tile in round.Board.Tiles do
-            if tile.Asset and tile.Asset.Owner == to and tile.Asset.AssetDescription.Colour == colour then
-                updateAsset(to, tile.Asset, round)
-            end
-        end
+        updateAssetsInParticipantColourGroup(to, colour, round)
     end
 
     local board = round.Board
@@ -100,8 +103,20 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
         return false, 0
     end
 
+    for _, v in asset.Owner.Assets do
+        if v.AssetDescription.Colour == asset.AssetDescription.Colour then
+            if v.IsMortgaged then
+                return false, 0
+            elseif development == "House" and v.Houses < asset.Houses then
+                return false, 0
+            elseif development == "Hotel" and (v.Hotels < asset.Hotels or v.Houses < asset.Houses) then
+                return false, 0
+            end
+        end
+    end
+
     local cost = TryGetDevelopmentCost(asset, development, asset.Owner.Round.BoardConfiguration)
-    if (not ignoreCost) and (not cost or not asset.Owner:CanAfford(cost)) then
+    if not ignoreCost and (not cost or not asset.Owner:CanAfford(cost)) then
         return false, 0
     end
 
@@ -127,7 +142,7 @@ local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Ho
     end
 
     SendNotification(`[PLAYER] bought a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
-    updateAsset(owner, asset, owner.Round)
+    updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
 end
 
 local function TrySellDevelopment(asset: Types.Asset): ()
@@ -152,7 +167,7 @@ local function TrySellDevelopment(asset: Types.Asset): ()
 
     SendNotification(`[PLAYER] sold a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
     owner:GiveMoney(sellPrice)
-    updateAsset(owner, asset, owner.Round)
+    updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
 end
 
 local function TrySellAllDevelopments(asset: Types.Asset): ()
@@ -178,7 +193,7 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     end
 
     owner:GiveMoney(sellPrice)
-    updateAsset(owner, asset, owner.Round)
+    updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
 end
 
 local function TryMortgage(asset: Types.Asset): ()
@@ -199,7 +214,7 @@ local function TryMortgage(asset: Types.Asset): ()
     local value = GetMortgageValue(asset)
     asset.Owner:GiveMoney(value)
     SendNotification(`[PLAYER] mortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
-    updateAsset(asset.Owner, asset, asset.Owner.Round)
+    updateAssetsInParticipantColourGroup(asset.Owner, asset.AssetDescription.Colour, asset.Owner.Round)
 end
 
 local function TryUnMortgage(asset: Types.Asset): ()
@@ -219,7 +234,7 @@ local function TryUnMortgage(asset: Types.Asset): ()
     local value = GetUnMortgageCost(asset)
     asset.Owner:TransferMoneyTo("Bank", value, true)
     SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
-    updateAsset(asset.Owner, asset, asset.Owner.Round)
+    updateAssetsInParticipantColourGroup(asset.Owner, asset.AssetDescription.Colour, asset.Owner.Round)
 end
 
 local function GetRentCost(asset: Types.Asset, participant: Types.Participant): number
