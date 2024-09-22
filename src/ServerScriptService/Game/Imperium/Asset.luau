@@ -319,7 +319,7 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
     if asset.Houses > 0 then
         local value = TryGetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
         if value then
-            for i = 0, asset.Houses do
+            for i = 1, asset.Houses do
                 sellAllValue += value
             end
     
@@ -331,7 +331,7 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
     if asset.Hotels > 0 then
         local value = TryGetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
         if value then
-            for i = 0, asset.Hotels do
+            for i = 1, asset.Hotels do
                 sellAllValue += value
             end
             view.SellHotelValue = value
