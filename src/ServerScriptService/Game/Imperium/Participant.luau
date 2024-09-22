@@ -242,7 +242,7 @@ local function DrawCard(participant: Types.Participant, card: Types.CardDescript
 
     PlaySound("DrawCard")
     SendNotification(`[PLAYER] drew a {cardType} card: {card.Title}`, {participant.Player})
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateCard"):FireClient(participant.Player, model)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateCard"):FireAllClients(model)
 
     task.wait(6)
     model:Destroy()
