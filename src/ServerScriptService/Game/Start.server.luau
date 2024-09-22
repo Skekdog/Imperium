@@ -9,6 +9,7 @@ local Tile = require(script.Parent.Imperium.Tile)
 local Types = require(script.Parent.Imperium.Types)
 local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
 local Round = require(ServerScriptService.Game.Imperium.Round)
@@ -27,7 +28,7 @@ local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateS
 
 if not info then
     local temp = {
-        Players = if RunService:IsStudio() then 1 else 8,
+        Players = if RunService:IsStudio() then 3 else 8,
         TurnTime = GameConfiguration.TurnTime.Default,
         AuctionTime = GameConfiguration.AuctionTime.Default,
         BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
@@ -82,6 +83,18 @@ task.wait(INTERMISSION_DURATION)
 
 SetWaitingText(nil, 0)
 round:StartRound()
+
+Players.PlayerRemoving:Connect(function(plr)
+    local participant = round:TryGetParticipant(plr)
+    if participant then
+        SendNotification(`[PLAYER] has left the game. Their assets will be auctioned off when their turn starts.`, {plr})
+        participant.HasDisconnected = true
+
+        if round.CurrentParticipant == participant then
+            participant:RemoveParticipant()
+        end
+    end
+end)
 
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 

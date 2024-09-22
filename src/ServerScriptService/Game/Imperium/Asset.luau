@@ -237,7 +237,7 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
     return rent
 end
 
-local function StartAuction(asset: Types.Asset, round: Types.Round): ()
+local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBankIfNoWinner: boolean?): ()
     ReplicatedStorage.Game.ServerClient.StartAuction:FireAllClients(asset.AssetDescription)
 
     local auctionDuration = round.GameConfiguration.AuctionTime
@@ -279,7 +279,10 @@ local function StartAuction(asset: Types.Asset, round: Types.Round): ()
     ReplicatedStorage.Game.ServerClient.StartAuction:FireAllClients(nil)
     con:Disconnect()
 
-    if not highestBidder then
+    if not highestBidder or not highestBidder.IsInGame then
+        if transferToBankIfNoWinner then
+            asset:TransferTo("Bank")
+        end
         return
     end
 

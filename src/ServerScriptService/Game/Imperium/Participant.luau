@@ -121,7 +121,7 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
     end
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
-    participant.Round:RemoveParticipant(participant)
+    participant:RemoveParticipant()
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
@@ -487,6 +487,44 @@ local function CanAfford(participant: Types.Participant, amount: number): boolea
     return participant.Money >= amount
 end
 
+local function RemoveParticipant(participant: Types.Participant): ()
+    local round = participant.Round
+
+    local nextParticipant: Types.Participant?
+    if round.CurrentParticipant == participant then
+        nextParticipant = round:SetNextParticipant()
+    end
+
+    table.remove(round.Participants, table.find(round.Participants, participant))
+    participant.IsInGame = false
+    participant.Player:SetAttribute("Status", "Spectating")
+    participant.Player:SetAttribute("IsJailed", false)
+
+    local plr = participant.Player
+    local char = plr.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.Health = 0
+        end
+    end
+
+    local isGameOver = #round.Participants == 1
+    if isGameOver then
+        return round.Participants[1]:GetTheDub()
+    end
+
+    for i = #participant.Assets, 1, -1 do
+        local asset = participant.Assets[i]
+        assert(asset, "Invalid index for asset (" .. i .. ")")
+        asset:StartAuction(round, true)
+    end
+
+    if nextParticipant and #round.Participants > 1 then
+        round:StartNextParticipantTurn(nextParticipant)
+    end
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -533,6 +571,9 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.CanAfford = CanAfford
 
     participant.IsInGame = true
+    participant.HasDisconnected = false
+
+    participant.RemoveParticipant = RemoveParticipant
 
     player:SetAttribute("Money", participant.Money)
     player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)

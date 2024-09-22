@@ -8,7 +8,7 @@ local Types = require(script.Parent.Types)
 
 local module = {}
 
-local function StartNextParticipantTurn(round: Types.Round): ()
+local function SetNextParticipant(round: Types.Round): Types.Participant
     local lastIndex: number? = 0
     if round.CurrentParticipant then
         lastIndex = table.find(round.Participants, round.CurrentParticipant)
@@ -23,8 +23,20 @@ local function StartNextParticipantTurn(round: Types.Round): ()
 
     lastIndex += 1
 
-    local nextParticipant = round.Participants[lastIndex]    
+    local nextParticipant = round.Participants[lastIndex]
+    assert(nextParticipant, "Round has no next participant")
+
     round.CurrentParticipant = nextParticipant
+
+    return nextParticipant
+end
+
+local function StartNextParticipantTurn(round: Types.Round, participant: Types.Participant?): ()
+    local nextParticipant = participant or SetNextParticipant(round)
+
+    if nextParticipant.HasDisconnected then
+        return nextParticipant:RemoveParticipant()
+    end
 
     local lastMovedAt = nextParticipant.LastMovedAt
 
@@ -34,7 +46,7 @@ local function StartNextParticipantTurn(round: Types.Round): ()
     ReplicatedStorage.Game.ServerClient.BeginTurn:FireAllClients(nextParticipant.Player.Name)
 
     task.delay(round.GameConfiguration.PlayerTurnTime, function()
-        if lastMovedAt ~= nextParticipant.LastMovedAt then
+        if lastMovedAt ~= nextParticipant.LastMovedAt or not nextParticipant.IsInGame then
             return
         end
         ReplicatedStorage.Game.ServerClient.BeginTurn:FireClient(nextParticipant.Player, "")
@@ -86,32 +98,6 @@ local function StartRound(round: Types.Round): ()
     StartNextParticipantTurn(round)
 end
 
-local function RemoveParticipant(round: Types.Round, participant: Types.Participant): ()
-    table.remove(round.Participants, table.find(round.Participants, participant))
-    participant.IsInGame = false
-    participant.Player:SetAttribute("Status", "Spectating")
-    participant.Player:SetAttribute("IsJailed", false)
-
-    local plr = participant.Player
-    local char = plr.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.Health = 0
-        end
-    end
-
-    for _, v in participant.Assets do
-        v:StartAuction(round)
-    end
-
-    if #round.Participants == 1 then
-        round.Participants[1]:GetTheDub()
-    elseif round.CurrentParticipant == participant and #round.Participants > 1 then
-        StartNextParticipantTurn(round)
-    end
-end
-
 function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     local round = {}
 
@@ -129,7 +115,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.TryGetParticipant = TryGetParticipant
     round.StartRound = StartRound
-    round.RemoveParticipant = RemoveParticipant
+    round.SetNextParticipant = SetNextParticipant
 
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))

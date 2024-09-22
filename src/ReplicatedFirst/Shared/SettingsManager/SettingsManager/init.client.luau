@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SM = require(script.Parent)
 
 -- This must be run before anything yields, especially todo with ui
-local options = ReplicatedStorage:WaitForChild("Shared").ServerClient.LoadSavedData.OnClientEvent:Wait()
+local options = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("LoadSavedData").OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 
 if options then

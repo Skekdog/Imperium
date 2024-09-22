@@ -73,7 +73,7 @@ export type Asset = {
     Hotels: number,
 
     TransferTo: (Asset, to: AssetOwner) -> (),
-    StartAuction: (Asset, round: Round) -> (),
+    StartAuction: (Asset, round: Round, transferToBankIfNoWinner: boolean?) -> (),
     
     TryMortgage: (Asset) -> (),
     TryUnMortgage: (Asset) -> (),
@@ -110,6 +110,7 @@ export type Participant = {
     Round: Round,
     Board: Board,
     IsInGame: boolean,
+    HasDisconnected: boolean,
 
     Money: number,
     JailCards: number,
@@ -159,6 +160,8 @@ export type Participant = {
 
     HasMonopoly: (Participant, colour: string) -> boolean,
     CanAfford: (Participant, amount: number) -> boolean,
+
+    RemoveParticipant: (Participant) -> (),
 }
 
 export type Board = {
@@ -181,9 +184,8 @@ export type Round = {
 
     StartRound: (Round) -> (),
     TryGetParticipant: (Round, player: Player) -> Participant?,
-    StartNextParticipantTurn: (Round) -> (),
-
-    RemoveParticipant: (Round, participant: Participant) -> (),
+    StartNextParticipantTurn: (Round, participant: Participant?) -> (),
+    SetNextParticipant: (Round) -> (),
 }
 
 return {}
