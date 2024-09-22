@@ -79,16 +79,37 @@ local function makeTileModel(boardConfiguration: Types.BoardConfiguration, posit
     return model
 end
 
+local function serialiseRentTable(t: {{string}}): string
+    local result = {}
+            
+    for _, v in ipairs(t) do
+        table.insert(result, v[1] .. v[2])
+    end
+    
+    return table.concat(result, "\n")
+end
+
 function module.new(boardConfiguration: Types.BoardConfiguration, position: number, tileDescription: Types.TileDescription): Types.Tile
     local tile = {}
 
     local name = TileUtils.GetName(tileDescription)
     local colour = TileUtils.GetColour(tileDescription)
     local icon = TileUtils.GetIcon(tileDescription)
+    local model = makeTileModel(boardConfiguration, position, name, colour, icon or "")
 
     tile.Position = position
     tile.TileDescription = tileDescription
-    tile.Model = makeTileModel(boardConfiguration, position, name, colour, icon or "")
+    tile.Model = model
+
+    if tileDescription.AssetDescription then
+        model:SetAttribute("Name", name)
+        model:SetAttribute("Colour", boardConfiguration.Colours[colour] or boardConfiguration.Colours.Default)
+        model:SetAttribute("HousePrice", boardConfiguration.HousePrices[colour])
+        model:SetAttribute("HotelPrice", boardConfiguration.HousePrices[colour])
+        model:SetAttribute("MortgageValue", tileDescription.AssetDescription.Price / 2)
+
+        model:SetAttribute("RentDescription", serialiseRentTable(tileDescription.AssetDescription.RentDescription))
+    end
 
     if tile.TileDescription.AssetDescription then
         tile.Asset = Asset.new(tile.TileDescription.AssetDescription)

@@ -1,15 +1,18 @@
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
 local AnimateJailBars = require(script.Parent.AnimateJailBars)
+local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local PayFine = require(script.Parent.PayFine)
 local RollDice = require(script.Parent.RollDice)
 local ToggleMovementEnabled = require(script.Parent.ToggleMovementEnabled)
 local UseGetOutOfJailFreeCard = require(script.Parent.UseGetOutOfJailFreeCard)
+local ViewDeed = require(script.Parent.ViewDeed)
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game").ServerClient
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
@@ -104,3 +107,28 @@ updateMoney()
 gameServerClient:WaitForChild("AnimateCard").OnClientEvent:Connect(AnimateDrawCard)
 gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(AnimateJailBars)
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
+
+local castParams = RaycastParams.new()
+castParams.FilterDescendantsInstances = {workspace:WaitForChild("Board")}
+castParams.FilterType = Enum.RaycastFilterType.Include
+
+ControlManager.Register("View Board Property", false, function()
+    local mousePos = UserInputService:GetMouseLocation()
+
+    local ray = workspace.CurrentCamera:ViewportPointToRay(mousePos.X, mousePos.Y)
+    local result = workspace:Raycast(ray.Origin, ray.Direction * 1000, castParams)
+
+    if not result then
+        ViewDeed()
+        return Enum.ContextActionResult.Pass
+    end
+
+    local model = result.Instance:FindFirstAncestorOfClass("Model")
+    if model then
+        ViewDeed(model)
+        return Enum.ContextActionResult.Sink
+    end
+
+    ViewDeed()
+    return Enum.ContextActionResult.Pass
+end)

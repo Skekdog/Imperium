@@ -41,6 +41,7 @@ export type AssetDescription = {
     Colour: string,
     Icon: string?,
     Price: number,
+    RentDescription: {{string}},
     Rent: ((Asset, Participant) -> number) | {
         Default: number,
         Houses: {[number]: number?},
