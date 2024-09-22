@@ -71,7 +71,8 @@ end
 
 local function GetRentForStation(asset: Types.Asset, participant: Types.Participant): number
     local ownedStations = 0
-    for _, asset in participant.Assets do
+    assert(asset.Owner ~= "Bank", "Unable to calculate station rent if asset is owned by Bank")
+    for _, asset in asset.Owner.Assets do
         if asset.AssetDescription.Colour == "Station" then
             ownedStations += 1
         end
