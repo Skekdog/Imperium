@@ -136,12 +136,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£2"},
-                {"Rent with Colour Set:", "£4"},
-                {"Rent with 1 House:", "£10"},
-                {"Rent with 2 Houses:", "£30"},
-                {"Rent with 3 Houses:", "£90"},
-                {"Rent with 4 Houses:", "£160"},
-                {"Rent with Hotel:", "£250"}
+                {"With Colour Set:", "£4"},
+                {"With 1 House:", "£10"},
+                {"With 2 Houses:", "£30"},
+                {"With 3 Houses:", "£90"},
+                {"With 4 Houses:", "£160"},
+                {"With Hotel:", "£250"}
             }
         }
     },
@@ -158,12 +158,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£4"},
-                {"Rent with Colour Set:", "£8"},
-                {"Rent with 1 House:", "£20"},
-                {"Rent with 2 Houses:", "£60"},
-                {"Rent with 3 Houses:", "£180"},
-                {"Rent with 4 Houses:", "£320"},
-                {"Rent with Hotel:", "£450"}
+                {"With Colour Set:", "£8"},
+                {"With 1 House:", "£20"},
+                {"With 2 Houses:", "£60"},
+                {"With 3 Houses:", "£180"},
+                {"With 4 Houses:", "£320"},
+                {"With Hotel:", "£450"}
             }
         }
     },
@@ -179,10 +179,10 @@ module.Tiles = {
             Price = 200,
             Rent = GetRentForStation,
             RentDescription = {
-                {"Rent with 1 owned Station:", "£25"},
-                {"Rent with 2 owned Stations:", "£50"},
-                {"Rent with 3 owned Stations:", "£100"},
-                {"Rent with 4 owned Stations:", "£200"}
+                {"With 1 owned Station:", "£25"},
+                {"With 2 owned Stations:", "£50"},
+                {"With 3 owned Stations:", "£100"},
+                {"With 4 owned Stations:", "£200"}
             }
         }
     },
@@ -198,12 +198,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£6"},
-                {"Rent with Colour Set:", "£12"},
-                {"Rent with 1 House:", "£30"},
-                {"Rent with 2 Houses:", "£90"},
-                {"Rent with 3 Houses:", "£270"},
-                {"Rent with 4 Houses:", "£400"},
-                {"Rent with Hotel:", "£550"}
+                {"With Colour Set:", "£12"},
+                {"With 1 House:", "£30"},
+                {"With 2 Houses:", "£90"},
+                {"With 3 Houses:", "£270"},
+                {"With 4 Houses:", "£400"},
+                {"With Hotel:", "£550"}
             }
         }
     },
@@ -220,12 +220,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£6"},
-                {"Rent with Colour Set:", "£12"},
-                {"Rent with 1 House:", "£30"},
-                {"Rent with 2 Houses:", "£90"},
-                {"Rent with 3 Houses:", "£270"},
-                {"Rent with 4 Houses:", "£400"},
-                {"Rent with Hotel:", "£550"}
+                {"With Colour Set:", "£12"},
+                {"With 1 House:", "£30"},
+                {"With 2 Houses:", "£90"},
+                {"With 3 Houses:", "£270"},
+                {"With 4 Houses:", "£400"},
+                {"With Hotel:", "£550"}
             }
         }
     },
@@ -241,12 +241,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£8"},
-                {"Rent with Colour Set:", "£16"},
-                {"Rent with 1 House:", "£40"},
-                {"Rent with 2 Houses:", "£100"},
-                {"Rent with 3 Houses:", "£300"},
-                {"Rent with 4 Houses:", "£450"},
-                {"Rent with Hotel:", "£600"}
+                {"With Colour Set:", "£16"},
+                {"With 1 House:", "£40"},
+                {"With 2 Houses:", "£100"},
+                {"With 3 Houses:", "£300"},
+                {"With 4 Houses:", "£450"},
+                {"With Hotel:", "£600"}
             }
         }
     },
@@ -266,12 +266,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£10"},
-                {"Rent with Colour Set:", "£20"},
-                {"Rent with 1 House:", "£50"},
-                {"Rent with 2 Houses:", "£150"},
-                {"Rent with 3 Houses:", "£450"},
-                {"Rent with 4 Houses:", "£625"},
-                {"Rent with Hotel:", "£750"}
+                {"With Colour Set:", "£20"},
+                {"With 1 House:", "£50"},
+                {"With 2 Houses:", "£150"},
+                {"With 3 Houses:", "£450"},
+                {"With 4 Houses:", "£625"},
+                {"With Hotel:", "£750"}
             }
         }
     },
@@ -282,8 +282,8 @@ module.Tiles = {
             Price = 150,
             Rent = GetRentForUtility,
             RentDescription = {
-                {"Rent with 1 Utility:", "4x dice roll"},
-                {"Rent with 2 Utilities:", "10x dice roll"}
+                {"With 1 Utility:", "4x dice roll"},
+                {"With 2 Utilities:", "10x dice roll"}
             }
         }
     },
@@ -299,12 +299,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£10"},
-                {"Rent with Colour Set:", "£20"},
-                {"Rent with 1 House:", "£50"},
-                {"Rent with 2 Houses:", "£150"},
-                {"Rent with 3 Houses:", "£450"},
-                {"Rent with 4 Houses:", "£625"},
-                {"Rent with Hotel:", "£750"}
+                {"With Colour Set:", "£20"},
+                {"With 1 House:", "£50"},
+                {"With 2 Houses:", "£150"},
+                {"With 3 Houses:", "£450"},
+                {"With 4 Houses:", "£625"},
+                {"With Hotel:", "£750"}
             }
         }
     },
@@ -320,12 +320,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£12"},
-                {"Rent with Colour Set:", "£24"},
-                {"Rent with 1 House:", "£60"},
-                {"Rent with 2 Houses:", "£180"},
-                {"Rent with 3 Houses:", "£500"},
-                {"Rent with 4 Houses:", "£700"},
-                {"Rent with Hotel:", "£900"}
+                {"With Colour Set:", "£24"},
+                {"With 1 House:", "£60"},
+                {"With 2 Houses:", "£180"},
+                {"With 3 Houses:", "£500"},
+                {"With 4 Houses:", "£700"},
+                {"With Hotel:", "£900"}
             }
         }
     },
@@ -336,10 +336,10 @@ module.Tiles = {
             Price = 200,
             Rent = GetRentForStation,
             RentDescription = {
-                {"Rent with 1 owned Station:", "£25"},
-                {"Rent with 2 owned Stations:", "£50"},
-                {"Rent with 3 owned Stations:", "£100"},
-                {"Rent with 4 owned Stations:", "£200"}
+                {"With 1 owned Station:", "£25"},
+                {"With 2 owned Stations:", "£50"},
+                {"With 3 owned Stations:", "£100"},
+                {"With 4 owned Stations:", "£200"}
             }
         }
     },
@@ -355,12 +355,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£14"},
-                {"Rent with Colour Set:", "£28"},
-                {"Rent with 1 House:", "£70"},
-                {"Rent with 2 Houses:", "£200"},
-                {"Rent with 3 Houses:", "£550"},
-                {"Rent with 4 Houses:", "£750"},
-                {"Rent with Hotel:", "£950"}
+                {"With Colour Set:", "£28"},
+                {"With 1 House:", "£70"},
+                {"With 2 Houses:", "£200"},
+                {"With 3 Houses:", "£550"},
+                {"With 4 Houses:", "£750"},
+                {"With Hotel:", "£950"}
             }
         }
     },
@@ -377,12 +377,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£14"},
-                {"Rent with Colour Set:", "£28"},
-                {"Rent with 1 House:", "£70"},
-                {"Rent with 2 Houses:", "£200"},
-                {"Rent with 3 Houses:", "£550"},
-                {"Rent with 4 Houses:", "£750"},
-                {"Rent with Hotel:", "£950"}
+                {"With Colour Set:", "£28"},
+                {"With 1 House:", "£70"},
+                {"With 2 Houses:", "£200"},
+                {"With 3 Houses:", "£550"},
+                {"With 4 Houses:", "£750"},
+                {"With Hotel:", "£950"}
             }
         }
     },
@@ -398,12 +398,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£16"},
-                {"Rent with Colour Set:", "£32"},
-                {"Rent with 1 House:", "£80"},
-                {"Rent with 2 Houses:", "£220"},
-                {"Rent with 3 Houses:", "£600"},
-                {"Rent with 4 Houses:", "£800"},
-                {"Rent with Hotel:", "£1000"}
+                {"With Colour Set:", "£32"},
+                {"With 1 House:", "£80"},
+                {"With 2 Houses:", "£220"},
+                {"With 3 Houses:", "£600"},
+                {"With 4 Houses:", "£800"},
+                {"With Hotel:", "£1000"}
             }
         }
     },
@@ -423,12 +423,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£18"},
-                {"Rent with Colour Set:", "£36"},
-                {"Rent with 1 House:", "£90"},
-                {"Rent with 2 Houses:", "£250"},
-                {"Rent with 3 Houses:", "£700"},
-                {"Rent with 4 Houses:", "£875"},
-                {"Rent with Hotel:", "£1050"}
+                {"With Colour Set:", "£36"},
+                {"With 1 House:", "£90"},
+                {"With 2 Houses:", "£250"},
+                {"With 3 Houses:", "£700"},
+                {"With 4 Houses:", "£875"},
+                {"With Hotel:", "£1050"}
             }
         }
     },
@@ -445,12 +445,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£18"},
-                {"Rent with Colour Set:", "£36"},
-                {"Rent with 1 House:", "£90"},
-                {"Rent with 2 Houses:", "£250"},
-                {"Rent with 3 Houses:", "£700"},
-                {"Rent with 4 Houses:", "£875"},
-                {"Rent with Hotel:", "£1050"}
+                {"With Colour Set:", "£36"},
+                {"With 1 House:", "£90"},
+                {"With 2 Houses:", "£250"},
+                {"With 3 Houses:", "£700"},
+                {"With 4 Houses:", "£875"},
+                {"With Hotel:", "£1050"}
             }
         }
     },
@@ -466,12 +466,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£20"},
-                {"Rent with Colour Set:", "£40"},
-                {"Rent with 1 House:", "£100"},
-                {"Rent with 2 Houses:", "£300"},
-                {"Rent with 3 Houses:", "£750"},
-                {"Rent with 4 Houses:", "£925"},
-                {"Rent with Hotel:", "£1100"}
+                {"With Colour Set:", "£40"},
+                {"With 1 House:", "£100"},
+                {"With 2 Houses:", "£300"},
+                {"With 3 Houses:", "£750"},
+                {"With 4 Houses:", "£925"},
+                {"With Hotel:", "£1100"}
             }
         }
     },
@@ -482,10 +482,10 @@ module.Tiles = {
             Price = 200,
             Rent = GetRentForStation,
             RentDescription = {
-                {"Rent with 1 owned Station:", "£25"},
-                {"Rent with 2 owned Stations:", "£50"},
-                {"Rent with 3 owned Stations:", "£100"},
-                {"Rent with 4 owned Stations:", "£200"}
+                {"With 1 owned Station:", "£25"},
+                {"With 2 owned Stations:", "£50"},
+                {"With 3 owned Stations:", "£100"},
+                {"With 4 owned Stations:", "£200"}
             }
         }
     },
@@ -501,12 +501,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£22"},
-                {"Rent with Colour Set:", "£44"},
-                {"Rent with 1 House:", "£110"},
-                {"Rent with 2 Houses:", "£330"},
-                {"Rent with 3 Houses:", "£800"},
-                {"Rent with 4 Houses:", "£975"},
-                {"Rent with Hotel:", "£1150"}
+                {"With Colour Set:", "£44"},
+                {"With 1 House:", "£110"},
+                {"With 2 Houses:", "£330"},
+                {"With 3 Houses:", "£800"},
+                {"With 4 Houses:", "£975"},
+                {"With Hotel:", "£1150"}
             }
         }
     },
@@ -522,12 +522,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£22"},
-                {"Rent with Colour Set:", "£44"},
-                {"Rent with 1 House:", "£110"},
-                {"Rent with 2 Houses:", "£330"},
-                {"Rent with 3 Houses:", "£800"},
-                {"Rent with 4 Houses:", "£975"},
-                {"Rent with Hotel:", "£1150"}
+                {"With Colour Set:", "£44"},
+                {"With 1 House:", "£110"},
+                {"With 2 Houses:", "£330"},
+                {"With 3 Houses:", "£800"},
+                {"With 4 Houses:", "£975"},
+                {"With Hotel:", "£1150"}
             }
         }
     },
@@ -538,8 +538,8 @@ module.Tiles = {
             Price = 150,
             Rent = GetRentForUtility,
             RentDescription = {
-                {"Rent with 1 Utility:", "4x dice roll"},
-                {"Rent with 2 Utilities:", "10x dice roll"}
+                {"With 1 Utility:", "4x dice roll"},
+                {"With 2 Utilities:", "10x dice roll"}
             }
         }
     },
@@ -555,12 +555,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£24"},
-                {"Rent with Colour Set:", "£48"},
-                {"Rent with 1 House:", "£120"},
-                {"Rent with 2 Houses:", "£360"},
-                {"Rent with 3 Houses:", "£850"},
-                {"Rent with 4 Houses:", "£1025"},
-                {"Rent with Hotel:", "£1200"}
+                {"With Colour Set:", "£48"},
+                {"With 1 House:", "£120"},
+                {"With 2 Houses:", "£360"},
+                {"With 3 Houses:", "£850"},
+                {"With 4 Houses:", "£1025"},
+                {"With Hotel:", "£1200"}
             }
         }
     },
@@ -581,12 +581,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£26"},
-                {"Rent with Colour Set:", "£52"},
-                {"Rent with 1 House:", "£130"},
-                {"Rent with 2 Houses:", "£390"},
-                {"Rent with 3 Houses:", "£900"},
-                {"Rent with 4 Houses:", "£1100"},
-                {"Rent with Hotel:", "£1275"}
+                {"With Colour Set:", "£52"},
+                {"With 1 House:", "£130"},
+                {"With 2 Houses:", "£390"},
+                {"With 3 Houses:", "£900"},
+                {"With 4 Houses:", "£1100"},
+                {"With Hotel:", "£1275"}
             }
         }
     },
@@ -602,12 +602,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£26"},
-                {"Rent with Colour Set:", "£52"},
-                {"Rent with 1 House:", "£130"},
-                {"Rent with 2 Houses:", "£390"},
-                {"Rent with 3 Houses:", "£900"},
-                {"Rent with 4 Houses:", "£1100"},
-                {"Rent with Hotel:", "£1275"}
+                {"With Colour Set:", "£52"},
+                {"With 1 House:", "£130"},
+                {"With 2 Houses:", "£390"},
+                {"With 3 Houses:", "£900"},
+                {"With 4 Houses:", "£1100"},
+                {"With Hotel:", "£1275"}
             }
         }
     },
@@ -624,12 +624,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£28"},
-                {"Rent with Colour Set:", "£56"},
-                {"Rent with 1 House:", "£150"},
-                {"Rent with 2 Houses:", "£450"},
-                {"Rent with 3 Houses:", "£1000"},
-                {"Rent with 4 Houses:", "£1200"},
-                {"Rent with Hotel:", "£1400"}
+                {"With Colour Set:", "£56"},
+                {"With 1 House:", "£150"},
+                {"With 2 Houses:", "£450"},
+                {"With 3 Houses:", "£1000"},
+                {"With 4 Houses:", "£1200"},
+                {"With Hotel:", "£1400"}
             }
         }
     },
@@ -640,10 +640,10 @@ module.Tiles = {
             Price = 200,
             Rent = GetRentForStation,
             RentDescription = {
-                {"Rent with 1 owned Station:", "£25"},
-                {"Rent with 2 owned Stations:", "£50"},
-                {"Rent with 3 owned Stations:", "£100"},
-                {"Rent with 4 owned Stations:", "£200"}
+                {"With 1 owned Station:", "£25"},
+                {"With 2 owned Stations:", "£50"},
+                {"With 3 owned Stations:", "£100"},
+                {"With 4 owned Stations:", "£200"}
             }
         }
     },
@@ -660,12 +660,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£35"},
-                {"Rent with Colour Set:", "£70"},
-                {"Rent with 1 House:", "£175"},
-                {"Rent with 2 Houses:", "£500"},
-                {"Rent with 3 Houses:", "£1100"},
-                {"Rent with 4 Houses:", "£1300"},
-                {"Rent with Hotel:", "£1500"}
+                {"With Colour Set:", "£70"},
+                {"With 1 House:", "£175"},
+                {"With 2 Houses:", "£500"},
+                {"With 3 Houses:", "£1100"},
+                {"With 4 Houses:", "£1300"},
+                {"With Hotel:", "£1500"}
             }
         }
     },
@@ -686,12 +686,12 @@ module.Tiles = {
             },
             RentDescription = {
                 {"Rent:", "£50"},
-                {"Rent with Colour Set:", "£100"},
-                {"Rent with 1 House:", "£200"},
-                {"Rent with 2 Houses:", "£600"},
-                {"Rent with 3 Houses:", "£1400"},
-                {"Rent with 4 Houses:", "£1700"},
-                {"Rent with Hotel:", "£2000"}
+                {"With Colour Set:", "£100"},
+                {"With 1 House:", "£200"},
+                {"With 2 Houses:", "£600"},
+                {"With 3 Houses:", "£1400"},
+                {"With 4 Houses:", "£1700"},
+                {"With Hotel:", "£2000"}
             }
         }
     },
