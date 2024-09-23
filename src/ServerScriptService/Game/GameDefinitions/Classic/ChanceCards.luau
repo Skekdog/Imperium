@@ -58,7 +58,7 @@ module[7] = {
 module[8] = {
     Title = "Go Back 3 Spaces.",
     Effect = function(participant: Types.Participant): ()
-        participant:MoveBy(-3)
+        participant:MoveBy(-3, true)
     end
 }
 

@@ -311,9 +311,9 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     participant.IsMoving = false
 end
 
-local function MoveBy(participant: Types.Participant, amount: number): ()
+local function MoveBy(participant: Types.Participant, amount: number, moveDirectly: boolean?): ()
     local position = TileMath.GetWrapAround(participant.Position + amount, #participant.Board.Tiles)
-    MoveTo(participant, position)
+    MoveTo(participant, position, moveDirectly)
 end
 
 local function MoveToTileByName(participant: Types.Participant, name: string, moveDirectly: boolean?): ()
