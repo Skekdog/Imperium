@@ -178,21 +178,30 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
 
     local boardConfiguration = owner.Round.BoardConfiguration
-    local houseCost = TryGetDevelopmentSellValue(asset, "House", boardConfiguration)
-    local hotelCost = TryGetDevelopmentSellValue(asset, "Hotel", boardConfiguration)
-    if not houseCost or not hotelCost then
-        return
+
+    local totalSellPrice = 0
+    for _, v in owner.Assets do
+        if v.AssetDescription.Colour ~= asset.AssetDescription.Colour then
+            continue
+        end
+        local houseCost = TryGetDevelopmentSellValue(asset, "House", boardConfiguration)
+        local hotelCost = TryGetDevelopmentSellValue(asset, "Hotel", boardConfiguration)
+        if not houseCost or not hotelCost then
+            return
+        end
+
+        local sellPrice = (houseCost * asset.Houses) + (hotelCost * asset.Hotels)
+        asset.Houses = 0
+        asset.Hotels = 0
+
+        totalSellPrice += sellPrice
     end
 
-    local sellPrice = (houseCost * asset.Houses) + (hotelCost * asset.Hotels)
-    asset.Houses = 0
-    asset.Hotels = 0
-
-    if sellPrice > 0 then
-        SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Name}.`, {owner.Player})
+    if totalSellPrice > 0 then
+        SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Colour} for £{totalSellPrice}.`, {owner.Player})
     end
 
-    owner:GiveMoney(sellPrice)
+    owner:GiveMoney(totalSellPrice)
     updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
 end
 
