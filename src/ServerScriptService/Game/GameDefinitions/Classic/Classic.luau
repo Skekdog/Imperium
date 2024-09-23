@@ -4,6 +4,10 @@ local Colours = require(script.Parent.Colours)
 local Types = require(script.Parent.Parent.Parent.Imperium.Types)
 local module = {}
 
+local random = Random.new()
+random:Shuffle(ChanceCards)
+random:Shuffle(CommunityChests)
+
 local function DrawCard(tile: Types.TileDescription, participant: Types.Participant): ()
     local deck: {Types.CardDescription}?
     if tile.Name == "Community Chest" then
@@ -13,7 +17,10 @@ local function DrawCard(tile: Types.TileDescription, participant: Types.Particip
     end
     assert(deck, `Failed to draw card for tile {tile.Name}`)
 
-    local card = deck[math.random(1, #deck)]
+    local card = deck[1]
+    table.remove(deck, 1)
+    table.insert(deck, card)
+    
     participant:DrawCard(card, tile.Name :: Types.CardType)
 end
 
