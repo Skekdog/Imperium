@@ -72,6 +72,8 @@ local function makeLog(msg: string): ()
 	label.LayoutOrder = #eventLog.Object.ScrollingFrame:GetChildren()
 
 	label.Parent = eventLog.Object.ScrollingFrame
+
+	UIAnimation.Animate(label, TweenInfo.new(0.25), {Size = UDim2.fromScale(1, 0.15)})
 end
 
 return function(msg: string, players: {Player}?)
