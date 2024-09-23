@@ -81,17 +81,6 @@ module.AvailableSettings = {
 		end
 	},
 	{
-		Name = "Background Menus",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "Closed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
-		PossibleValues = {"Closed", "Stacked"},
-		Default = "Closed",
-		Callback = function(val)
-			script.Parent.UIManager:SetAttribute("BackgroundMenuMode", val)
-		end,
-	},
-	{
 		Name = "Close Scale",
 		Tab = "Display",
 		Category = "Development",

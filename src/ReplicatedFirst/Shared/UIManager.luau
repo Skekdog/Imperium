@@ -29,7 +29,6 @@ end
 local UIManager = {}
 
 export type Layer = "Special" | "Popup" | "Button" | "HUD"
-export type BackgroundMenuMode = "Closed" | "Stacked"
 
 export type UI = {
 	Name: string, -- Unique identifier
@@ -97,8 +96,6 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				return
 			end
 
-			local mode = script:GetAttribute("BackgroundMenuMode") :: BackgroundMenuMode
-
 			if not newVisible then
 				object.ZIndex = 0
 				return
@@ -108,7 +105,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			for _, ui in registeredUIs do
 				if ui.Layer == "Popup" and highestIndex < ui.Object.ZIndex and ui.Visible then
 					highestIndex = if not ui.Object:GetAttribute("IgnoreStacking") then ui.Object.ZIndex else highestIndex
-					if ui ~= self and mode == "Closed" and not ui.Object:GetAttribute("IgnoreStacking") then
+					if ui ~= self and not ui.Object:GetAttribute("IgnoreStacking") then
 						ui:ToggleVisible(false, true)
 					end
 				end
