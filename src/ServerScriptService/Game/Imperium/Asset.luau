@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
@@ -89,6 +90,15 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
         return false, 0
     end
 
+    local cost = TryGetDevelopmentCost(asset, development, asset.Owner.Round.BoardConfiguration)
+    if not ignoreCost and (not cost or not asset.Owner:CanAfford(cost)) then
+        return false, 0
+    end
+
+    if true then
+        return if asset.Houses < 4 then development == "House" else development == "Hotel", cost
+    end
+
     if asset.IsMortgaged then
         return false, 0
     end
@@ -115,12 +125,62 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
         end
     end
 
-    local cost = TryGetDevelopmentCost(asset, development, asset.Owner.Round.BoardConfiguration)
-    if not ignoreCost and (not cost or not asset.Owner:CanAfford(cost)) then
-        return false, 0
+    return true, cost
+end
+
+local animateDevelopmentRemote = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateDevelopmentModel")
+function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number): ()
+    assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
+    local tile = asset.Owner.Round.Board:FindTileByName(asset.AssetDescription.Name)
+
+    local name = development .. tostring(index)
+
+    local model = (tile :: any).Model:FindFirstChild(name) :: Model?
+    if not model then
+        return
     end
 
-    return true, cost
+    local heightOffset = Vector3.new(0, model:GetExtentsSize().Y, 0)
+    local targetCFrame = model:GetPivot() - heightOffset
+
+    animateDevelopmentRemote:FireAllClients(model, targetCFrame)
+
+    if development == "Hotel" then
+        for i = 1, asset.Houses do
+            addDevelopmentModel(asset, "House", i)
+        end
+    end
+
+    task.delay(1.5, model.Destroy, model)
+end
+
+function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number): ()
+    assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
+    local tile = asset.Owner.Round.Board:FindTileByName(asset.AssetDescription.Name)
+
+    local model = (if development == "House" then ServerStorage.Game.House:Clone() else ServerStorage.Game.Hotel:Clone()) :: Model
+
+    local attachmentName = development .. tostring(index)
+    local attachment = (tile :: any).Model.Base:FindFirstChild(attachmentName) :: Attachment or error(`Failed to find Attachment {attachmentName}`)
+
+    if development == "Hotel" then
+        for i = 1, asset.Houses do
+            tryRemoveDevelopmentModel(asset, "House", i)
+        end
+    end
+
+    local targetCFrame = attachment.WorldCFrame
+
+    local heightOffset = Vector3.new(0, model:GetExtentsSize().Y, 0)
+    local adjustedCFrame = targetCFrame + (heightOffset / 2)
+
+    model:PivotTo(targetCFrame - heightOffset)
+
+    model.Name = attachmentName
+    model.Parent = tile.Model
+    animateDevelopmentRemote:FireAllClients(model, adjustedCFrame)
+
+    task.delay(1.5, model.PivotTo, model, adjustedCFrame)
 end
 
 local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Hotel"): ()
@@ -137,8 +197,10 @@ local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Ho
 
     if development == "House" then
         asset.Houses += 1
+        addDevelopmentModel(asset, development, asset.Houses)
     elseif development == "Hotel" then
         asset.Hotels += 1
+        addDevelopmentModel(asset, development, asset.Hotels)
     end
 
     SendNotification(`[PLAYER] bought a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
@@ -152,9 +214,11 @@ local function TrySellDevelopment(asset: Types.Asset): ()
     local development: "House" | "Hotel"
     if asset.Hotels > 0 then
         development = "Hotel"
+        tryRemoveDevelopmentModel(asset, development, asset.Hotels)
         asset.Hotels -= 1
     elseif asset.Houses > 0 then
         development = "House"
+        tryRemoveDevelopmentModel(asset, development, asset.Houses)
         asset.Houses -= 1
     else
         return

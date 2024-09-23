@@ -1,17 +1,16 @@
 local RunService = game:GetService("RunService")
-local DURATION = 1
 
-return function(bars: Model, targetCFrame: CFrame): ()
+return function(model: Model, targetCFrame: CFrame, duration: number): ()
     local startTime = tick()
-    local startCFrame = bars:GetPivot()
+    local startCFrame = model:GetPivot()
 
     local con
     con = RunService.Heartbeat:Connect(function()
         local elapsedTime = tick() - startTime
-        local alpha = math.min(elapsedTime / DURATION, 1) ^ 6
+        local alpha = math.min(elapsedTime / duration, 1) ^ 6
 
         local newCFrame = startCFrame:Lerp(targetCFrame, alpha)
-        bars:PivotTo(newCFrame)
+        model:PivotTo(newCFrame)
 
         if alpha >= 1 then
             con:Disconnect()

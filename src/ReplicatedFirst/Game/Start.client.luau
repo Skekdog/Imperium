@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
-local AnimateJailBars = require(script.Parent.AnimateJailBars)
+local LerpModelCFrame = require(script.Parent.LerpModelCFrame)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -105,7 +105,14 @@ player:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
 
 gameServerClient:WaitForChild("AnimateCard").OnClientEvent:Connect(AnimateDrawCard)
-gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(AnimateJailBars)
+
+gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(function(bars: Model, targetCFrame: CFrame)
+    LerpModelCFrame(bars, targetCFrame, 1)
+end)
+gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(function(model: Model, targetCFrame: CFrame)
+    LerpModelCFrame(model, targetCFrame, 1)
+end)
+
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
 
 local castParams = RaycastParams.new()
