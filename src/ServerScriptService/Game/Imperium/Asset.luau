@@ -314,6 +314,7 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
     local view = {
         Name = asset.AssetDescription.Name,
         Colour = TileUtils.GetColor3(tile.TileDescription, round),
+        Position = tile.Position,
     }
 
     if asset.IsMortgaged then

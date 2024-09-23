@@ -1,6 +1,7 @@
 export type ClientAssetView = {
     Name: string,
     Colour: Color3,
+    Position: number,
 
     MortgageValue: number?,
     UnMortgageCost: number?,

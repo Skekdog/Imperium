@@ -120,7 +120,8 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
     button.Text = name
     button.BackgroundColor3 = asset.Colour
 
-    button.LayoutOrder = tonumber(asset.Colour:ToHex(), 16) or error("Failed to convert colour to hex")
+    -- todo: this can cause problems if there are two similar colours. woo.
+    button.LayoutOrder = (tonumber(asset.Colour:ToHex(), 16) or error("Failed to convert colour to hex")) + asset.Position
 
     button.Name = "Asset_" .. name
     button.Visible = true
