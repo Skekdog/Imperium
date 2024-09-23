@@ -4,6 +4,7 @@ local UserInputService = game:GetService("UserInputService")
 
 export type SettingDefinition = {
 	Name: string,
+	DisplayName: string?,
 	Tab: "Display" | "Gameplay" | "Controls" | "Touch" | "General" | "Keybinds",
 	Category: string,
 	Tooltip: string,
@@ -126,6 +127,7 @@ module.AvailableSettings = {
 	},
 	{
 		Name = "EventLog",
+		DisplayName = "Event Log",
 		Tab = "Keybinds",
 		Category = "Menus - Enable the checkbox to make a keybind toggled",
 		Tooltip = "Opens the event log.",

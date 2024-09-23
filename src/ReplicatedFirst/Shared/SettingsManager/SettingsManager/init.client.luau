@@ -116,6 +116,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	local tab = setting.Tab
 	local settingType = setting.PossibleValues
 	local name = setting.Name
+	local displayName = setting.DisplayName or name
 	local page = settingsFrame:FindFirstChild("Page_"..tab) :: Instance
 	
 	local cat = setting.Category
@@ -140,7 +141,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		local val = frame.Value
 		UIAnimation.TransitionSwitch(val, SM.GetSetting(name) :: boolean)
 		
-		frame.Label.Text = name..":"
+		frame.Label.Text = displayName .. ":"
 		
 		frame.MouseButton1Click:Connect(function()
 			local newVal = not SM.GetSetting(name)
@@ -150,7 +151,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		f = frame
 	elseif type(settingType) == "table" then
 		local frame = selectorFrame:Clone() :: typeof(selectorFrame)
-		frame.Label.Text = name..":"
+		frame.Label.Text = displayName .. ":"
 		
 		local opts = {}
 		for i, v in settingType do
@@ -183,7 +184,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	elseif settingType == "Keybind" then
 		local frame = keybindFrame:Clone()
 		local m = frame.Frame
-		m.Label.Text = name..":"
+		m.Label.Text = displayName .. ":"
 		
 		local setBinds = SM.GetSetting(name) :: SM.KeybindSetting
 		
