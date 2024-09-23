@@ -38,7 +38,7 @@ local ChanceTile: Types.TileDescription = {
 
 local CommunityChestTile: Types.TileDescription = {
     Name = "Community Chest",
-    Icon = "rbxassetid://93730445736567",
+    Icon = "rbxassetid://118048991405187",
     Colour = "Community Chest",
     OnEnter = DrawCard,
 }
