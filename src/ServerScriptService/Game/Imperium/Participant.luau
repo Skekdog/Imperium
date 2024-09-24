@@ -252,8 +252,6 @@ end
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
-    participant.IsMoving = true
-
     participant.PreviousPosition = participant.Position
     local passGo = (participant.Position == 1) or ((participant.Position > position) and (position ~= 1))
     if passGo and not moveDirectly and participant.LastMovedAt ~= 0 then
@@ -307,8 +305,6 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     if tile.TileDescription.OnEnter then
         tile.TileDescription.OnEnter(tile.TileDescription, participant)
     end
-
-    participant.IsMoving = false
 end
 
 local function MoveBy(participant: Types.Participant, amount: number, moveDirectly: boolean?): ()
@@ -375,6 +371,7 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
 end
 
 local function TryPlayMove(participant: Types.Participant): ()
+    participant.IsMoving = true
     SetTimeMilestone(nil)
     ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
     if participant.JailedOn ~= 0 then
@@ -406,6 +403,7 @@ local function TryPlayMove(participant: Types.Participant): ()
     if participant.IsInGame then
         participant.Round:StartNextParticipantTurn()
     end
+    participant.IsMoving = false
 end
 
 local function GiveJailCards(participant: Types.Participant, amount: number): ()

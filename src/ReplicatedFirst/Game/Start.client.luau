@@ -25,15 +25,14 @@ local payFine = UIManager.WaitForUI("PayFine") :: UIManager.UI & {Object: typeof
 local useCard = UIManager.WaitForUI("UseGetOutOfJailFreeCard") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.UseGetOutOfJailFreeCard)}
 gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
     local plr = Players:FindFirstChild(name)
-    if not plr or not plr:IsA("Player") then
-        return
-    end
 
     local isPlayer = plr == player
 
-    local char = plr.Character
-    if char then
-        workspace.CurrentCamera.CameraSubject = char:FindFirstChildOfClass("Humanoid")
+    if plr and plr:IsA("Player") then
+        local char = plr.Character
+        if char then
+            workspace.CurrentCamera.CameraSubject = char:FindFirstChildOfClass("Humanoid")
+        end
     end
 
     local isJailed = player:GetAttribute("IsJailed") :: boolean
