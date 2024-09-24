@@ -1,8 +1,6 @@
 {
     "className": "Sound",
     "properties": {
-        "SoundId": "rbxassetid://9114752603",
-        "PlaybackRegionsEnabled": true,
-        "PlaybackRegion": {"NumberRange": [0.5, 3]}
+        "SoundId": "rbxassetid://9125574353"
     }
 }

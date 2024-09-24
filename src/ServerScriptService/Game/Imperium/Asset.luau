@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local PlaySoundAtPart = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.PlaySoundAtPart)
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
@@ -129,7 +130,7 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
 end
 
 local animateDevelopmentRemote = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateDevelopmentModel")
-function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number): ()
+function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number, playSound: boolean): ()
     assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
     local tile = asset.Owner.Round.Board:FindTileByName(asset.AssetDescription.Name)
 
@@ -147,14 +148,18 @@ function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "H
 
     if development == "Hotel" then
         for i = 1, asset.Houses do
-            addDevelopmentModel(asset, "House", i)
+            addDevelopmentModel(asset, "House", i, false)
         end
+    end
+
+    if playSound then
+        PlaySoundAtPart("Construction", (tile :: any).Model.Base)
     end
 
     task.delay(1.5, model.Destroy, model)
 end
 
-function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number): ()
+function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number, playSound: boolean): ()
     assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
     local tile = asset.Owner.Round.Board:FindTileByName(asset.AssetDescription.Name)
 
@@ -165,7 +170,7 @@ function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel",
 
     if development == "Hotel" then
         for i = 1, asset.Houses do
-            tryRemoveDevelopmentModel(asset, "House", i)
+            tryRemoveDevelopmentModel(asset, "House", i, false)
         end
     end
 
@@ -179,6 +184,10 @@ function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel",
     model.Name = attachmentName
     model.Parent = tile.Model
     animateDevelopmentRemote:FireAllClients(model, adjustedCFrame)
+
+    if playSound then
+        PlaySoundAtPart("Construction", (tile :: any).Model.Base)
+    end
 
     task.delay(1.5, model.PivotTo, model, adjustedCFrame)
 end
@@ -197,10 +206,10 @@ local function TryDevelopProperty(asset: Types.Asset, development: "House" | "Ho
 
     if development == "House" then
         asset.Houses += 1
-        addDevelopmentModel(asset, development, asset.Houses)
+        addDevelopmentModel(asset, development, asset.Houses, true)
     elseif development == "Hotel" then
         asset.Hotels += 1
-        addDevelopmentModel(asset, development, asset.Hotels)
+        addDevelopmentModel(asset, development, asset.Hotels, true)
     end
 
     SendNotification(`[PLAYER] bought a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
@@ -214,11 +223,11 @@ local function TrySellDevelopment(asset: Types.Asset): ()
     local development: "House" | "Hotel"
     if asset.Hotels > 0 then
         development = "Hotel"
-        tryRemoveDevelopmentModel(asset, development, asset.Hotels)
+        tryRemoveDevelopmentModel(asset, development, asset.Hotels, true)
         asset.Hotels -= 1
     elseif asset.Houses > 0 then
         development = "House"
-        tryRemoveDevelopmentModel(asset, development, asset.Houses)
+        tryRemoveDevelopmentModel(asset, development, asset.Houses, true)
         asset.Houses -= 1
     else
         return
