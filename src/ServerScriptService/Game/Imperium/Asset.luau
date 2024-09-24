@@ -96,10 +96,6 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
         return false, 0
     end
 
-    if true then
-        return if asset.Houses < 4 then development == "House" else development == "Hotel", cost
-    end
-
     if asset.IsMortgaged then
         return false, 0
     end
