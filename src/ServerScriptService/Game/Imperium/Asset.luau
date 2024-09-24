@@ -243,11 +243,8 @@ local function TrySellDevelopment(asset: Types.Asset): ()
     updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
 end
 
-local function TrySellAllDevelopments(asset: Types.Asset): ()
+local function getSellAllValue(asset: Types.Asset): number
     local owner = asset.Owner
-    if owner == "Bank" then
-        return
-    end
     assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
 
     local boardConfiguration = owner.Round.BoardConfiguration
@@ -257,17 +254,35 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
         if v.AssetDescription.Colour ~= asset.AssetDescription.Colour then
             continue
         end
-        local houseCost = TryGetDevelopmentSellValue(asset, "House", boardConfiguration)
-        local hotelCost = TryGetDevelopmentSellValue(asset, "Hotel", boardConfiguration)
+
+        local houseCost = TryGetDevelopmentSellValue(v, "House", boardConfiguration)
+        local hotelCost = TryGetDevelopmentSellValue(v, "Hotel", boardConfiguration)
         if not houseCost or not hotelCost then
-            return
+            continue
         end
 
-        local sellPrice = (houseCost * asset.Houses) + (hotelCost * asset.Hotels)
-        asset.Houses = 0
-        asset.Hotels = 0
+        local sellPrice = (houseCost * v.Houses) + (hotelCost * v.Hotels)
 
         totalSellPrice += sellPrice
+    end
+
+    return totalSellPrice
+end
+
+local function TrySellAllDevelopments(asset: Types.Asset): ()
+    local owner = asset.Owner
+    if owner == "Bank" then
+        return
+    end
+    assert(typeof(owner) ~= "string", "The bank cannot sell all developments")
+
+    local totalSellPrice = getSellAllValue(asset)
+    for _, v in owner.Assets do
+        if v.AssetDescription.Colour ~= asset.AssetDescription.Colour then
+            continue
+        end
+        v.Houses = 0
+        v.Hotels = 0
     end
 
     if totalSellPrice > 0 then
@@ -413,28 +428,7 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         view.HousePrice = houseCost
     end
 
-    local sellAllValue = 0
-    if asset.Houses > 0 then
-        local value = TryGetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
-        if value then
-            for i = 1, asset.Houses do
-                sellAllValue += value
-            end
-    
-            if asset.Hotels < 1 then
-                view.SellHouseValue = value
-            end
-        end
-    end
-    if asset.Hotels > 0 then
-        local value = TryGetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
-        if value then
-            for i = 1, asset.Hotels do
-                sellAllValue += value
-            end
-            view.SellHotelValue = value
-        end
-    end
+    local sellAllValue = getSellAllValue(asset)
 
     if sellAllValue > 0 then
         view.SellAllValue = sellAllValue
