@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local ProfileManager = require(script.Parent.Parent.Parent.Shared.ProfileManager)
@@ -121,6 +122,8 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
     participant:RemoveParticipant()
+
+    AwardBadge(participant.Player, "Bankrupt!")
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
@@ -458,6 +461,8 @@ local function GetTheDub(participant: Types.Participant): ()
 
     local plr = participant.Player
     local profile = ProfileManager.GetProfile(plr)
+
+    AwardBadge(plr, "Imperium")
 
     if profile then
         plr:SetAttribute("Wins", profile.Wins + 1)

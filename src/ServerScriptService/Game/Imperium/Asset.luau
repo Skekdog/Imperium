@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local PlaySoundAtPart = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.PlaySoundAtPart)
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
@@ -58,6 +59,21 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     if to ~= "Bank" then
         table.insert(to.Assets, asset)
         updateAssetsInParticipantColourGroup(to, colour, round)
+
+        task.defer(function() -- Defer so that if TransferTo() is called in a loop we don't award the badge erroneously
+            for _, tile in round.Board.Tiles do
+                local new = tile.Asset
+                if not new then
+                    continue
+                end
+
+                if new.Owner ~= to then
+                    break
+                end
+
+                AwardBadge(to.Player, "Monopoly")
+            end
+        end)
     end
 
     local board = round.Board
