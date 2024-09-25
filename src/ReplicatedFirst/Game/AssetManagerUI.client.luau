@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AssetManagement = require(script.Parent.AssetManagement)
 local ClientTypes = require(script.Parent.ClientTypes)
+local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local ui = UIManager.WaitForUI("AssetManager") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.AssetManager)}
@@ -49,14 +50,15 @@ local function closeActions(): ()
 end
 
 local revealed = false
-object.Reveal.Activated:Connect(function()
+local function reveal(): ()
     revealed = not revealed
 
     UIAnimation.Animate(object, TweenInfo.new(0.25), { Position = UDim2.new(if revealed then UDim.new(0, 10) else UDim.new(-0.15, 0), UDim.new(1, -10)) })
     if not revealed then
         closeActions()
     end
-end)
+end
+object.Reveal.Activated:Connect(reveal)
 
 local function updateView(asset: ClientTypes.ClientAssetView): ()
     local name = asset.Name
@@ -188,4 +190,9 @@ end)
 
 ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt").OnClientEvent:Connect(function()
     ui:ToggleVisible(false)
+end)
+
+ControlManager.Register("Asset Manager", false, function()
+    reveal()
+    return Enum.ContextActionResult.Sink
 end)

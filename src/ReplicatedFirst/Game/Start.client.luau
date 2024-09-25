@@ -54,6 +54,21 @@ rollDice.Object.Activated:Connect(RollDice)
 payFine.Object.Activated:Connect(PayFine)
 useCard.Object.Activated:Connect(UseGetOutOfJailFreeCard)
 
+ControlManager.Register("Roll Dice", false, function()
+    RollDice()
+    return Enum.ContextActionResult.Sink
+end)
+
+ControlManager.Register("Pay Fine", false, function()
+    PayFine()
+    return Enum.ContextActionResult.Sink
+end)
+
+ControlManager.Register("Use Card", false, function()
+    UseGetOutOfJailFreeCard()
+    return Enum.ContextActionResult.Sink
+end)
+
 local buyPropertyUI = UIManager.WaitForUI("BuyProperty") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.BuyProperty)}
 local acceptBuyCon: RBXScriptConnection?
 local declineBuyCon: RBXScriptConnection?
@@ -77,6 +92,7 @@ gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(descripti
     object.TextLabel.Text = `Would you like to purchase {description.Name} for £{description.Price}?`
 
     local function makeChoice(accepted: boolean)
+        ControlManager.Unregister("Confirm Purchase")
         buyPropertyUI:ToggleVisible(false)
 
         assert(acceptBuyCon and declineBuyCon)
@@ -85,6 +101,11 @@ gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(descripti
 
         gameClientServer.RespondPropertyPurchase:FireServer(accepted, description.Name)
     end
+
+    ControlManager.Register("Confirm Purchase", false, function()
+        makeChoice(true)
+        return Enum.ContextActionResult.Sink
+    end)
     
     acceptBuyCon = object.Yes.Activated:Connect(function()
         makeChoice(true)
