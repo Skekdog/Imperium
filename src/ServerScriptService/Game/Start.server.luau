@@ -11,18 +11,8 @@ local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Sh
 local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
-local Classic = require(ServerScriptService.Game.GameDefinitions.Classic.Classic)
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local SetWaitingText = require(script.Parent.SetWaitingText)
-
-local board = Classic
-
-ServerStorage.Game.Maps:FindFirstChild("Happy Home"):Clone().Parent = workspace :: any
-
-local tiles = {}
-for i, description in board.Tiles do
-    table.insert(tiles, Tile.new(board, i, description))
-end
 
 local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") :: Teleport.GameInfo?
 
@@ -32,12 +22,26 @@ if not info then
         TurnTime = GameConfiguration.TurnTime.Default,
         AuctionTime = GameConfiguration.AuctionTime.Default,
         BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
-        Map = "Happy Home",
-        Board = "Classic (UK)",
+        Map = GameConfiguration.Map.Default,
+        Board = GameConfiguration.Board.Default,
     } :: Teleport.GameInfo
     info = temp
 end
 assert(info)
+
+local map = ServerStorage.Game.Maps:FindFirstChild(info.Map)
+assert(map, `Map {info.Map} not found`)
+map:Clone().Parent = workspace
+
+local boardFolder = ServerScriptService.Game.GameDefinitions:FindFirstChild(info.Board)
+assert(boardFolder, `Board {info.Board} not found`)
+
+local board = (require)(boardFolder:FindFirstChild("BoardTheme"))
+
+local tiles = {}
+for i, description in board.Tiles do
+    table.insert(tiles, Tile.new(board, i, description))
+end
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
@@ -59,6 +63,7 @@ Players.PlayerAdded:Connect(function(plr)
 
         char.DescendantAdded:Connect(disableCollision)
     end)
+    plr:LoadCharacter()
 end)
 
 local startWait = GetTime()
@@ -72,7 +77,7 @@ while (players < info.Players) and (GetTime() - startWait < MAX_PLAYER_LOAD_WAIT
     players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
 end
 
-local round = Round.new(Classic, tiles, {
+local round = Round.new(board, tiles, {
     PlayerTurnTime = info.TurnTime,
     AuctionTime = info.AuctionTime,
     BankruptcyTime = info.BankruptcyTime,

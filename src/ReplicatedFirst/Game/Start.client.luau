@@ -64,7 +64,7 @@ ControlManager.Register("Pay Fine", false, function()
     return Enum.ContextActionResult.Sink
 end)
 
-ControlManager.Register("Use Card", false, function()
+ControlManager.Register("Use Jail Card", false, function()
     UseGetOutOfJailFreeCard()
     return Enum.ContextActionResult.Sink
 end)
