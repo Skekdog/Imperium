@@ -114,6 +114,8 @@ end
 
 local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner): ()
     SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, {participant.Player})
+    AwardBadge(participant.Player, "Bankrupt!")
+
     participant:TransferMoneyTo(to, participant.Money, true)
     participant:TransferJailCards(to, participant.JailCards)
     for _, asset in participant.Assets do
@@ -122,8 +124,6 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
     participant:RemoveParticipant()
-
-    AwardBadge(participant.Player, "Bankrupt!")
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
