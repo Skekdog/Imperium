@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AssetManagement = require(script.Parent.AssetManagement)
 local ClientTypes = require(script.Parent.ClientTypes)
@@ -36,14 +37,35 @@ end
 
 local function setActionsVisible(visible: boolean): ()
     if not visible then
+        local selected = GuiService.SelectedObject
+        if selected and selected:IsDescendantOf(actions) then
+            GuiService.SelectedObject = assetList:FindFirstChild("Asset_" .. (currentAsset or "")) :: AssetListButton?
+        end
+
         currentAsset = nil
         setHighlightedAsset()
     end
 
+    actions.Selectable = visible
+
     -- I love hardcoding!
     UIAnimation.Animate(object.Reveal, TweenInfo.new(0.25), {Position = UDim2.new(if visible then 1 else 0.5, 0, 0, 0)})
     UIAnimation.Animate(object.Title, TweenInfo.new(0.25), {Size = UDim2.new(if visible then 1 else 0.5, 0, 0.1, 9)})
-    UIAnimation.Animate(actions, TweenInfo.new(0.25), {Position = if visible then UDim2.new(0.5, 5, 0.1, 0) else UDim2.new(0, 0, 0.1, 0)})
+
+    local tween = UIAnimation.Animate(actions, TweenInfo.new(0.25), {Position = if visible then UDim2.new(0.5, 5, 0.1, 0) else UDim2.new(0, 0, 0.1, 0)})
+    
+    if visible then
+        actions.Visible = true
+    else
+        local function onComplete()
+            actions.Visible = visible
+        end
+        if tween then
+            tween.Completed:Once(onComplete)
+        else
+            onComplete()
+        end
+    end
 end
 
 local function closeActions(): ()
@@ -124,10 +146,26 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
     end
 
     for _, v in scaleUp do
-        UIAnimation.Animate(v, TweenInfo.new(0.25), {Size = UDim2.new(1, 0, 0.15, 0)})
+        local tween = UIAnimation.Animate(v, TweenInfo.new(0.25), {Size = UDim2.new(1, 0, 0.15, 0)})
+        local function onComplete()
+            v.Visible = true
+        end
+        if tween then
+            tween.Completed:Once(onComplete)
+        else
+            onComplete()
+        end
     end
     for _, v in scaleDown do
-        UIAnimation.Animate(v, TweenInfo.new(0.25), {Size = UDim2.new(0, 0, 0, 0)})
+        local tween = UIAnimation.Animate(v, TweenInfo.new(0.25), {Size = UDim2.new(0, 0, 0, 0)})
+        local function onComplete()
+            v.Visible = false
+        end
+        if tween then
+            tween.Completed:Once(onComplete)
+        else
+            onComplete()
+        end
     end
 end
 
