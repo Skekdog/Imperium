@@ -73,12 +73,16 @@ end)
 local buyPropertyUI = UIManager.WaitForUI("BuyProperty") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.BuyProperty)}
 local acceptBuyCon: RBXScriptConnection?
 local declineBuyCon: RBXScriptConnection?
+local closeBuyCon: RBXScriptConnection?
 gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(description: {Name: string, Price: number}?)
     if acceptBuyCon then
         acceptBuyCon:Disconnect()
     end
     if declineBuyCon then
         declineBuyCon:Disconnect()
+    end
+    if closeBuyCon then
+        closeBuyCon:Disconnect()
     end
 
     if not description then
@@ -98,9 +102,10 @@ gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(descripti
         ControlManager.Unregister("Confirm Purchase")
         buyPropertyUI:ToggleVisible(false)
 
-        assert(acceptBuyCon and declineBuyCon)
+        assert(acceptBuyCon and declineBuyCon and closeBuyCon)
         acceptBuyCon:Disconnect()
         declineBuyCon:Disconnect()
+        closeBuyCon:Disconnect()
 
         gameClientServer.RespondPropertyPurchase:FireServer(accepted, description.Name)
     end
@@ -116,6 +121,12 @@ gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(descripti
 
     declineBuyCon = object.No.Activated:Connect(function()
         makeChoice(false)
+    end)
+
+    closeBuyCon = object:GetPropertyChangedSignal("Visible"):Connect(function()
+        if not object.Visible then
+            makeChoice(false)
+        end
     end)
 end)
 
