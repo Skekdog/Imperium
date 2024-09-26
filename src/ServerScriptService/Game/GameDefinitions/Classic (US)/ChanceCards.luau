@@ -10,14 +10,14 @@ module[1] = {
 }
 
 module[2] = {
-    Title = "Advance to Illinois Avenue. If you pass Go, collect £200.",
+    Title = "Advance to Illinois Avenue. If you pass Go, collect $200.",
     Effect = function(participant: Types.Participant): ()
         participant:MoveToTileByName("Illinois Avenue")
     end
 }
 
 module[3] = {
-    Title = "Advance to St. Charles Place. If you pass Go, collect £200.",
+    Title = "Advance to St. Charles Place. If you pass Go, collect $200.",
     Effect = function(participant: Types.Participant): ()
         participant:MoveToTileByName("St. Charles Place")
     end
@@ -42,7 +42,7 @@ module[5] = {
 }
 
 module[6] = {
-    Title = "Bank pays you dividend of £50.",
+    Title = "Bank pays you dividend of $50.",
     Effect = function(participant: Types.Participant): ()
         participant:GiveMoney(50)
     end
@@ -63,14 +63,14 @@ module[8] = {
 }
 
 module[9] = {
-    Title = "Go to Jail. Go directly to Jail. Do not pass Go. Do not collect £200.",
+    Title = "Go to Jail. Go directly to Jail. Do not pass Go. Do not collect $200.",
     Effect = function(participant: Types.Participant): ()
         participant:SendToJail()
     end
 }
 
 module[10] = {
-    Title = "Make general repairs on all your property. For each house, pay £25. For each hotel, pay £100.",
+    Title = "Make general repairs on all your property. For each house, pay $25. For each hotel, pay $100.",
     Effect = function(participant: Types.Participant): ()
         local houses = 0
         local hotels = 0
@@ -84,14 +84,14 @@ module[10] = {
 }
 
 module[11] = {
-    Title = "Take a trip to Reading Railroad. If you pass Go, collect £200.",
+    Title = "Take a trip to Reading Railroad. If you pass Go, collect $200.",
     Effect = function(participant: Types.Participant): ()
         participant:MoveToTileByName("Reading Railroad")
     end
 }
 
 module[12] = {
-    Title = "Pay poor tax of £15.",
+    Title = "Pay poor tax of $15.",
     Effect = function(participant: Types.Participant): ()
         participant:TransferMoneyTo("Bank", -15)
     end
@@ -105,7 +105,7 @@ module[13] = {
 }
 
 module[14] = {
-    Title = "You have been elected Chairman of the Board. Pay each player £50.",
+    Title = "You have been elected Chairman of the Board. Pay each player $50.",
     Effect = function(participant: Types.Participant): ()
         for _, otherParticipant in participant.Round.Participants do
             if otherParticipant ~= participant then
@@ -116,7 +116,7 @@ module[14] = {
 }
 
 module[15] = {
-    Title = "Your building loan matures. Collect £150.",
+    Title = "Your building loan matures. Collect $150.",
     Effect = function(participant: Types.Participant): ()
         participant:GiveMoney(150)
     end

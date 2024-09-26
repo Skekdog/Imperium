@@ -4,6 +4,8 @@ local Colours = require(script.Parent.Colours)
 local Types = require(script.Parent.Parent.Parent.Imperium.Types)
 local module = {}
 
+module.CurrencySymbol = "£"
+
 local random = Random.new()
 random:Shuffle(ChanceCards)
 random:Shuffle(CommunityChests)

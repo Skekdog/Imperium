@@ -12,6 +12,8 @@ export type BoardConfiguration = {
     Tiles: {TileDescription},
     Colours: {[string]: Color3, Default: Color3},
 
+    CurrencySymbol: string,
+
     HousePrices: {[string]: number},
 
     StartingJailCards: number,

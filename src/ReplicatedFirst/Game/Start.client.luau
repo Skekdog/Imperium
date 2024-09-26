@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
+local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local LerpModelCFrame = require(script.Parent.LerpModelCFrame)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local Notification = require(script.Parent.Parent.Shared.Notification)
@@ -42,12 +43,12 @@ gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
 end)
 
 ReplicatedStorage:GetAttributeChangedSignal("FineAmount"):Connect(function()
-    payFine.Object.Text = `Pay Fine (£{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
+    payFine.Object.Text = `Pay Fine ({GetCurrencySymbol()}{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
 end)
 player:GetAttributeChangedSignal("GetOutOfJailFreeCards"):Connect(function()
     useCard.Object.Text = `Use Card ({player:GetAttribute("GetOutOfJailFreeCards") :: number})`
 end)
-payFine.Object.Text = `Pay Fine (£{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
+payFine.Object.Text = `Pay Fine ({GetCurrencySymbol()}{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
 useCard.Object.Text = `Use Card ({player:GetAttribute("GetOutOfJailFreeCards") :: number})`
 
 rollDice.Object.Activated:Connect(RollDice)
@@ -84,12 +85,14 @@ gameServerClient.PromptPropertyPurchase.OnClientEvent:Connect(function(descripti
         return buyPropertyUI:ToggleVisible(false)
     end
 
+    local currency = GetCurrencySymbol()
+
     buyPropertyUI:ToggleVisible(true)
     
     local object = buyPropertyUI.Object
     object.PropertyName.Text = description.Name
-    object.Price.Text = "£" .. description.Price
-    object.TextLabel.Text = `Would you like to purchase {description.Name} for £{description.Price}?`
+    object.Price.Text = currency .. description.Price
+    object.TextLabel.Text = `Would you like to purchase {description.Name} for {currency}{description.Price}?`
 
     local function makeChoice(accepted: boolean)
         ControlManager.Unregister("Confirm Purchase")
@@ -118,7 +121,8 @@ end)
 
 local moneyDisplay = UIManager.WaitForUI("MoneyDisplay") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.MoneyDisplay)}
 local function updateMoney()
-    moneyDisplay.Object.Text = "£" .. (player:GetAttribute("Money") :: number? or 0)
+    local currency = GetCurrencySymbol()
+    moneyDisplay.Object.Text = currency .. (player:GetAttribute("Money") :: number? or 0)
 end
 moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
 player:GetAttributeChangedSignal("Money"):Connect(updateMoney)

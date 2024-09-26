@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local AwardBadge = require(script.Parent.Parent.AwardBadge)
+local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
 local ProfileManager = require(script.Parent.Parent.Parent.Shared.ProfileManager)
@@ -131,7 +132,7 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
     if to ~= "Bank" then
         table.insert(players, to.Player)
     end
-    SendNotification(`[PLAYER] needs another £{targetAmount - participant.Money} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
+    SendNotification(`[PLAYER] needs another {GetCurrencySymbol}{targetAmount - participant.Money} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
     
     ReplicatedStorage:SetAttribute("GoingBankrupt", true)
     local start = GetTime()
@@ -165,7 +166,7 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
         end
 
         local lt = amount < 0
-        SendNotification(`[PLAYER] {if lt then "received" else "paid"} £{math.abs(amount)} {if lt then "from" else "to"} {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
+        SendNotification(`[PLAYER] {if lt then "received" else "paid"} {GetCurrencySymbol()}{math.abs(amount)} {if lt then "from" else "to"} {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
     end
 
     GiveMoney(participant, -amount)
@@ -450,7 +451,7 @@ local function TryPayFine(participant: Types.Participant): ()
     if participant.JailedOn ~= 0 and participant.Money >= participant.Round.BoardConfiguration.JailFine then
         participant:TransferMoneyTo("Bank", participant.Round.BoardConfiguration.JailFine, true)
 
-        SendNotification(`[PLAYER] paid a fine of £{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
+        SendNotification(`[PLAYER] paid a fine of {GetCurrencySymbol()}{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
         LeaveJail(participant)
     end
 end

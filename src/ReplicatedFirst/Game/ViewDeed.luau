@@ -1,3 +1,4 @@
+local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
 local ui = UIManager.WaitForUI("PropertyDeed") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.PropertyDeed)}
@@ -17,17 +18,19 @@ return function(tile: Model?): ()
         return ui:ToggleVisible()
     end
 
+    local currency = GetCurrencySymbol()
+
     object.TitleFrame.BackgroundColor3 = tile:GetAttribute("Colour") :: Color3
     object.TitleFrame.PropertyName.Text = name
 
     local housePrice = tile:GetAttribute("HousePrice") :: string?
     if housePrice then
-        object.Frame.PricingInfo.House.Value.Text = "£" .. housePrice
+        object.Frame.PricingInfo.House.Value.Text = currency .. housePrice
     end
 
     local hotelPrice = tile:GetAttribute("HotelPrice") :: string?
     if hotelPrice then
-        object.Frame.PricingInfo.Hotel.Value.Text = "£" .. hotelPrice
+        object.Frame.PricingInfo.Hotel.Value.Text = currency .. hotelPrice
     end
 
     for _, v in object.Frame.RentInfo:GetChildren() do
@@ -51,7 +54,7 @@ return function(tile: Model?): ()
 
     local mortgageValue = tile:GetAttribute("MortgageValue") :: string?
     if mortgageValue then
-        object.Frame.MortgageValue.Value.Text = "£" .. mortgageValue
+        object.Frame.MortgageValue.Value.Text = currency .. mortgageValue
     end
 
     ui:ToggleVisible(true)

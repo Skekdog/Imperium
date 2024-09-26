@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AssetManagement = require(script.Parent.AssetManagement)
 local ClientTypes = require(script.Parent.ClientTypes)
+local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -66,11 +67,13 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
         return
     end
 
+    local currency = GetCurrencySymbol()
+
     local scaleUp: {TextButton} = {}
     local scaleDown: {TextButton} = {}
 
     if asset.SellAllValue then
-        actions.SellAll.Text = `Sell All (£{asset.SellAllValue})`
+        actions.SellAll.Text = `Sell All ({currency}{asset.SellAllValue})`
         actions.SellAll.Visible = true
         bindToClick(actions.SellAll, function() AssetManagement.SellAll(name) end)
         table.insert(scaleUp, actions.SellAll)
@@ -79,12 +82,12 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
     end
 
     if asset.SellHotelValue then
-        actions.SellDevelopment.Text = `Sell Hotel (£{asset.SellHotelValue})`
+        actions.SellDevelopment.Text = `Sell Hotel ({currency}{asset.SellHotelValue})`
         actions.SellDevelopment.Visible = true
         bindToClick(actions.SellDevelopment, function() AssetManagement.SellHotel(name) end)
         table.insert(scaleUp, actions.SellDevelopment)
     elseif asset.SellHouseValue then
-        actions.SellDevelopment.Text = `Sell House (£{asset.SellHouseValue})`
+        actions.SellDevelopment.Text = `Sell House ({currency}{asset.SellHouseValue})`
         actions.SellDevelopment.Visible = true
         bindToClick(actions.SellDevelopment, function() AssetManagement.SellHouse(name) end)
         table.insert(scaleUp, actions.SellDevelopment)
@@ -93,12 +96,12 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
     end
 
     if asset.HousePrice then
-        actions.BuyDevelopment.Text = `Buy House (£{asset.HousePrice})`
+        actions.BuyDevelopment.Text = `Buy House ({currency}{asset.HousePrice})`
         actions.BuyDevelopment.Visible = true
         bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHouse(name, asset.HousePrice) end)
         table.insert(scaleUp, actions.BuyDevelopment)
     elseif asset.HotelPrice then
-        actions.BuyDevelopment.Text = `Buy Hotel (£{asset.HotelPrice})`
+        actions.BuyDevelopment.Text = `Buy Hotel ({currency}{asset.HotelPrice})`
         actions.BuyDevelopment.Visible = true
         bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHotel(name, asset.HotelPrice) end)
         table.insert(scaleUp, actions.BuyDevelopment)
@@ -107,12 +110,12 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
     end
 
     if asset.UnMortgageCost then
-        actions.Mortgage.Text = `Unmortgage (£{asset.UnMortgageCost})`
+        actions.Mortgage.Text = `Unmortgage ({currency}{asset.UnMortgageCost})`
         actions.Mortgage.Visible = true
         bindToClick(actions.Mortgage, function() AssetManagement.Unmortgage(name, asset.UnMortgageCost) end)
         table.insert(scaleUp, actions.Mortgage)
     elseif asset.MortgageValue then
-        actions.Mortgage.Text = `Mortgage (£{asset.MortgageValue})`
+        actions.Mortgage.Text = `Mortgage ({currency}{asset.MortgageValue})`
         actions.Mortgage.Visible = true
         bindToClick(actions.Mortgage, function() AssetManagement.Mortgage(name) end)
         table.insert(scaleUp, actions.Mortgage)

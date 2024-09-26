@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local AwardBadge = require(script.Parent.Parent.AwardBadge)
+local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local PlaySoundAtPart = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.PlaySoundAtPart)
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
@@ -298,7 +299,7 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
     end
 
     if totalSellPrice > 0 then
-        SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Colour} for £{totalSellPrice}.`, {owner.Player})
+        SendNotification(`[PLAYER] sold all developments on {asset.AssetDescription.Colour} for {GetCurrencySymbol()}{totalSellPrice}.`, {owner.Player})
     end
 
     owner:GiveMoney(totalSellPrice)
@@ -322,7 +323,7 @@ local function TryMortgage(asset: Types.Asset): ()
 
     local value = GetMortgageValue(asset)
     asset.Owner:GiveMoney(value)
-    SendNotification(`[PLAYER] mortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
+    SendNotification(`[PLAYER] mortgaged {asset.AssetDescription.Name} for {GetCurrencySymbol()}{value}.`, {asset.Owner.Player})
     updateAssetsInParticipantColourGroup(asset.Owner, asset.AssetDescription.Colour, asset.Owner.Round)
 end
 
@@ -342,7 +343,7 @@ local function TryUnMortgage(asset: Types.Asset): ()
 
     local value = GetUnMortgageCost(asset)
     asset.Owner:TransferMoneyTo("Bank", value, true)
-    SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name} for £{value}.`, {asset.Owner.Player})
+    SendNotification(`[PLAYER] unmortgaged {asset.AssetDescription.Name} for {GetCurrencySymbol()}{value}.`, {asset.Owner.Player})
     updateAssetsInParticipantColourGroup(asset.Owner, asset.AssetDescription.Colour, asset.Owner.Round)
 end
 
@@ -410,7 +411,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
         return
     end
 
-    SendNotification(`[PLAYER] won the auction for {asset.AssetDescription.Name} at £{highestBid}.`, {highestBidder.Player})
+    SendNotification(`[PLAYER] won the auction for {asset.AssetDescription.Name} at {GetCurrencySymbol()}{highestBid}.`, {highestBidder.Player})
 
     highestBidder:TransferMoneyTo("Bank", highestBid, true)
     asset:TransferTo(highestBidder)

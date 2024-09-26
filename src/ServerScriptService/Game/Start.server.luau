@@ -36,7 +36,8 @@ map:Clone().Parent = workspace
 local boardFolder = ServerScriptService.Game.GameDefinitions:FindFirstChild(info.Board)
 assert(boardFolder, `Board {info.Board} not found`)
 
-local board = (require)(boardFolder:FindFirstChild("BoardTheme"))
+local board = (require)(boardFolder:FindFirstChild("BoardTheme")) :: Types.BoardConfiguration
+ReplicatedStorage:SetAttribute("CurrencySymbol", board.CurrencySymbol)
 
 local tiles = {}
 for i, description in board.Tiles do
