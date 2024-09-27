@@ -19,7 +19,7 @@ module[2] = {
 module[3] = {
     Title = "Doctor's fee. Pay £50.",
     Effect = function(participant: Types.Participant): ()
-        participant:TransferMoneyTo("Bank", -50)
+        participant:TransferMoneyTo("Bank", 50)
     end,
 }
 
@@ -90,14 +90,14 @@ module[11] = {
 module[12] = {
     Title = "Hospital fees. Pay £50.",
     Effect = function(participant: Types.Participant): ()
-        participant:TransferMoneyTo("Bank", -50)
+        participant:TransferMoneyTo("Bank", 50)
     end
 }
 
 module[13] = {
     Title = "School fees. Pay £50.",
     Effect = function(participant: Types.Participant): ()
-        participant:TransferMoneyTo("Bank", -50)
+        participant:TransferMoneyTo("Bank", 50)
     end
 }
 
@@ -118,7 +118,7 @@ module[15] = {
             hotels += asset.Hotels
         end
 
-        participant:TransferMoneyTo("Bank", -((houses * 40) + (hotels * 115)))
+        participant:TransferMoneyTo("Bank", ((houses * 40) + (hotels * 115)))
     end
 }
 

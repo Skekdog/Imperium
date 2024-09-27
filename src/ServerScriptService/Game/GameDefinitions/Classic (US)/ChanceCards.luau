@@ -79,7 +79,7 @@ module[10] = {
             hotels += asset.Hotels
         end
 
-        participant:TransferMoneyTo("Bank", -((houses * 25) + (hotels * 100)))
+        participant:TransferMoneyTo("Bank", ((houses * 25) + (hotels * 100)))
     end
 }
 
@@ -93,7 +93,7 @@ module[11] = {
 module[12] = {
     Title = "Pay poor tax of $15.",
     Effect = function(participant: Types.Participant): ()
-        participant:TransferMoneyTo("Bank", -15)
+        participant:TransferMoneyTo("Bank", 15)
     end
 }
 
