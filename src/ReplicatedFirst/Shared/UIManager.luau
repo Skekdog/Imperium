@@ -92,7 +92,6 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				return
 			end
 			if object:GetAttribute("IgnoreStacking") then
-				object.ZIndex = 10000
 				return
 			end
 
@@ -104,7 +103,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			local highestIndex = 0
 			for _, ui in registeredUIs do
 				if ui.Layer == "Popup" and highestIndex < ui.Object.ZIndex and ui.Visible then
-					highestIndex = if not ui.Object:GetAttribute("IgnoreStacking") then ui.Object.ZIndex else highestIndex
+					highestIndex = ui.Object.ZIndex
 					if ui ~= self and not ui.Object:GetAttribute("IgnoreStacking") then
 						ui:ToggleVisible(false, true)
 					end
