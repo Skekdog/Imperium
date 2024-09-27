@@ -62,6 +62,7 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
         updateAssetsInParticipantColourGroup(to, colour, round)
 
         task.defer(function() -- Defer so that if TransferTo() is called in a loop we don't award the badge erroneously
+            local shouldAward = true
             for _, tile in round.Board.Tiles do
                 local new = tile.Asset
                 if not new then
@@ -69,9 +70,12 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
                 end
 
                 if new.Owner ~= to then
+                    shouldAward = false
                     break
                 end
+            end
 
+            if shouldAward then
                 AwardBadge(to.Player, "Monopoly")
             end
         end)
