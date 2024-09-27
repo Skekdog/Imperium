@@ -43,13 +43,13 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
     SetTimeMilestone(round.GameConfiguration.PlayerTurnTime)
 
-    ReplicatedStorage.Game.ServerClient.BeginTurn:FireAllClients(nextParticipant.Player.Name)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireAllClients(nextParticipant.Player.Name)
 
     task.delay(round.GameConfiguration.PlayerTurnTime, function()
         if lastMovedAt ~= nextParticipant.LastMovedAt or not nextParticipant.IsInGame then
             return
         end
-        ReplicatedStorage.Game.ServerClient.BeginTurn:FireClient(nextParticipant.Player, "")
+        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireClient(nextParticipant.Player, "")
         nextParticipant:TryPlayMove()
     end)
 end
@@ -70,7 +70,7 @@ local function StartRound(round: Types.Round): ()
 
     round.Started = true
 
-    ReplicatedStorage.Game.ServerClient.SetMovementEnabled:FireAllClients(false)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("SetMovementEnabled"):FireAllClients(false)
 
     SetWaitingText("Starting soon...", 8)
     local threads = {}

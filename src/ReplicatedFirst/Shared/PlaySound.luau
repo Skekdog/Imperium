@@ -4,7 +4,7 @@ local SoundService = game:GetService("SoundService")
 type SoundName = "Click" | "Siren" | "DiceRoll" | "MoneyGained" | "LockingUp" | "DrawCard"
 return function(soundName: SoundName, to: Player?): Sound?
     if to then
-        return ReplicatedStorage.Shared.ServerClient.PlaySound:FireClient(to, soundName)
+        return ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("PlaySound"):FireClient(to, soundName)
     end
 
     local sound = SoundService:FindFirstChild(soundName, true)

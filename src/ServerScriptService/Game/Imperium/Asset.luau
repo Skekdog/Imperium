@@ -367,7 +367,7 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
 end
 
 local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBankIfNoWinner: boolean?): ()
-    ReplicatedStorage.Game.ServerClient.StartAuction:FireAllClients(asset.AssetDescription)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("StartAuction"):FireAllClients(asset.AssetDescription)
 
     local auctionDuration = round.GameConfiguration.AuctionTime
     SetWaitingText("Auction in progress...", auctionDuration)
@@ -378,7 +378,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
     local endTime = GetTime() + auctionDuration
 
     local con: RBXScriptConnection
-    con = ReplicatedStorage.Game.ClientServer.MakeBid.OnServerEvent:Connect(function(plr, property: unknown, amount: unknown)
+    con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("MakeBid").OnServerEvent:Connect(function(plr, property: unknown, amount: unknown)
         if property ~= asset.AssetDescription.Name then
             return
         end
@@ -392,7 +392,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
             return
         end
 
-        ReplicatedStorage.Game.ServerClient.UpdateAuction:FireAllClients(participant.Player, amount)
+        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAuction"):FireAllClients(participant.Player, amount)
 
         highestBidder = participant
         highestBid = amount
@@ -405,7 +405,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
         task.wait()
     end
     
-    ReplicatedStorage.Game.ServerClient.StartAuction:FireAllClients(nil)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("StartAuction"):FireAllClients(nil)
     con:Disconnect()
 
     if not highestBidder or not highestBidder.IsInGame then

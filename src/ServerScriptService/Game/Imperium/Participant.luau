@@ -21,7 +21,7 @@ local function animateJailBars(round: Types.Round, locked: boolean): ()
     local bars = model.Bars
     local base = model.Base
 
-    ReplicatedStorage.Game.ServerClient.AnimateJailBars:FireAllClients(bars, if locked then base.BarsLocked.WorldCFrame else base.BarsUnlocked.WorldCFrame)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateJailBars"):FireAllClients(bars, if locked then base.BarsLocked.WorldCFrame else base.BarsUnlocked.WorldCFrame)
 end
 
 local function SendToJail(participant: Types.Participant): ()
@@ -55,13 +55,13 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
         return asset:StartAuction(participant.Round)
     end
 
-    ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, asset.AssetDescription)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"):FireClient(participant.Player, asset.AssetDescription)
 
     local startTime = GetTime()
     local response: boolean?
 
     local con: RBXScriptConnection
-    con = ReplicatedStorage.Game.ClientServer.RespondPropertyPurchase.OnServerEvent:Once(function(plr, accepted: unknown, propertyName: unknown)
+    con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("RespondPropertyPurchase").OnServerEvent:Once(function(plr, accepted: unknown, propertyName: unknown)
         if plr ~= participant.Player then
             return
         end
@@ -98,7 +98,7 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
     elseif response == false then
         asset:StartAuction(participant.Round)
     else
-        ReplicatedStorage.Game.ServerClient.PromptPropertyPurchase:FireClient(participant.Player, nil)
+        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"):FireClient(participant.Player, nil)
     end
 
     con:Disconnect()

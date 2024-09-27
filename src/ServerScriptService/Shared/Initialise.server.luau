@@ -12,7 +12,7 @@ Players.PlayerAdded:Connect(function(plr): ()
 	
     local profile = ProfileManager.LoadProfile(plr)
 	if profile then
-        ReplicatedStorage.Shared.ServerClient.LoadSavedData:FireClient(plr, profile.Data.Settings)
+        ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("LoadSavedData"):FireClient(plr, profile.Data.Settings)
 
 		plr:SetAttribute("Wins", profile.Data.Wins)
     end
@@ -22,7 +22,7 @@ Players.PlayerRemoving:Connect(function(plr)
 	ProfileManager.ReleaseProfile(plr)
 end)
 
-ReplicatedStorage.Shared.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: unknown)
+ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ClientServer"):WaitForChild("SaveSettings").OnServerEvent:Connect(function(plr, options: unknown)
 	if typeof(options) ~= "string" then
 		return
 	end
