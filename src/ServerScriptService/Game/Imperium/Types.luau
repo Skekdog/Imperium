@@ -135,7 +135,7 @@ export type Participant = {
     TryPayFine: (Participant) -> (),
 
     MoveToTileByName: (Participant, name: string, moveDirectly: boolean?) -> (),
-    MoveTo: (Participant, position: number, moveDirectly: boolean?, initialMove: boolean?) -> (),
+    MoveTo: (Participant, position: number, moveDirectly: boolean?, initialMove: boolean?, noRentPayment: boolean?) -> (),
     MoveBy: (Participant, amount: number, moveDirectly: boolean?) -> (),
 
     SendToJail: (Participant) -> (),

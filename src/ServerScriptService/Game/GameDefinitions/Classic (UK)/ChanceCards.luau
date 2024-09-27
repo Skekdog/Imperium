@@ -28,7 +28,16 @@ module[4] = {
     Effect = function(participant: Types.Participant): ()
         local closestUtility = participant:FindClosestForwardPositionByColour("Utility")
         assert(closestUtility, "No utilities found")
-        participant:MoveTo(closestUtility)
+
+        participant:MoveTo(closestUtility, nil, nil, true)
+
+        local tile = participant.Board.Tiles[closestUtility]
+        assert(tile.Asset, "Tile has no asset")
+
+        if tile.Asset.Owner ~= participant and tile.Asset.Owner ~= "Bank" then
+            local cost = participant:RollDice().Result * 10
+            participant:TransferMoneyTo(tile.Asset.Owner, cost)
+        end
     end
 }
 
@@ -37,7 +46,16 @@ module[5] = {
     Effect = function(participant: Types.Participant): ()
         local closestRailroad = participant:FindClosestForwardPositionByColour("Station")
         assert(closestRailroad, "No railroads found")
-        participant:MoveTo(closestRailroad)
+        
+        participant:MoveTo(closestRailroad, nil, nil, true)
+        
+        local tile = participant.Board.Tiles[closestRailroad]
+        assert(tile.Asset, "Tile has no asset")
+
+        if tile.Asset.Owner ~= participant and tile.Asset.Owner ~= "Bank" then
+            local cost = tile.Asset:GetRentCost(participant) * 2
+            participant:TransferMoneyTo(tile.Asset.Owner, cost)
+        end
     end
 }
 

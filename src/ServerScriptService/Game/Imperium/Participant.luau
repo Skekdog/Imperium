@@ -253,7 +253,7 @@ local function DrawCard(participant: Types.Participant, card: Types.CardDescript
     card.Effect(participant)
 end
 
-local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?): ()
+local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?, noRentPayment: boolean?): ()
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
     participant.PreviousPosition = participant.Position
@@ -311,7 +311,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
             if owner == "Bank" then
                 participant.ValidPropertyPurchaseTurn = participant.Round.Turn
                 PromptPurchaseProperty(participant, asset)
-            else
+            elseif not noRentPayment then
                 participant:TryPayRent(tile)
             end
         end
