@@ -272,20 +272,31 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
     local isJailed = participant.JailedOn ~= 0
 
     if not moveDirectly then
-        local allTiles = participant.Board.Tiles
-        local targetRow = TileMath.GetRowFromPosition(position, #allTiles)
-        local currentPosition = participant.PreviousPosition
-
         local startTime = GetTime()
-        local currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
-        while currentRow ~= targetRow do
-            local nextCornerPosition = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, #allTiles), #allTiles)
-            local nextCorner = participant.Board.Tiles[nextCornerPosition]
+        local numTiles = #participant.Board.Tiles
 
-            currentPosition = nextCornerPosition
-            currentRow = TileMath.GetRowFromPosition(currentPosition, #allTiles)
+        local targetRow = TileMath.GetRowFromPosition(position, numTiles)
 
-            moveCharacter(participant.Player.Character, nextCorner, false, GetTime() - startTime, isJailed)
+        local currentPosition = participant.PreviousPosition
+        local currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
+
+        local rowDiff = math.max(targetRow - currentRow, 1)
+        if targetRow == currentRow and position > currentPosition then
+            rowDiff = 0
+        end
+
+        if position < currentPosition and targetRow == currentRow and not moveDirectly then
+            rowDiff = 4
+        end
+
+        for i = 1, rowDiff do
+            local nextCorner = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, numTiles), numTiles)
+
+            currentPosition = nextCorner
+            currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
+
+            local nextTile = participant.Board.Tiles[currentPosition]
+            moveCharacter(participant.Player.Character, nextTile, false, GetTime() - startTime, isJailed)
         end
         moveCharacter(participant.Player.Character, tile, nil, nil, isJailed)
     else
@@ -348,10 +359,12 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local roll1 = math.random(1, 6)
     local roll2 = math.random(1, 6)
 
-    SendNotification(`[PLAYER] rolled a {roll1 + roll2}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
+    local result = roll1 + roll2
+
+    SendNotification(`[PLAYER] rolled a {result}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
 
     return {
-        Result = roll1 + roll2,
+        Result = result,
         IsDoubles = roll1 == roll2,
     }
 end
