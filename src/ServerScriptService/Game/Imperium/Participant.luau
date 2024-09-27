@@ -354,10 +354,77 @@ local function FindClosestForwardPositionByColour(participant: Types.Participant
     return closest.Position
 end
 
+local function findSide(part: BasePart): string
+    local cf = part.CFrame
+    local cs = {
+        Side = nil :: string?,
+        Y = -2
+    }
+    if cf.LookVector.Y > cs.Y then
+        cs.Side = "FrontSurface"
+        cs.Y = cf.LookVector.Y
+    end
+    if -cf.LookVector.Y > cs.Y then
+        cs.Side = "BackSurface"
+        cs.Y = -cf.LookVector.Y
+    end
+    if cf.RightVector.Y > cs.Y then
+        cs.Side = "RightSurface"
+        cs.Y = cf.RightVector.Y
+    end
+    if -cf.RightVector.Y > cs.Y then
+        cs.Side = "LeftSurface"
+        cs.Y = -cf.RightVector.Y
+    end
+    if cf.UpVector.Y > cs.Y then
+        cs.Side = "TopSurface"
+        cs.Y = cf.UpVector.Y
+    end
+    if -cf.UpVector.Y > cs.Y then
+        cs.Side = "BottomSurface"
+        cs.Y = -cf.UpVector.Y
+    end
+    return cs.Side or error("Failed to find side")
+end
+
+local function genRandom(): number
+    return math.random(-100, 100) * 25
+end
+
+local diceMap = {
+    FrontSurface = 2,
+    TopSurface = 1,
+    LeftSurface = 3,
+    RightSurface = 4,
+    BackSurface = 5,
+    BottomSurface = 6
+}
+
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
     PlaySound("DiceRoll")
-    local roll1 = math.random(1, 6)
-    local roll2 = math.random(1, 6)
+    local dice1 = ServerStorage.Game.Dice:Clone()
+    local dice2 = ServerStorage.Game.Dice:Clone()
+
+    local num = 0
+    local function throwDice(dice: typeof(dice1))
+        num += 1
+        dice.CFrame = CFrame.new(num * 5, 100, num * 5)
+
+        dice.Parent = workspace :: any
+        dice:ApplyAngularImpulse(Vector3.new(genRandom(), genRandom(), genRandom()))
+    end
+
+    throwDice(dice1)
+    throwDice(dice2)
+    
+    task.wait(3)
+    local roll1 = diceMap[findSide(dice1)]
+    local roll2 = diceMap[findSide(dice2)]
+
+    task.delay(2, function()
+        dice1:Destroy()
+        dice2:Destroy()
+    end)
 
     local result = roll1 + roll2
 
