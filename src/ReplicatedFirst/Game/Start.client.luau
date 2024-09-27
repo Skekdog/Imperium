@@ -56,16 +56,25 @@ payFine.Object.Activated:Connect(PayFine)
 useCard.Object.Activated:Connect(UseGetOutOfJailFreeCard)
 
 ControlManager.Register("Roll Dice", false, function()
+    if not useCard.Object.Visible then
+        return Enum.ContextActionResult.Pass
+    end
     RollDice()
     return Enum.ContextActionResult.Sink
 end)
 
 ControlManager.Register("Pay Fine", false, function()
+    if not payFine.Object.Visible then
+        return Enum.ContextActionResult.Pass
+    end
     PayFine()
     return Enum.ContextActionResult.Sink
 end)
 
 ControlManager.Register("Use Jail Card", false, function()
+    if not rollDice.Object.Visible then
+        return Enum.ContextActionResult.Pass
+    end
     UseGetOutOfJailFreeCard()
     return Enum.ContextActionResult.Sink
 end)
