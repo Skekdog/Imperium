@@ -21,13 +21,13 @@ local settings: Settings = {
     Map = {
         Name = "Map",
         DisplayName = "Map",
-        Default = "Doomspires",
+        Default = "Happy Home",
         PossibleValues = {"Happy Home", "Doomspires"},
     },
     Board = {
         Name = "Board",
         DisplayName = "Board",
-        Default = "Classic (US)",
+        Default = "Classic (UK)",
         PossibleValues = {"Classic (UK)", "Classic (US)"},
     },
     TurnTime = {
