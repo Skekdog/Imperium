@@ -1,7 +1,9 @@
 local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AssetManagement = require(script.Parent.AssetManagement)
 local ClientTypes = require(script.Parent.ClientTypes)
+local CreateAssetButton = require(script.Parent.CreateAssetButton)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
@@ -12,7 +14,7 @@ local object = ui.Object
 local assetList = object.AssetList.ScrollingFrame
 local actions = object.Actions
 
-type AssetListButton = typeof(assetList.ButtonTemplate)
+type Button = CreateAssetButton.Button
 
 local currentAsset: string?
 local clickCons: {[TextButton]: RBXScriptConnection?} = {}
@@ -26,10 +28,10 @@ local function bindToClick(button: TextButton, callback: () -> ())
     clickCons[button] = button.Activated:Connect(callback)
 end
 
-local function setHighlightedAsset(button: AssetListButton?): ()
+local function setHighlightedAsset(button: Button?): ()
     for _, v in assetList:GetChildren() do
         if v:IsA("TextButton") then
-            local vButton = v :: AssetListButton
+            local vButton = v :: Button
             vButton.UIStroke.Enabled = vButton == button
         end
     end
@@ -39,7 +41,7 @@ local function setActionsVisible(visible: boolean): ()
     if not visible then
         local selected = GuiService.SelectedObject
         if selected and selected:IsDescendantOf(actions) then
-            GuiService.SelectedObject = assetList:FindFirstChild("Asset_" .. (currentAsset or "")) :: AssetListButton?
+            GuiService.SelectedObject = assetList:FindFirstChild("Asset_" .. (currentAsset or "")) :: Button?
         end
 
         currentAsset = nil
@@ -171,7 +173,7 @@ end
 
 bindToClick(actions.Close, closeActions)
 
-local function selectAsset(button: AssetListButton, name: string, asset: ClientTypes.ClientAssetView): ()
+local function selectAsset(button: Button, name: string, asset: ClientTypes.ClientAssetView): ()
     if currentAsset == name then
         button.UIStroke.Enabled = false
         return closeActions()
@@ -185,30 +187,18 @@ local function selectAsset(button: AssetListButton, name: string, asset: ClientT
     updateView(asset)
 end
 
-ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset").OnClientEvent:Connect(function(asset: ClientTypes.ClientAssetView)
+ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Player, asset: ClientTypes.ClientAssetView)
+    if plr ~= Players.LocalPlayer then
+        return
+    end
     local name = asset.Name
 
-    local button = assetList:FindFirstChild("Asset_" .. name) :: AssetListButton?
+    local button = assetList:FindFirstChild("Asset_" .. name) :: Button?
     if not button then
-        button = assetList.ButtonTemplate:Clone()
+        button = CreateAssetButton(UDim2.new(1, 0, 0.15, 0), asset)
     end
     assert(button)
-
-    button.Text = name
-    button.BackgroundColor3 = asset.Colour
-
-    if not button.Parent then
-        local targetSize = button.Size
-        button.Size = UDim2.new(targetSize.X, UDim.new())
-        UIAnimation.Animate(button, TweenInfo.new(0.25), {Size = targetSize})
-    end
-
-    -- todo: this can cause problems if there are two similar colours. woo.
-    button.LayoutOrder = (tonumber(asset.Colour:ToHex(), 16) or error("Failed to convert colour to hex")) + asset.Position
-
-    button.Name = "Asset_" .. name
-    button.Visible = true
-    button.Parent = assetList
+    button.Parent = assetList :: any
 
     updateView(asset)
 
@@ -217,8 +207,11 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
     end)
 end)
 
-ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset").OnClientEvent:Connect(function(name: string)
-    local button = assetList:FindFirstChild("Asset_" .. name) :: AssetListButton?
+ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: Player, name: string)
+    if plr ~= Players.LocalPlayer then
+        return
+    end
+    local button = assetList:FindFirstChild("Asset_" .. name) :: Button?
     if button then
         UIAnimation.Animate(button, TweenInfo.new(0.25), {Size = UDim2.new()})
         task.delay(0.25, button.Destroy, button)

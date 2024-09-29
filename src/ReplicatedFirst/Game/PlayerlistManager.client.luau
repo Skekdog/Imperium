@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
+local TradingUI = require(script.Parent.TradingUI)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local list = ui.List
@@ -24,6 +25,8 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	clone.Money.Text = tostring(plr:GetAttribute("Money"))
 	clone.Wins.Text = tostring(plr:GetAttribute("Wins"))
 
+	clone.Trade.Visible = status ~= "Spectating" and plr ~= Players.LocalPlayer
+
 	movePlr(plr, status :: any)
 end
 
@@ -36,6 +39,10 @@ local function createPlr(plr: Player)
 
 	clone.Money.Text = tostring(plr:GetAttribute("Money"))
 	clone.Wins.Text = tostring(plr:GetAttribute("Wins"))
+
+	clone.Trade.Activated:Connect(function()
+		TradingUI(plr)
+	end)
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
