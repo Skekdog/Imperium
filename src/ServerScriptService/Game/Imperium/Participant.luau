@@ -481,6 +481,9 @@ local function TryPlayMove(participant: Types.Participant): ()
                 SendToJail(participant)
                 return participant.Round:StartNextParticipantTurn()
             end
+
+            MoveBy(participant, roll.Result)
+            return TryPlayMove(participant)
         else
             participant.DoublesStreak = 0
         end
