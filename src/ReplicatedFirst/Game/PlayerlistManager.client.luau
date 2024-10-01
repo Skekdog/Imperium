@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local TradingUI = require(script.Parent.TradingUI)
 
@@ -129,3 +130,7 @@ for _, v in Players:GetPlayers() do
 end
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+
+local roundInfo = ui.Info.RoundInfo.Info
+roundInfo.Gamemode.Text = AwaitReplicatedAttribute("BoardTheme")
+roundInfo.Map.Text = AwaitReplicatedAttribute("Map")

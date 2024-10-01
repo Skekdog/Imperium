@@ -1,9 +1,4 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 return function(): string
-    local symbol = ReplicatedStorage:GetAttribute("CurrencySymbol") :: string?
-    if not symbol then
-        symbol = ReplicatedStorage:GetAttributeChangedSignal("CurrencySymbol"):Wait()
-    end
-    assert(symbol)
-    return symbol
+    return AwaitReplicatedAttribute("CurrencySymbol")
 end

@@ -37,7 +37,10 @@ local boardFolder = ServerScriptService.Game.GameDefinitions:FindFirstChild(info
 assert(boardFolder, `Board {info.Board} not found`)
 
 local board = (require)(boardFolder:FindFirstChild("BoardTheme")) :: Types.BoardConfiguration
+
 ReplicatedStorage:SetAttribute("CurrencySymbol", board.CurrencySymbol)
+ReplicatedStorage:SetAttribute("BoardTheme", info.Board)
+ReplicatedStorage:SetAttribute("Map", info.Map)
 
 local tiles = {}
 for i, description in board.Tiles do
