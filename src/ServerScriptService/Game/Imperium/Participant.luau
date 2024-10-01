@@ -153,6 +153,10 @@ end
 
 local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number, noNotification: boolean?): ()
     assert(to ~= participant, "Can't transfer money to same participant")
+    if amount == 0 then
+        return
+    end
+    
     if not participant:CanAfford(amount) then
         local survived = BankruptcyWarning(participant, amount, to)
         if not survived then
