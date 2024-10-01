@@ -604,7 +604,7 @@ local function RemoveParticipant(participant: Types.Participant): ()
 
     for i = #participant.Assets, 1, -1 do
         local asset = participant.Assets[i]
-        assert(asset, "Invalid index for asset (" .. i .. ")")
+        assert(asset, `Invalid index for asset {i}`)
         asset:StartAuction(round, true)
     end
 
