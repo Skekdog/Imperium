@@ -351,6 +351,10 @@ local function TryUnMortgage(asset: Types.Asset): ()
     updateAssetsInParticipantColourGroup(asset.Owner, asset.AssetDescription.Colour, asset.Owner.Round)
 end
 
+local function HasAnyDevelopments(asset: Types.Asset): boolean
+    return asset.Houses > 0 or asset.Hotels > 0
+end
+
 local function GetRentCost(asset: Types.Asset, participant: Types.Participant): number
     if typeof(asset.AssetDescription.Rent) == "function" then
         return asset.AssetDescription.Rent(asset, participant)
@@ -359,7 +363,7 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
     local rentTable = asset.AssetDescription.Rent
     local rent = rentTable.Houses[asset.Houses] or rentTable.Hotels[asset.Hotels] or rentTable.Default
 
-    if asset.Owner ~= "Bank" and asset.Owner:HasMonopoly(asset.AssetDescription.Colour) then
+    if asset.Owner ~= "Bank" and asset.Owner:HasMonopoly(asset.AssetDescription.Colour) and not asset:HasAnyDevelopments() then
         rent *= 2
     end
 
@@ -482,6 +486,8 @@ function module.new(description: Types.AssetDescription): Types.Asset
     asset.TryGetDevelopmentSellValue = TryGetDevelopmentSellValue
 
     asset.CanMakeDevelopment = CanMakeDevelopment
+
+    asset.HasAnyDevelopments = HasAnyDevelopments
 
     return asset
 end

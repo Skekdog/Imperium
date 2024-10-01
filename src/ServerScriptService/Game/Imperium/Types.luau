@@ -94,6 +94,8 @@ export type Asset = {
     GetRentCost: (Asset, participant: Participant) -> number,
 
     GetClientAssetView: (Asset, round: Round) -> ClientAssetView,
+
+    HasAnyDevelopments: (Asset) -> boolean,
 }
 
 export type EdgeTile = typeof(ServerStorage.Game.Tile)
