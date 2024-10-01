@@ -91,7 +91,7 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
 
     if response == true then
         if asset.Owner ~= "Bank" then
-            return
+            return con:Disconnect()
         end
 
         participant:PurchaseProperty(asset)
