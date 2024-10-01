@@ -356,6 +356,10 @@ local function HasAnyDevelopments(asset: Types.Asset): boolean
 end
 
 local function GetRentCost(asset: Types.Asset, participant: Types.Participant): number
+    if asset.IsMortgaged then
+        return 0
+    end
+    
     if typeof(asset.AssetDescription.Rent) == "function" then
         return asset.AssetDescription.Rent(asset, participant)
     end
