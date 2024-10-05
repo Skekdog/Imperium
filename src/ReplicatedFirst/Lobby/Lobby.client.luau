@@ -8,8 +8,8 @@ local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
-local serverClient = ReplicatedStorage.Lobby.ServerClient
-local clientServer = ReplicatedStorage.Lobby.ClientServer
+local serverClient = ReplicatedStorage:WaitForChild("Lobby"):WaitForChild("ServerClient")
+local clientServer = ReplicatedStorage:WaitForChild("Lobby"):WaitForChild("ClientServer")
 
 local MAX_PLAYERS = 8
 
