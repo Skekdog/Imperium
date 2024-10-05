@@ -38,7 +38,8 @@
         },
         "Lighting": {
             "$properties": {
-                "GlobalShadows": false
+                "GlobalShadows": false,
+                "Technology": "Future"
             }
         },
         "StarterPlayer": {

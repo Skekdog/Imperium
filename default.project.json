@@ -24,27 +24,6 @@
             "Game": {"$path": "Assets/Game"},
             "Lobby": {"$path": "Assets/Lobby"}
         },
-        "Lighting": {
-            "$path": "src/Lighting",
-            "$properties": {
-                "GlobalShadows": false
-            }
-        },
-        "TextChatService": {
-            "$properties": {
-                "ChatVersion": "TextChatService"
-            }
-        },
-        "Workspace": {
-            "$properties": {
-                "StreamingEnabled": false
-            }
-        },
-        "StarterPlayer": {
-            "$properties": {
-                "CharacterWalkSpeed": 32
-            }
-        },
         "SoundService": {
             "$path": "src/SoundService"
         }
