@@ -110,6 +110,29 @@ export type Tile = {
     Asset: Asset?,
 }
 
+export type TradeManager = {
+    Participant: Participant,
+    TradingWith: Participant?,
+
+    HasAcceptedTrade: boolean,
+    OfferedAssets: {Asset},
+    OfferedMoney: number,
+    OfferedJailCards: number,
+
+    OfferAsset: (TradeManager, assetName: string) -> (),
+    OfferMoney: (TradeManager, amount: number) -> (),
+    OfferJailCards: (TradeManager, amount: number) -> (),
+
+    SetTradeAccepted: (TradeManager, accepted: boolean) -> (),
+    DeclineTrade: (TradeManager) -> (),
+
+    Reset: (TradeManager) -> (),
+    FinishTrade: (TradeManager, accepted: boolean) -> (),
+
+    SendTradeOffer: (TradeManager, to: Participant) -> (),
+    RespondTradeOffer: (TradeManager, accepted: boolean) -> (),
+}
+
 export type Participant = {
     Player: Player,
     Round: Round,
@@ -120,6 +143,8 @@ export type Participant = {
     Money: number,
     JailCards: number,
     Assets: {Asset},
+    
+    TradeManager: TradeManager,
 
     IsMoving: boolean,
     LastMovedAt: number,

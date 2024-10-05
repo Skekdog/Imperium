@@ -11,6 +11,7 @@ local Teleport = require(script.Parent.Parent.Parent.Shared.Teleport)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local TileMath = require(script.Parent.Parent.TileMath)
+local TradeManager = require(script.Parent.TradeManager)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -662,6 +663,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.HasDisconnected = false
 
     participant.RemoveParticipant = RemoveParticipant
+
+    participant.TradeManager = TradeManager.new(participant)
 
     player:SetAttribute("Money", participant.Money)
     player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
