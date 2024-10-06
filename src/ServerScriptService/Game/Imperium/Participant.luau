@@ -389,7 +389,7 @@ local function findSide(part: BasePart): string
 end
 
 local function genRandom(): number
-    return math.random(-100, 100) * 25
+    return math.random(-100, 100) * 50
 end
 
 local diceMap = {
