@@ -38,7 +38,7 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		-- if img ~= "" then return img end
 
 		local str = UIS:GetStringForKeyCode(keycode :: Enum.KeyCode)
-		if str ~= "" then
+		if str ~= "" and str ~= " " then
 			if str:sub(1, 6) == "Button" then
 				return `\{{str:sub(7, -1)}\}`
 			end
