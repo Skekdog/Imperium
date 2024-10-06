@@ -108,6 +108,11 @@ local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Money += amount
     participant.Player:SetAttribute("Money", participant.Money)
 
+    local moneyNeeded = ReplicatedStorage:GetAttribute("NeededMoneyBankruptcy") :: number
+    if moneyNeeded ~= 0 then
+        ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", moneyNeeded - amount)
+    end
+
     if amount > 0 then
         PlaySound("MoneyGained", participant.Player)
     end
@@ -132,16 +137,18 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
     if to ~= "Bank" then
         table.insert(players, to.Player)
     end
-    SendNotification(`[PLAYER] needs another {GetCurrencySymbol()}{targetAmount - participant.Money} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
+
+    local neededMoney = targetAmount - participant.Money
+    SendNotification(`[PLAYER] needs another {GetCurrencySymbol()}{neededMoney} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
     
-    ReplicatedStorage:SetAttribute("GoingBankrupt", true)
+    ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", neededMoney)
     local start = GetTime()
     local maxTime = start + participant.Round.GameConfiguration.BankruptcyTime
     SetTimeMilestone(participant.Round.GameConfiguration.BankruptcyTime)
-    while true and GetTime() < maxTime and participant.Money < targetAmount do
+    while GetTime() < maxTime and participant.Money < targetAmount do
         task.wait()
     end
-    ReplicatedStorage:SetAttribute("GoingBankrupt", false)
+    ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", 0)
 
     if participant.Money < targetAmount then
         GoBankrupt(participant, to)

@@ -23,7 +23,7 @@
                     "CurrentPlayer": {"String": ""},
                     "WaitingText": {"String": "Waiting for players..."},
                     "FineAmount": {"Float64": 50},
-                    "GoingBankrupt": {"Bool": false}
+                    "NeededMoneyBankruptcy": {"Float64": 0}
                 }
             }
         },
