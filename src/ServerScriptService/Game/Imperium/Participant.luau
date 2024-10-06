@@ -431,7 +431,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     throwDice(dice2)
     
     task.wait(0.5)
-    while dice1.AssemblyLinearVelocity.Magnitude > 0.1 or dice2.AssemblyLinearVelocity.Magnitude > 0.1 and (dice1.Parent or dice2.Parent) do
+    while (dice1.AssemblyLinearVelocity.Magnitude > 0.1 and dice1.Parent) or (dice2.Parent and dice2.AssemblyLinearVelocity.Magnitude > 0.1) do
         task.wait()
     end
     task.wait(0.5)
