@@ -96,10 +96,9 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
         end
 
         participant:PurchaseProperty(asset)
-    elseif response == false then
-        asset:StartAuction(participant.Round)
     else
         ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"):FireClient(participant.Player, nil)
+        asset:StartAuction(participant.Round)
     end
 
     con:Disconnect()
