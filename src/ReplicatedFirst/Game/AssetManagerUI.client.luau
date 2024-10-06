@@ -48,26 +48,9 @@ local function setActionsVisible(visible: boolean): ()
         setHighlightedAsset()
     end
 
-    actions.Selectable = visible
-
-    -- I love hardcoding!
-    UIAnimation.Animate(object.Reveal, TweenInfo.new(0.25), {Position = UDim2.new(if visible then 1 else 0.5, 0, 0, 0)})
-    UIAnimation.Animate(object.Title, TweenInfo.new(0.25), {Size = UDim2.new(if visible then 1 else 0.5, 0, 0.1, 9)})
-
-    local tween = UIAnimation.Animate(actions, TweenInfo.new(0.25), {Position = if visible then UDim2.new(0.5, 5, 0.1, 0) else UDim2.new(0, 0, 0.1, 0)})
-    
-    if visible then
-        actions.Visible = true
-    else
-        local function onComplete()
-            actions.Visible = visible
-        end
-        if tween then
-            tween.Completed:Once(onComplete)
-        else
-            onComplete()
-        end
-    end
+    object.Reveal.Position = UDim2.new(if visible then UDim.new(1, -12) else UDim.new(0.5, -12), UDim.new())
+    object.Title.Size = UDim2.new(if visible then UDim.new(1, 0) else UDim.new(0.5, 0), UDim.new(0.1, 12))
+    actions.Visible = visible
 end
 
 local function closeActions(): ()
@@ -78,7 +61,7 @@ local revealed = false
 local function reveal(): ()
     revealed = not revealed
 
-    UIAnimation.Animate(object, TweenInfo.new(0.25), { Position = UDim2.new(if revealed then UDim.new(0, 10) else UDim.new(-0.15, 0), UDim.new(1, -10)) })
+    UIAnimation.Animate(object, TweenInfo.new(0.25), { Position = UDim2.new(if revealed then UDim.new(0, 10) else UDim.new(-0.15, 16), UDim.new(1, -10)) })
     if not revealed then
         closeActions()
     end
@@ -93,81 +76,48 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
 
     local currency = GetCurrencySymbol()
 
-    local scaleUp: {TextButton} = {}
-    local scaleDown: {TextButton} = {}
-
     if asset.SellAllValue then
         actions.SellAll.Text = `Sell All ({currency}{asset.SellAllValue})`
         actions.SellAll.Visible = true
         bindToClick(actions.SellAll, function() AssetManagement.SellAll(name) end)
-        table.insert(scaleUp, actions.SellAll)
     else
-        table.insert(scaleDown, actions.SellAll)
+        actions.SellAll.Visible = false
     end
 
     if asset.SellHotelValue then
         actions.SellDevelopment.Text = `Sell Hotel ({currency}{asset.SellHotelValue})`
         actions.SellDevelopment.Visible = true
         bindToClick(actions.SellDevelopment, function() AssetManagement.SellHotel(name) end)
-        table.insert(scaleUp, actions.SellDevelopment)
     elseif asset.SellHouseValue then
         actions.SellDevelopment.Text = `Sell House ({currency}{asset.SellHouseValue})`
         actions.SellDevelopment.Visible = true
         bindToClick(actions.SellDevelopment, function() AssetManagement.SellHouse(name) end)
-        table.insert(scaleUp, actions.SellDevelopment)
     else
-        table.insert(scaleDown, actions.SellDevelopment)
+        actions.SellDevelopment.Visible = false
     end
 
     if asset.HousePrice then
         actions.BuyDevelopment.Text = `Buy House ({currency}{asset.HousePrice})`
         actions.BuyDevelopment.Visible = true
         bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHouse(name, asset.HousePrice) end)
-        table.insert(scaleUp, actions.BuyDevelopment)
     elseif asset.HotelPrice then
         actions.BuyDevelopment.Text = `Buy Hotel ({currency}{asset.HotelPrice})`
         actions.BuyDevelopment.Visible = true
         bindToClick(actions.BuyDevelopment, function() AssetManagement.BuyHotel(name, asset.HotelPrice) end)
-        table.insert(scaleUp, actions.BuyDevelopment)
     else
-        table.insert(scaleDown, actions.BuyDevelopment)
+        actions.BuyDevelopment.Visible = false
     end
 
     if asset.UnMortgageCost then
         actions.Mortgage.Text = `Unmortgage ({currency}{asset.UnMortgageCost})`
         actions.Mortgage.Visible = true
         bindToClick(actions.Mortgage, function() AssetManagement.Unmortgage(name, asset.UnMortgageCost) end)
-        table.insert(scaleUp, actions.Mortgage)
     elseif asset.MortgageValue then
         actions.Mortgage.Text = `Mortgage ({currency}{asset.MortgageValue})`
         actions.Mortgage.Visible = true
         bindToClick(actions.Mortgage, function() AssetManagement.Mortgage(name) end)
-        table.insert(scaleUp, actions.Mortgage)
     else
-        table.insert(scaleDown, actions.Mortgage)
-    end
-
-    for _, v in scaleUp do
-        local tween = UIAnimation.Animate(v, TweenInfo.new(0.25), {Size = UDim2.new(1, 0, 0.15, 0)})
-        local function onComplete()
-            v.Visible = true
-        end
-        if tween then
-            tween.Completed:Once(onComplete)
-        else
-            onComplete()
-        end
-    end
-    for _, v in scaleDown do
-        local tween = UIAnimation.Animate(v, TweenInfo.new(0.25), {Size = UDim2.new(0, 0, 0, 0)})
-        local function onComplete()
-            v.Visible = false
-        end
-        if tween then
-            tween.Completed:Once(onComplete)
-        else
-            onComplete()
-        end
+        actions.Mortgage.Visible = false
     end
 end
 
@@ -213,7 +163,6 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
     end
     local button = assetList:FindFirstChild("Asset_" .. name) :: Button?
     if button then
-        UIAnimation.Animate(button, TweenInfo.new(0.25), {Size = UDim2.new()})
         task.delay(0.25, button.Destroy, button)
     end
 

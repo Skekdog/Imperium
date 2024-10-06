@@ -1,5 +1,4 @@
 local ClientTypes = require(script.Parent.ClientTypes)
-local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 
 export type Button = typeof(script.AssetButton)
 
@@ -13,8 +12,7 @@ return function(size: UDim2, asset: ClientTypes.ClientAssetView): Button
     button.Text = name
     button.BackgroundColor3 = asset.Colour
 
-    button.Size = UDim2.new(size.X, UDim.new())
-    UIAnimation.Animate(button, TweenInfo.new(0.25), {Size = size})
+    button.Size = size
 
     -- todo: this can cause problems if there are two similar colours. woo.
     button.LayoutOrder = (tonumber(asset.Colour:ToHex(), 16) or error("Failed to convert colour to hex")) + asset.Position
