@@ -138,6 +138,7 @@ local function updateSetting(slot: LobbySlot, setting: string, value: string | n
     assert(element)
 
     element.Title.Text = GameConfiguration[setting].DisplayName
+    element.LayoutOrder = GameConfiguration[setting].Order
     element.Value.Text = tostring(value)
     element.Visible = true
     element.Name = setting
@@ -291,6 +292,7 @@ for _, setting in GameConfiguration do
 
         inputSetting.Name = setting.Name
         inputSetting.Title.Text = setting.DisplayName
+        inputSetting.LayoutOrder = setting.Order
         
         local placeholderText
         if setting.Min and setting.Max then
@@ -316,6 +318,7 @@ for _, setting in GameConfiguration do
 
         selectionSetting.Name = setting.Name
         selectionSetting.Title.Text = setting.Name
+        selectionSetting.LayoutOrder = setting.Order
 
         for i, v in setting.PossibleValues do
             local option = selectionSetting.Options.OptionTemplate:Clone()

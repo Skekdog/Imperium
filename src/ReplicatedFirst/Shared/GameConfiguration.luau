@@ -5,6 +5,7 @@ export type Setting = {
     PossibleValues: {string} | "number",
     Max: number?,
     Min: number?,
+    Order: number,
 }
 
 export type Settings = {[string]: Setting}
@@ -23,12 +24,14 @@ local settings: Settings = {
         DisplayName = "Map",
         Default = "Happy Home",
         PossibleValues = {"Happy Home", "Doomspires"},
+        Order = 1,
     },
     Board = {
         Name = "Board",
         DisplayName = "Board",
         Default = "Classic (UK)",
         PossibleValues = {"Classic (UK)", "Classic (US)"},
+        Order = 2,
     },
     TurnTime = {
         Name = "TurnTime",
@@ -37,6 +40,7 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 45,
         Min = 5,
+        Order = 3,
     },
     AuctionTime = {
         Name = "AuctionTime",
@@ -45,6 +49,7 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 25,
         Min = 5,
+        Order = 4,
     },
     BankruptcyTime = {
         Name = "BankruptcyTime",
@@ -53,6 +58,7 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 180,
         Min = 30,
+        Order = 5,
     }
 }
 
