@@ -418,7 +418,12 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     throwDice(dice1)
     throwDice(dice2)
     
-    task.wait(3)
+    task.wait(0.5)
+    while dice1.AssemblyLinearVelocity.Magnitude > 0.1 or dice2.AssemblyLinearVelocity.Magnitude > 0.1 and (dice1.Parent or dice2.Parent) do
+        task.wait()
+    end
+    task.wait(0.5)
+
     local roll1 = diceMap[findSide(dice1)]
     local roll2 = diceMap[findSide(dice2)]
 
