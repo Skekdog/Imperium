@@ -31,7 +31,9 @@
             "$path": "src/Lighting",
             "$properties": {
                 "GlobalShadows": false,
-                "Technology": "Future"
+                "Technology": "Future",
+                "ClockTime": 10,
+                "GeographicLatitude": 60
             }
         },
         "Players": {

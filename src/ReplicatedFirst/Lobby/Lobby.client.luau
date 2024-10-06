@@ -1,5 +1,7 @@
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
 local Notification = require(script.Parent.Parent.Shared.Notification)
@@ -25,6 +27,20 @@ type PrivateLobbySlot = typeof(browser.PrivateLobbyTemplate)
 type AnyLobbySlot = LobbySlot | PrivateLobbySlot | LobbyOverview
 
 local lobbies: {[number]: LobbySlot?} = {}
+
+local camera = workspace.CurrentCamera
+camera.CameraType = Enum.CameraType.Scriptable
+camera.CFrame = CFrame.fromEulerAnglesXYZ(math.rad(-40), math.rad(170), 0)
+
+local DURATION = 240
+local timePerHour = DURATION / 24
+local function animateTime(): ()
+    local tween = TweenService:Create(Lighting, TweenInfo.new((24 - Lighting.ClockTime) * timePerHour, Enum.EasingStyle.Linear), {ClockTime = 24})
+    tween:Play()
+
+    tween.Completed:Once(animateTime)
+end
+animateTime()
 
 local currentLobby: number?
 local function setCurrentLobby(id: number?): ()
