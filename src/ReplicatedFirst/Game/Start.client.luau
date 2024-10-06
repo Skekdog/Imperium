@@ -1,4 +1,3 @@
-local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -144,7 +143,6 @@ local function updateMoney()
     local currency = GetCurrencySymbol()
     moneyDisplay.Object.Text = currency .. (player:GetAttribute("Money") :: number? or 0)
 end
-moneyDisplay.Object.Size = UDim2.fromOffset(0, GuiService:GetGuiInset().Y)
 player:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
 

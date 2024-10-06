@@ -155,7 +155,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		but.Name = self.Name
 		
 		local key = ControlManager.GetFirstKeyCode(self.Name, true)
-		local keyHint = if key ~= "" and key ~= "NONE" then `<br/>[{key}]` else ""
+		local keyHint = if key ~= "" and key ~= "NONE" then ` [{key}]` else ""
 		but.Text = self.DisplayName..keyHint
 
 		but.Visible = true

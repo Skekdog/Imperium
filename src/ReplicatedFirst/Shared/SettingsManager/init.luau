@@ -1,5 +1,4 @@
 local HTTPService = game:GetService("HttpService")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UserInputService = game:GetService("UserInputService")
 
 export type SettingDefinition = {
@@ -44,17 +43,6 @@ module.AvailableSettings = {
 		Tooltip = "Choose whether to show display names, usernames, or both.",
 		PossibleValues = {"Display Name", "Username", "Both"},
 		Default = "Display Name",
-	},
-	{
-		Name = "Sidebar Alignment",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "Controls the position of the sidebar. May be useful on phones with inset screens.",
-		PossibleValues = {"Left", "Right"},
-		Default = "Right",
-		Callback = function(val)
-			require(ReplicatedFirst.Shared.SetSidebarAlignment)(val)
-		end
 	},
 	{
 		Name = "Animate UI Transitions",
