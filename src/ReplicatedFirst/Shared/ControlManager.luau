@@ -59,6 +59,8 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 			return "RAlt"
 		elseif keycode == Enum.KeyCode.Tab then
 			return "Tab"
+		elseif keycode == Enum.KeyCode.Space then
+			return "Space"
 		elseif (keycode.Name:sub(1, 1) == "F") and (tonumber(keycode.Name:sub(2))) then
 			return keycode.Name
 		end
