@@ -132,5 +132,5 @@ end
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 
 local roundInfo = ui.Info.RoundInfo.Info
-roundInfo.Gamemode.Text = AwaitReplicatedAttribute("BoardTheme")
-roundInfo.Map.Text = AwaitReplicatedAttribute("Map")
+roundInfo.Gamemode.Text = "Board Theme: " .. AwaitReplicatedAttribute("BoardTheme")
+roundInfo.Map.Text = "Map: " .. AwaitReplicatedAttribute("Map")
