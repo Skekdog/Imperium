@@ -406,12 +406,18 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local dice1 = ServerStorage.Game.Dice:Clone()
     local dice2 = ServerStorage.Game.Dice:Clone()
 
+    local diceFolder = workspace:FindFirstChild("Dice") or Instance.new("Folder", workspace) :: any
+    diceFolder.Name = "Dice"
+    diceFolder:ClearAllChildren()
+
     local num = 0
     local function throwDice(dice: typeof(dice1))
         num += 1
         dice.CFrame = CFrame.new(num * 5, 100, num * 5)
 
-        dice.Parent = workspace :: any
+        dice.Parent = diceFolder
+        dice.Parent.Name = "Dice"
+
         dice:ApplyAngularImpulse(Vector3.new(genRandom(), genRandom(), genRandom()))
     end
 
