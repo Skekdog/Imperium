@@ -263,12 +263,8 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     participant.PreviousPosition = participant.Position
     local passGo = (participant.Position == 1) or ((participant.Position > position) and (position ~= 1))
-    if passGo and not moveDirectly and participant.LastMovedAt ~= 0 then
+    if passGo and not moveDirectly and participant.Round.Turn ~= 1 then
         GiveMoney(participant, participant.Round.BoardConfiguration.PassGoMoney)
-    end
-
-    if not intialMove then
-        participant.LastMovedAt = workspace:GetServerTimeNow()
     end
     participant.Position = position
 
@@ -432,12 +428,13 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     end)
 
     local result = roll1 + roll2
+    local isDoubles = roll1 == roll2
 
-    SendNotification(`[PLAYER] rolled a {result}.` .. if roll1 == roll2 then " Doubles!" else "", {participant.Player})
+    SendNotification(`[PLAYER] rolled a {result}.` .. if isDoubles then " Doubles!" else "", {participant.Player})
 
     return {
         Result = result,
-        IsDoubles = roll1 == roll2,
+        IsDoubles = isDoubles,
     }
 end
 
@@ -460,42 +457,59 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
 end
 
 local function TryPlayMove(participant: Types.Participant): ()
+    for _, v in participant.Round.Participants do
+        assert(not v.IsMoving, `{v.Player.Name} is already moving`)
+    end
+
+    local boardConfig = participant.Round.BoardConfiguration
+
     participant.IsMoving = true
+    participant.LastMovedAt = GetTime()
+
     SetTimeMilestone(nil)
     ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
-    if participant.JailedOn ~= 0 then
-        if participant.JailedOn <= participant.Round.Turn - participant.Round.BoardConfiguration.JailLength then
-            SendNotification(`[PLAYER] is leaving jail after waiting for {participant.Round.BoardConfiguration.JailLength} turns.`, {participant.Player})
-            LeaveJail(participant)
-        elseif participant.Round.BoardConfiguration.CanLeaveJailByRollingDoubles and RollDice(participant).IsDoubles then
-            SendNotification(`[PLAYER] rolled doubles and is leaving jail.`, {participant.Player})
-            LeaveJail(participant)
-        end
-    else
-        local roll = RollDice(participant)
-        if roll.IsDoubles then
-            participant.DoublesStreak += 1
 
-            local neededDoubles = participant.Round.BoardConfiguration.DoublesConsecutiveJailAmount
-            if participant.DoublesStreak >= neededDoubles then
-                SendNotification(`[PLAYER] rolled doubles {neededDoubles} times in a row and was sent to jail.`, {participant.Player})
-                SendToJail(participant)
-                return participant.Round:StartNextParticipantTurn()
+    local function play()
+        if participant.JailedOn ~= 0 then
+            local jailLength = boardConfig.JailLength
+            if participant.Round.Turn - participant.JailedOn >= jailLength then
+                SendNotification(`[PLAYER] is leaving jail after waiting {jailLength} turns.`, {participant.Player})
+                LeaveJail(participant, true)
+                return play()
+            else
+                local result = RollDice(participant)
+                if result.IsDoubles then
+                    participant.DoublesStreak += 1
+                    SendNotification("After rolling doubles, [PLAYER] is leaving jail.", {participant.Player})
+                    LeaveJail(participant, true)
+                    return play()
+                end
+                return
+            end
+        end
+
+        local result = RollDice(participant)
+        if result.IsDoubles then
+            participant.DoublesStreak += 1
+            local doublesLimit = boardConfig.DoublesConsecutiveJailAmount
+            if participant.DoublesStreak >= doublesLimit then
+                SendNotification(`[PLAYER] rolled doubles {doublesLimit} times and was sent to jail.`, {participant.Player})
+                return SendToJail(participant)
             end
 
-            MoveBy(participant, roll.Result)
-            return TryPlayMove(participant)
+            MoveBy(participant, result.Result)
+            return if participant.JailedOn == 0 then play() else nil -- We could land on Go To Jail hence the check
         else
             participant.DoublesStreak = 0
         end
 
-        MoveBy(participant, roll.Result)
+        MoveBy(participant, result.Result)
     end
 
-    if participant.IsInGame then
-        participant.Round:StartNextParticipantTurn()
-    end
+    play()
+
     participant.IsMoving = false
+    participant.Round:StartNextParticipantTurn()
 end
 
 local function GiveJailCards(participant: Types.Participant, amount: number): ()
