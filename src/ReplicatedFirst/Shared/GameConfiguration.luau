@@ -33,9 +33,9 @@ local settings: Settings = {
     TurnTime = {
         Name = "TurnTime",
         DisplayName = "Turn Time",
-        Default = 15,
+        Default = 10,
         PossibleValues = "number",
-        Max = 60,
+        Max = 45,
         Min = 5,
     },
     AuctionTime = {
@@ -43,7 +43,7 @@ local settings: Settings = {
         DisplayName = "Auction Time",
         Default = 10,
         PossibleValues = "number",
-        Max = 30,
+        Max = 25,
         Min = 5,
     },
     BankruptcyTime = {
@@ -51,7 +51,7 @@ local settings: Settings = {
         DisplayName = "Bankruptcy Time",
         Default = 60,
         PossibleValues = "number",
-        Max = 300,
+        Max = 180,
         Min = 30,
     }
 }
