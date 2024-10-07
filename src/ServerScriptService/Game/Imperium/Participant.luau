@@ -591,6 +591,8 @@ local function GetTheDub(participant: Types.Participant): ()
 
     task.wait(15)
     Teleport(Players:GetPlayers(), "Lobby")
+
+    task.wait(math.huge) -- Do not continue the game
 end
 
 local function HasMonopoly(participant: Types.Participant, colour: string): boolean
