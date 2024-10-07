@@ -55,4 +55,9 @@ end)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Captures, false)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
-StarterGui:SetCore("ResetButtonCallback", false)
+
+local success
+repeat
+	success = pcall(StarterGui.SetCore, StarterGui, "ResetButtonCallback", false)
+	task.wait(0.5)
+until success
