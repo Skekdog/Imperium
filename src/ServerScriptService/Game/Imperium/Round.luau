@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Board = require(script.Parent.Board)
+local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Participant = require(script.Parent.Participant)
@@ -38,20 +39,63 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
         return nextParticipant:RemoveParticipant()
     end
 
-    local lastMovedAt = nextParticipant.LastMovedAt
-
     ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
     SetTimeMilestone(round.GameConfiguration.PlayerTurnTime)
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireAllClients(nextParticipant.Player.Name)
 
-    task.delay(round.GameConfiguration.PlayerTurnTime, function()
-        if lastMovedAt ~= nextParticipant.LastMovedAt or not nextParticipant.IsInGame then
-            return
+    local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
+
+    local playedMove: "Dice" | "JailCard" | "Fine"?
+    local cons: {RBXScriptConnection} = {}
+    local function clearCons(): ()
+        for _, v in cons do
+            v:Disconnect()
         end
-        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireClient(nextParticipant.Player, "")
+    end
+
+    table.insert(cons, gameClientServer:WaitForChild("RollDice").OnServerEvent:Connect(function(plr)
+        if nextParticipant:CanPlayMove("Dice") and plr == nextParticipant.Player then
+            clearCons()
+            playedMove = "Dice"
+        end
+    end))
+
+    table.insert(cons, gameClientServer:WaitForChild("UseGetOutOfJailFreeCard").OnServerEvent:Connect(function(plr)
+        if nextParticipant:CanPlayMove("JailCard") and plr == nextParticipant.Player then
+            clearCons()
+            playedMove = "JailCard"
+        end
+    end))
+
+    table.insert(cons, gameClientServer:WaitForChild("PayFine").OnServerEvent:Connect(function(plr)
+        if nextParticipant:CanPlayMove("Fine") and plr == nextParticipant.Player then
+            clearCons()
+            playedMove = "Fine"
+        end
+    end))
+
+    local start = GetTime()
+
+    while not playedMove and GetTime() < start + round.GameConfiguration.PlayerTurnTime and nextParticipant.IsInGame do
+        task.wait()
+    end
+
+    clearCons()
+
+    if not playedMove then
+        playedMove = "Dice"
+    end
+    assert(playedMove)
+
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireClient(nextParticipant.Player, "")
+    if playedMove == "Dice" then
         nextParticipant:TryPlayMove()
-    end)
+    elseif playedMove == "JailCard" then
+        nextParticipant:TryUseJailCard()
+    elseif playedMove == "Fine" then
+        nextParticipant:TryPayFine()
+    end
 end
 
 local function TryGetParticipant(round: Types.Round, player: Player): Types.Participant?

@@ -107,41 +107,6 @@ end)
 
 local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
 
-local function canPlayMove(plr: Player): Types.Participant?
-    local participant = round:TryGetParticipant(plr)
-
-    if not participant then
-        return
-    end
-
-    if round.CurrentParticipant == participant and not participant.IsMoving then
-        return participant
-    else
-        return
-    end
-end
-
-gameClientServer.RollDice.OnServerEvent:Connect(function(plr)
-    local participant = canPlayMove(plr)
-    if participant then
-        participant:TryPlayMove()
-    end
-end)
-
-gameClientServer.UseGetOutOfJailFreeCard.OnServerEvent:Connect(function(plr)
-    local participant = canPlayMove(plr)
-    if participant then
-        participant:TryUseJailCard()
-    end
-end)
-
-gameClientServer.PayFine.OnServerEvent:Connect(function(plr)
-    local participant = canPlayMove(plr)
-    if participant then
-        participant:TryPayFine()
-    end
-end)
-
 local function getAsset(plr: Player, name: string): Types.Asset?
     local participant = round:TryGetParticipant(plr)
     if not participant then

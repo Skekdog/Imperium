@@ -147,7 +147,6 @@ export type Participant = {
     TradeManager: TradeManager,
 
     IsMoving: boolean,
-    LastMovedAt: number,
     PreviousPosition: number,
     Position: number,
 
@@ -157,6 +156,7 @@ export type Participant = {
     DoublesStreak: number,
 
     RollDice: (Participant) -> DiceRollResult,
+    CanPlayMove: (Participant, move: "Dice" | "JailCard" | "Fine") -> boolean,
     TryPlayMove: (Participant) -> (),
     TryUseJailCard: (Participant) -> (),
     TryPayFine: (Participant) -> (),

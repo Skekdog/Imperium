@@ -481,7 +481,6 @@ local function TryPlayMove(participant: Types.Participant): ()
     local boardConfig = participant.Round.BoardConfiguration
 
     participant.IsMoving = true
-    participant.LastMovedAt = GetTime()
 
     SetTimeMilestone(nil)
     ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
@@ -558,21 +557,25 @@ local function TryPayRent(participant: Types.Participant, tile: Types.Tile): ()
 end
 
 local function TryUseJailCard(participant: Types.Participant): ()
-    if participant.JailCards > 0 and participant.JailedOn ~= 0 then
-        participant:TransferJailCards("Bank", 1)
-
-        SendNotification(`[PLAYER] used a Get Out of Jail Free card.`, {participant.Player})
-        LeaveJail(participant)
+    if not participant:CanPlayMove("JailCard") then
+        return
     end
+
+    participant:TransferJailCards("Bank", 1)
+
+    SendNotification(`[PLAYER] used a Get Out of Jail Free card.`, {participant.Player})
+    LeaveJail(participant)
 end
 
 local function TryPayFine(participant: Types.Participant): ()
-    if participant.JailedOn ~= 0 and participant.Money >= participant.Round.BoardConfiguration.JailFine then
-        participant:TransferMoneyTo("Bank", participant.Round.BoardConfiguration.JailFine, true)
-
-        SendNotification(`[PLAYER] paid a fine of {GetCurrencySymbol()}{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
-        LeaveJail(participant)
+    if not participant:CanPlayMove("Fine") then
+        return
     end
+
+    participant:TransferMoneyTo("Bank", participant.Round.BoardConfiguration.JailFine, true)
+
+    SendNotification(`[PLAYER] paid a fine of {GetCurrencySymbol()}{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
+    LeaveJail(participant)
 end
 
 local function GetTheDub(participant: Types.Participant): ()
@@ -650,6 +653,17 @@ local function RemoveParticipant(participant: Types.Participant): ()
     end
 end
 
+local function CanPlayMove(participant: Types.Participant, move: "Dice" | "JailCard" | "Fine"): boolean
+    if move == "Dice" then
+        return not participant.IsMoving
+    elseif move == "JailCard" then
+        return participant.JailCards > 0 and participant.JailedOn ~= 0
+    elseif move == "Fine" then
+        return participant.JailedOn ~= 0 and participant:CanAfford(participant.Round.BoardConfiguration.JailFine)
+    end
+    error("Invalid move")
+end
+
 function module.new(player: Player, round: Types.Round): Types.Participant
     local participant = {}
 
@@ -662,7 +676,6 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.Assets = {}
 
     participant.IsMoving = false
-    participant.LastMovedAt = 0
     participant.DoublesStreak = 0
     participant.PreviousPosition = 0
     participant.Position = 0
@@ -699,6 +712,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.HasDisconnected = false
 
     participant.RemoveParticipant = RemoveParticipant
+
+    participant.CanPlayMove = CanPlayMove
 
     participant.TradeManager = TradeManager.new(participant)
 
