@@ -96,7 +96,7 @@ round:StartRound()
 Players.PlayerRemoving:Connect(function(plr)
     local participant = round:TryGetParticipant(plr)
     if participant then
-        SendNotification(`[PLAYER] has left the game. Their assets will be auctioned off when their turn starts.`, {plr})
+        SendNotification(`{plr.Name} has left the game. Their assets will be auctioned off when their turn starts.`) -- todo: Format names correctly as per client settings. Can't just pass the player instance because they're gone
         participant.HasDisconnected = true
 
         if round.CurrentParticipant == participant then

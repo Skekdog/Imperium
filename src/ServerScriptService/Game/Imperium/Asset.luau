@@ -400,6 +400,8 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
             return
         end
 
+        assert(participant ~= asset.Owner, `Player {participant.Player.Name} tried to bid on their own property?`)
+
         ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAuction"):FireAllClients(participant.Player, amount)
 
         highestBidder = participant
@@ -422,6 +424,8 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
         end
         return
     end
+
+    assert(highestBidder ~= asset.Owner, `Player {highestBidder.Player.Name} somehow bid on their own property?`)
 
     SendNotification(`[PLAYER] won the auction for {asset.AssetDescription.Name} at {GetCurrencySymbol()}{highestBid}.`, {highestBidder.Player})
 
