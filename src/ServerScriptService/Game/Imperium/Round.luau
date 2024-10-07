@@ -46,7 +46,7 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
 
     local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
 
-    local playedMove: "Dice" | "JailCard" | "Fine"?
+    local playedMove: "Dice" | "JailCard" | "Fine" | "Skip"?
     local cons: {RBXScriptConnection} = {}
     local function clearCons(): ()
         for _, v in cons do
@@ -77,14 +77,14 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
 
     local start = GetTime()
 
-    while not playedMove and GetTime() < start + round.GameConfiguration.PlayerTurnTime and nextParticipant.IsInGame do
+    while not playedMove and GetTime() < start + round.GameConfiguration.PlayerTurnTime and not nextParticipant.HasDisconnected do
         task.wait()
     end
 
     clearCons()
 
     if not playedMove then
-        playedMove = "Dice"
+        playedMove = if nextParticipant.HasDisconnected then "Skip" else "Dice"
     end
     assert(playedMove)
 
@@ -95,6 +95,8 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
         nextParticipant:TryUseJailCard()
     elseif playedMove == "Fine" then
         nextParticipant:TryPayFine()
+    elseif playedMove == "Skip" then
+        StartNextParticipantTurn(round)
     end
 end
 
