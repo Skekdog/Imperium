@@ -617,7 +617,10 @@ local function RemoveParticipant(participant: Types.Participant): ()
         nextParticipant = round:SetNextParticipant()
     end
 
-    table.remove(round.Participants, table.find(round.Participants, participant))
+    local index = table.find(round.Participants, participant)
+    assert(index, `Invalid index for participant {participant.Player.Name}`)
+    table.remove(round.Participants, index)
+    
     participant.IsInGame = false
     participant.Player:SetAttribute("Status", "Spectating")
     participant.Player:SetAttribute("IsJailed", false)
