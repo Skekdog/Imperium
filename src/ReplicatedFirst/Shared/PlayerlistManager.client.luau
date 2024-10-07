@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
-local TradingUI = require(script.Parent.TradingUI)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local list = ui.List
@@ -23,8 +22,8 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	end
 
 	local status = plr:GetAttribute("Status") or "Spectating"
-	clone.Money.Text = tostring(plr:GetAttribute("Money"))
-	clone.Wins.Text = tostring(plr:GetAttribute("Wins"))
+	clone.Money.Text = tostring(plr:GetAttribute("Money") or 0)
+	clone.Wins.Text = tostring(plr:GetAttribute("Wins") or 0)
 
 	clone.Trade.Visible = status ~= "Spectating" and plr ~= Players.LocalPlayer
 
@@ -38,12 +37,8 @@ local function createPlr(plr: Player)
 	clone.Username.Text = "@"..plr.Name
 	clone.Username.TextColor3 = Color3.new()
 
-	clone.Money.Text = tostring(plr:GetAttribute("Money"))
-	clone.Wins.Text = tostring(plr:GetAttribute("Wins"))
-
-	clone.Trade.Activated:Connect(function()
-		TradingUI(plr)
-	end)
+	clone.Money.Text = tostring(plr:GetAttribute("Money") or 0)
+	clone.Wins.Text = tostring(plr:GetAttribute("Wins") or 0)
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
@@ -132,5 +127,7 @@ end
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
 
 local roundInfo = ui.Info.RoundInfo.Info
+
+--todo: Don't do this in the lobby
 roundInfo.Gamemode.Text = "Board Theme: " .. AwaitReplicatedAttribute("BoardTheme")
 roundInfo.Map.Text = "Map: " .. AwaitReplicatedAttribute("Map")

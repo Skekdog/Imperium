@@ -7,7 +7,6 @@ end
 
 local reg = UIManager.RegisterUI
 local un = UIManager.UnregisteredUIs
-reg(un.Playerlist)
 reg(un.CurrentTurnIndicator)
 reg(un.RollDice)
 reg(un.BuyProperty)
