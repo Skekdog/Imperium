@@ -56,7 +56,3 @@ StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Captures, false)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
 StarterGui:SetCore("ResetButtonCallback", false)
-
--- If we do not have this event, then the server fires various data sync events before the client begins listening, resulting in desync. This is a (bad) fix.
-task.wait(1)
-ReplicatedStorage:WaitForChild("Shared").ClientServer.RequestData:FireServer()
