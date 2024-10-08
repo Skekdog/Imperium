@@ -10,18 +10,7 @@ local UIManager = require(ReplicatedFirst.Shared.UIManager)
 local ui = UIManager.WaitForUI("CurrentTurnIndicator")
 local object = ui.Object :: typeof(UIManager.UnregisteredUIs.CurrentTurnIndicator)
 
-local function setWaitingText(): ()
-    local text = ReplicatedStorage:GetAttribute("WaitingText") :: string?
-    if not text then
-        return
-    end
-
-    object.Frame.Turn.Text = text
-end
-ReplicatedStorage:GetAttributeChangedSignal("WaitingText"):Connect(setWaitingText)
-setWaitingText()
-
-ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
+local function setPlayerText(): ()
     local name = ReplicatedStorage:GetAttribute("CurrentPlayer") :: string?
     if not name then
         return
@@ -34,7 +23,20 @@ ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(function()
     end
 
     object.Frame.Turn.Text = `{GetPlayerName(player)}'s Turn`
-end)
+end
+
+local function setWaitingText(): ()
+    local text = ReplicatedStorage:GetAttribute("WaitingText") :: string?
+    if not text then
+        return setPlayerText()
+    end
+
+    object.Frame.Turn.Text = text
+end
+ReplicatedStorage:GetAttributeChangedSignal("WaitingText"):Connect(setWaitingText)
+setWaitingText()
+
+ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(setPlayerText)
 
 ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(function()
     local neededMoney = ReplicatedStorage:GetAttribute("NeededMoneyBankruptcy") :: number

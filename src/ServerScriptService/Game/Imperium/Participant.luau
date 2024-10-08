@@ -489,6 +489,7 @@ local function TryPlayMove(participant: Types.Participant): ()
     participant.IsMoving = true
 
     local function play()
+        SetWaitingText(nil, -1)
         SetTimeMilestone(nil)
         if participant.JailedOn ~= 0 then
             local jailLength = boardConfig.JailLength
