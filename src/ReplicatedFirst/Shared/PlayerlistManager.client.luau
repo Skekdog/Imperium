@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
@@ -128,6 +129,10 @@ game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, fal
 
 local roundInfo = ui.Info.RoundInfo.Info
 
---todo: Don't do this in the lobby
-roundInfo.Gamemode.Text = "Board Theme: " .. AwaitReplicatedAttribute("BoardTheme")
-roundInfo.Map.Text = "Map: " .. AwaitReplicatedAttribute("Map")
+if IsLobby() then
+	roundInfo.Gamemode.Text = "Board Theme: Lobby"
+	roundInfo.Map.Text = "Map: Lobby"
+else
+	roundInfo.Gamemode.Text = "Board Theme: " .. AwaitReplicatedAttribute("BoardTheme")
+	roundInfo.Map.Text = "Map: " .. AwaitReplicatedAttribute("Map")
+end
