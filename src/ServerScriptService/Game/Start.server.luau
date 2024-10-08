@@ -51,7 +51,9 @@ local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
 
 PhysicsService:RegisterCollisionGroup("Characters")
+PhysicsService:RegisterCollisionGroup("Dice")
 PhysicsService:CollisionGroupSetCollidable("Characters", "Characters", false)
+PhysicsService:CollisionGroupSetCollidable("Dice", "Characters", false)
 local function disableCollision(part: Instance): ()
     if part:IsA("BasePart") then
         part.CollisionGroup = "Characters"

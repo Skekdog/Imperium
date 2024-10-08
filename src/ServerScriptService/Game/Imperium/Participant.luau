@@ -409,6 +409,7 @@ local diceMap = {
 
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
     PlaySound("DiceRoll")
+    ServerStorage.Game.Dice.CollisionGroup = "Dice"
     local dice1 = ServerStorage.Game.Dice:Clone()
     local dice2 = ServerStorage.Game.Dice:Clone()
 
