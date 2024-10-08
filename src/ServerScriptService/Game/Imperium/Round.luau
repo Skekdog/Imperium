@@ -12,10 +12,10 @@ local module = {}
 local function SetNextParticipant(round: Types.Round): Types.Participant
     local lastIndex: number? = 0
     if round.CurrentParticipant then
-        lastIndex = table.find(round.Participants, round.CurrentParticipant)
         if #Players:GetPlayers() < 1 then
             task.wait(100) -- Do not continue the game
         end
+        lastIndex = table.find(round.Participants, round.CurrentParticipant)
         assert(lastIndex, "Round has no current participant")
     end
     assert(lastIndex)
