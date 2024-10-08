@@ -58,7 +58,7 @@ local GoToJailIcon = "rbxassetid://114111426528418"
 local FreeParkingIcon = "rbxassetid://138390415994185"
 
 local function GetRentForUtility(asset: Types.Asset, participant: Types.Participant): number
-    local roll = math.abs(participant.Position - participant.PreviousPosition)
+    local roll = participant.LastRoll.Result
 
     local ownedUtilities = 0
     for _, asset in participant.Assets do

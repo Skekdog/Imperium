@@ -449,10 +449,14 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
 
     SendNotification(`[PLAYER] rolled a {result}.` .. if isDoubles then " Doubles!" else "", {participant.Player})
 
-    return {
+    local diceRollResult = {
         Result = result,
         IsDoubles = isDoubles,
     }
+
+    participant.LastRoll = diceRollResult
+
+    return diceRollResult
 end
 
 local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
@@ -714,6 +718,10 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.RemoveParticipant = RemoveParticipant
 
     participant.CanPlayMove = CanPlayMove
+    participant.LastRoll = {
+        Result = 0,
+        IsDoubles = false,
+    }
 
     participant.TradeManager = TradeManager.new(participant)
 
