@@ -1,3 +1,4 @@
+local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -161,7 +162,11 @@ local castParams = RaycastParams.new()
 castParams.FilterDescendantsInstances = {workspace:WaitForChild("Board")}
 castParams.FilterType = Enum.RaycastFilterType.Include
 
-ControlManager.Register("View Board Property", false, function()
+ContextActionService:BindAction("View Board Property", function(_, state, input)
+    if state ~= Enum.UserInputState.End then
+        return Enum.ContextActionResult.Pass
+    end
+
     local mousePos = UserInputService:GetMouseLocation()
 
     local ray = workspace.CurrentCamera:ViewportPointToRay(mousePos.X, mousePos.Y)
@@ -179,5 +184,6 @@ ControlManager.Register("View Board Property", false, function()
     end
 
     ViewDeed()
+
     return Enum.ContextActionResult.Pass
-end)
+end, false, Enum.UserInputType.MouseButton1, Enum.UserInputType.Touch)

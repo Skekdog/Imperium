@@ -184,15 +184,6 @@ module.AvailableSettings = {
 		SpecifyToggle = true,
 		Default = {Keycodes = {Enum.KeyCode.B, Enum.KeyCode.ButtonR1}, Toggled = true},
 	},
-	{
-		Name = "View Board Property",
-		Tab = "Keybinds",
-		Category = "Menus - Enable the checkbox to make a keybind toggled",
-		Tooltip = "Opens the property deed at the current mouse position.",
-		PossibleValues = "Keybind",
-		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.UserInputType.MouseButton1}, Toggled = true},
-	},
 } :: {SettingDefinition}
 
 
