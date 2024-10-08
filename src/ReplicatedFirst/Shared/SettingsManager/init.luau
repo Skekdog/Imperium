@@ -47,7 +47,7 @@ module.AvailableSettings = {
 		Default = false,
 		Callback = function(val)
 			if not IsLobby() then
-				Lighting.ClockTime = 0
+				Lighting.ClockTime = if val then 0 else 14
 			end
 		end,
 	},
