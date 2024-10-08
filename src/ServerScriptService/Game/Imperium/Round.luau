@@ -13,6 +13,9 @@ local function SetNextParticipant(round: Types.Round): Types.Participant
     local lastIndex: number? = 0
     if round.CurrentParticipant then
         lastIndex = table.find(round.Participants, round.CurrentParticipant)
+        if #Players:GetPlayers() < 1 then
+            task.wait(math.huge) -- Do not continue the game
+        end
         assert(lastIndex, "Round has no current participant")
     end
     assert(lastIndex)
