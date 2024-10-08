@@ -482,10 +482,8 @@ local function TryPlayMove(participant: Types.Participant): ()
 
     participant.IsMoving = true
 
-    SetTimeMilestone(nil)
-    ReplicatedStorage:SetAttribute("CurrentPlayer", nil)
-
     local function play()
+        SetTimeMilestone(nil)
         if participant.JailedOn ~= 0 then
             local jailLength = boardConfig.JailLength
             if participant.Round.Turn - participant.JailedOn >= jailLength then
