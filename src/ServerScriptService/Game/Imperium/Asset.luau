@@ -466,6 +466,12 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         view.HousePrice = houseCost
     end
 
+    if asset.Hotels > 0 then
+        view.SellHotelValue = TryGetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
+    elseif asset.Houses > 0 then
+        view.SellHouseValue = TryGetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
+    end
+
     local sellAllValue = getSellAllValue(asset)
 
     if sellAllValue > 0 then
