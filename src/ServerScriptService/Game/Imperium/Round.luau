@@ -43,6 +43,7 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     end
 
     ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
+    SetWaitingText(nil, -1)
     SetTimeMilestone(round.GameConfiguration.PlayerTurnTime)
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireAllClients(nextParticipant.Player.Name)
