@@ -445,7 +445,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     end)
 
     local result = roll1 + roll2
-    local isDoubles = roll1 == roll2
+    local isDoubles = true --roll1 == roll2
 
     SendNotification(`[PLAYER] rolled a {result}.` .. if isDoubles then " Doubles!" else "", {participant.Player})
 
@@ -467,6 +467,8 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
             animateJailBars(participant.Round, true)
         end
     end
+
+    moveCharacter(participant.Player.Character, participant.Board:FindTileByName("Jail"), true, nil, false)
 
     if not skipTurn then
         participant:TryPlayMove()
