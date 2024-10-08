@@ -91,7 +91,6 @@ SetWaitingText("Starting soon...", INTERMISSION_DURATION)
 task.wait(INTERMISSION_DURATION)
 
 SetWaitingText(nil, 0)
-round:StartRound()
 
 Players.PlayerRemoving:Connect(function(plr)
     local participant = round:TryGetParticipant(plr)
@@ -185,3 +184,5 @@ gameClientServer.UnmortgageProperty.OnServerEvent:Connect(function(plr, property
 
     asset:TryUnMortgage()
 end)
+
+round:StartRound()

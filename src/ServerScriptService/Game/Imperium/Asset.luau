@@ -318,7 +318,7 @@ local function TryMortgage(asset: Types.Asset): ()
     end
 
     for _, v in asset.Owner.Assets do
-        if v:HasAnyDevelopments() then
+        if v.AssetDescription.Colour == asset.AssetDescription.Colour and v:HasAnyDevelopments() then
             return
         end
     end
