@@ -1,5 +1,7 @@
 local HTTPService = game:GetService("HttpService")
+local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
+local IsLobby = require(script.Parent.IsLobby)
 
 export type SettingDefinition = {
 	Name: string,
@@ -35,6 +37,19 @@ module.AvailableSettings = {
 		Callback = function(val) -- Can't directly reference this because cyclic dependency!
 			require(script.Parent.ThemesManager).UpdateTheme(val)
 		end :: any,
+	},
+	{
+		Name = "Night Sky",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "Enables or disables the night sky.",
+		PossibleValues = "Boolean",
+		Default = false,
+		Callback = function(val)
+			if not IsLobby() then
+				Lighting.ClockTime = 0
+			end
+		end,
 	},
 	{
 		Name = "Player Names",
