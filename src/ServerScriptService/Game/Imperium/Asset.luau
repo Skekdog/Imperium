@@ -298,6 +298,15 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
         if v.AssetDescription.Colour ~= asset.AssetDescription.Colour then
             continue
         end
+
+        for i = 1, v.Houses do
+            tryRemoveDevelopmentModel(v, "House", i, true)
+        end
+
+        for i = 1, v.Hotels do
+            tryRemoveDevelopmentModel(v, "Hotel", i, true)
+        end
+
         v.Houses = 0
         v.Hotels = 0
     end
