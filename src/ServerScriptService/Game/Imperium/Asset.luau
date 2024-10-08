@@ -317,8 +317,13 @@ local function TryMortgage(asset: Types.Asset): ()
         return
     end
 
+    for _, v in asset.Owner.Assets do
+        if v:HasAnyDevelopments() then
+            return
+        end
+    end
+
     asset.IsMortgaged = true
-    asset:TrySellAllDevelopments()
 
     local tile = asset.Owner.Round.Board:TryFindTileByName(asset.AssetDescription.Name)
     assert(tile, "Asset is not on a tile");

@@ -4,7 +4,10 @@ local ScreenMessage = require(script.Parent.Parent.Shared.ScreenMessage)
 local module = {}
 
 local clientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
-function module.Mortgage(name: string): ()
+function module.Mortgage(name: string, isSellAllVisible: boolean): ()
+    if isSellAllVisible then
+        return ScreenMessage("Error", "You must sell all developments before mortgaging")
+    end
     clientServer:WaitForChild("MortgageProperty"):FireServer(name)
 end
 

@@ -115,7 +115,7 @@ local function updateView(asset: ClientTypes.ClientAssetView): ()
     elseif asset.MortgageValue then
         actions.Mortgage.Text = `Mortgage ({currency}{asset.MortgageValue})`
         actions.Mortgage.Visible = true
-        bindToClick(actions.Mortgage, function() AssetManagement.Mortgage(name) end)
+        bindToClick(actions.Mortgage, function() AssetManagement.Mortgage(name, actions.SellAll.Visible) end)
     else
         actions.Mortgage.Visible = false
     end
