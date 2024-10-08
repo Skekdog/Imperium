@@ -395,7 +395,7 @@ local function findSide(part: BasePart): string
 end
 
 local function genRandom(): number
-    return math.random(-100, 100) * 50
+    return math.random(-100, 100) * 200
 end
 
 local diceMap = {
@@ -420,7 +420,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     local num = 0
     local function throwDice(dice: typeof(dice1))
         num += 1
-        dice.CFrame = CFrame.new(num * 5, 100, num * 5)
+        dice.CFrame = CFrame.new(num * 7.5, 100, num * 7.5)
 
         dice.Parent = diceFolder
         dice.Parent.Name = "Dice"
