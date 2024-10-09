@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -27,6 +28,10 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	clone.Wins.Text = tostring(plr:GetAttribute("Wins") or 0)
 
 	clone.Trade.Visible = status ~= "Spectating" and plr ~= Players.LocalPlayer
+
+	clone.Trade.Activated:Connect(function()
+		ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("TradeRequest"):FireServer(plr)
+	end)
 
 	movePlr(plr, status :: any)
 end
