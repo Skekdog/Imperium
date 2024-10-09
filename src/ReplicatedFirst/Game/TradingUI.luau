@@ -68,6 +68,8 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Pla
                 retractAsset(button, asset)
             end
         end)
+    elseif plr == currentTrader and not button.Parent then
+        button.Parent = theirItems :: any
     end
 end)
 
