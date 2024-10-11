@@ -22,6 +22,7 @@ if not info then
         TurnTime = GameConfiguration.TurnTime.Default,
         AuctionTime = GameConfiguration.AuctionTime.Default,
         BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
+        StartingMoney = GameConfiguration.StartingMoney.Default,
         Map = GameConfiguration.Map.Default,
         Board = GameConfiguration.Board.Default,
     } :: Teleport.GameInfo
@@ -87,6 +88,7 @@ local round = Round.new(board, tiles, {
     PlayerTurnTime = info.TurnTime,
     AuctionTime = info.AuctionTime,
     BankruptcyTime = info.BankruptcyTime,
+    StartingMoney = info.StartingMoney,
 })
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)

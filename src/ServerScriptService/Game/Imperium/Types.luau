@@ -17,7 +17,6 @@ export type BoardConfiguration = {
     HousePrices: {[string]: number},
 
     StartingJailCards: number,
-    StartingMoney: number,
     PassGoMoney: number,
 
     JailFine: number,
@@ -36,6 +35,7 @@ export type GameConfiguration = {
     AuctionTime: number,
     PlayerTurnTime: number,
     BankruptcyTime: number,
+    StartingMoney: number,
 }
 
 export type AssetDescription = {

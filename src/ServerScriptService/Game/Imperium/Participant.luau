@@ -678,7 +678,7 @@ function module.new(player: Player, round: Types.Round): Types.Participant
     participant.Board = round.Board
 
     participant.JailCards = round.BoardConfiguration.StartingJailCards
-    participant.Money = round.BoardConfiguration.StartingMoney
+    participant.Money = round.GameConfiguration.StartingMoney
     participant.Assets = {}
 
     participant.IsMoving = false

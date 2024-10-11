@@ -11,6 +11,7 @@ export type Setting = {
 export type Settings = {[string]: Setting}
 
 export type SerialisedSettings = {
+    StartingMoney: number,
     TurnTime: number,
     AuctionTime: number,
     BankruptcyTime: number,
@@ -19,6 +20,15 @@ export type SerialisedSettings = {
 }
 
 local settings: Settings = {
+    StartingMoney = {
+        Name = "StartingMoney",
+        DisplayName = "Starting Money",
+        Default = 1500,
+        PossibleValues = "number",
+        Max = 5000,
+        Min = 100,
+        Order = 0,
+    },
     Map = {
         Name = "Map",
         DisplayName = "Map",
