@@ -239,6 +239,10 @@ local function moveCharacter(participant: Types.Participant, char: Model?, tile:
 end
 
 local function DrawCard(participant: Types.Participant, card: Types.CardDescription, cardType: Types.CardType): ()
+    if participant.HasDisconnected then
+        return
+    end
+
     local position = participant.Board.Tiles[participant.Position].Model:GetPivot()
 
     local model = (ServerStorage.Game:FindFirstChild(cardType .. " Card") :: Types.CardModel):Clone()
@@ -261,7 +265,9 @@ local function DrawCard(participant: Types.Participant, card: Types.CardDescript
     task.wait(6)
     model:Destroy()
     
-    card.Effect(participant)
+    if not participant.HasDisconnected then
+        card.Effect(participant)
+    end
 end
 
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?, noRentPayment: boolean?): ()
