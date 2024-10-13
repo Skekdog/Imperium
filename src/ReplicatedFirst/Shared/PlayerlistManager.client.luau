@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetPlayerName = require(script.Parent.GetPlayerName)
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -40,7 +41,10 @@ local function createPlr(plr: Player)
 	local clone = ui.PlayerFrame:Clone()
 	players[plr.Name] = clone
 
-	clone.Username.Text = "@"..plr.Name
+	clone.Username:SetAttribute("Format", "[PLAYER]")
+	clone.Username:SetAttribute("Player_1", GetPlayerName(plr))
+	clone.Username:AddTag("DynamicNames")
+	
 	clone.Username.TextColor3 = Color3.new()
 
 	clone.Money.Text = tostring(plr:GetAttribute("Money") or 0)
