@@ -11,9 +11,5 @@ return function(descriptor: Player | string, mode: "Username" | "Display Name" |
             return descriptor
         end
     end
-    if descriptor.Name == descriptor.DisplayName then
-        return `@{descriptor.Name}`
-    else
-        return `{descriptor.DisplayName} (@{descriptor.Name})`
-    end
+    return `{descriptor.DisplayName} (@{descriptor.Name})`
 end
