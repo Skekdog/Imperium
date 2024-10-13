@@ -84,7 +84,11 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
     local board = round.Board
 
     local tileModel = board:FindTileByName(asset.AssetDescription.Name).Model :: Types.EdgeTile
-    tileModel.BaseUIPart.BaseUI.Owner.Text = if to == "Bank" then "" else GetPlayerName(to.Player):gsub(" ", "\n")
+    local label = tileModel.BaseUIPart.BaseUI.Owner
+
+    label:SetAttribute("Player_1", if to == "Bank" then nil else GetPlayerName(to.Player))
+    label:SetAttribute("Format", if to == "Bank" then "" else "[PLAYER]")
+    label:AddTag("DynamicNames")
 end
 
 local function TryGetDevelopmentCost(asset: Types.Asset, development: "House" | "Hotel", boardConfiguration: Types.BoardConfiguration): number?

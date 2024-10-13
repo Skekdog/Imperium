@@ -3,8 +3,8 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
+local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
-local GetPlayerName = require(ReplicatedFirst.Shared.GetPlayerName)
 local UIManager = require(ReplicatedFirst.Shared.UIManager)
 
 local ui = UIManager.WaitForUI("CurrentTurnIndicator")
@@ -22,7 +22,10 @@ local function setPlayerText(): ()
         return
     end
 
-    object.Frame.Turn.Text = `{GetPlayerName(player)}'s Turn`
+    local turnLabel = object.Frame.Turn
+    turnLabel:SetAttribute("Player_1", GetPlayerName(player))
+    turnLabel:SetAttribute("Format", "[PLAYER]'s Turn")
+    turnLabel:AddTag("DynamicNames")
 end
 
 local function setWaitingText(): ()

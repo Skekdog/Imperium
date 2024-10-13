@@ -154,7 +154,9 @@ return function(target: Player): ()
     youAccepted = false
     theyAccepted = false
 
-    object.ThemTitle.Text = GetPlayerName(target)
+    object.ThemTitle:SetAttribute("Player_1", GetPlayerName(target))
+    object.ThemTitle:SetAttribute("Format", "[PLAYER]")
+    object.ThemTitle:AddTag("DynamicNames")
 
     bindToClick(confirmButton, function()
         bidirectional:WaitForChild("AnswerTradeOffer"):FireServer(not youAccepted)

@@ -1,5 +1,5 @@
 local TweenService = game:GetService("TweenService")
-local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local GetPlayerName = require(script.Parent.GetPlayerName)
 local SettingsManager = require(script.Parent.Parent.Shared.SettingsManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -30,9 +30,20 @@ local function moveDown(frame: Frame)
 	end
 end
 
-local function makeLabel(text: string)
+local function makeLabel(text: string, players: {Player}?): ()
 	local label = ui.Label:Clone()
-	label.Text = text
+
+	if players then
+		for i, plr in players do
+			if plr then
+				label:SetAttribute("Player_" .. tostring(i), GetPlayerName(plr))
+			end
+		end
+	end
+
+	label:SetAttribute("Format", text)
+	label:AddTag("DynamicNames")
+
 	label:SetAttribute("TargetPosition", UDim2.fromScale(label.Position.X.Scale, 0))
 	label.Position = UDim2.fromScale(label.Position.X.Scale, -0.3)
 	label.BackgroundTransparency = 1
@@ -49,25 +60,25 @@ local function makeLabel(text: string)
 	task.delay(2, fade, label, true)
 end
 
-local function replacePlayers(str: string, players: {Player}): string
-    local i = 1
-    -- Replace [PLAYER] with the corresponding player name from the table
-    str = string.gsub(str, "%[PLAYER%]", function()
-        local playerName = GetPlayerName(players[i])
-        i = i + 1
-        return playerName or "[PLAYER]"
-    end)
-    return str
-end
-
-local function makeLog(msg: string): ()
+local function makeLog(msg: string, players: {Player}?): ()
 	local eventLog = UIManager.TryGetUI("EventLog") :: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.EventLog)})?
 	if not eventLog then
 		return
 	end
 
 	local label = eventLog.Object.ScrollingFrame.EventTemplate:Clone()
-	label.Text = msg
+
+	if players then
+		for i, plr in players do
+			if plr then
+				label:SetAttribute("Player_" .. tostring(i), GetPlayerName(plr))
+			end
+		end
+	end
+
+	label:SetAttribute("Format", msg)
+	label:AddTag("DynamicNames")
+	
 	label.Visible = true
 	label.LayoutOrder = #eventLog.Object.ScrollingFrame:GetChildren()
 
@@ -77,9 +88,6 @@ local function makeLog(msg: string): ()
 end
 
 return function(msg: string, players: {Player}?)
-	if players then
-		msg = replacePlayers(msg, players)
-	end
-	makeLabel(msg)
-	makeLog(msg)
+	makeLabel(msg, players)
+	makeLog(msg, players)
 end

@@ -30,7 +30,10 @@ gameServerClient:WaitForChild("StartAuction").OnClientEvent:Connect(resetAuction
 gameServerClient:WaitForChild("UpdateAuction").OnClientEvent:Connect(function(highestBidder: Player, highestBid: number)
     local currency = GetCurrencySymbol()
     object.CurrentBid.Text = currency .. highestBid
-    object.CurrentWinner.Text = GetPlayerName(highestBidder)
+
+    object.CurrentWinner:SetAttribute("Player_1", GetPlayerName(highestBidder))
+    object.CurrentWinner:SetAttribute("Format", "[PLAYER]")
+    object.CurrentWinner:AddTag("DynamicNames")
 end)
 
 local function parseValue(text: string): number

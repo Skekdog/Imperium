@@ -1,23 +1,19 @@
-local RunService = game:GetService("RunService")
-
-return function(player: Player): string
-    if RunService:IsClient() then
-        local SettingsManager = require(script.Parent.Parent.Shared.SettingsManager)
-        local mode = SettingsManager.GetSetting("Player Names") :: "Username" | "Display Name" | "Both"
-
+-- descriptor string is of format "DisplayName (@Name)"
+return function(descriptor: Player | string, mode: "Username" | "Display Name" | "Both"?): string
+    if typeof(descriptor) == "string" then
         if mode == "Username" then
-            return `{player.Name}`
+            return descriptor:split(" ")[2]:sub(3, -2)
         elseif mode == "Display Name" then
-            return `{player.DisplayName}`
+            return descriptor:split(" ")[1]
         elseif mode == "Both" then
-            return `{player.DisplayName} (@{player.Name})`
+            return descriptor
         else
-            return `@{player.Name}`
+            return descriptor
         end
     end
-    if player.Name == player.DisplayName then
-        return `@{player.Name}`
+    if descriptor.Name == descriptor.DisplayName then
+        return `@{descriptor.Name}`
     else
-        return `{player.DisplayName} (@{player.Name})`
+        return `{descriptor.DisplayName} (@{descriptor.Name})`
     end
 end

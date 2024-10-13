@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
-local Notification = require(script.Parent.Parent.Shared.Notification)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local Notification = require(script.Parent.Parent.Shared.Notification)
 local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -194,7 +194,10 @@ local function createLobbySlot(lobby: LobbyTypes.ClientLobby): ()
         updateSetting(slot, setting, value)
     end
 
-    slot.LobbyName.Text = `{GetPlayerName(lobby.Owner)}'s Lobby`
+    local lobbyNameLabel = slot.LobbyName
+    lobbyNameLabel:SetAttribute("Player_1", GetPlayerName(lobby.Owner))
+    lobbyNameLabel:SetAttribute("Format", "[PLAYER]'s Lobby")
+    lobbyNameLabel:AddTag("DynamicNames")
 
     lobbies[id] = slot
 

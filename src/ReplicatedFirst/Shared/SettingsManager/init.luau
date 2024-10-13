@@ -58,6 +58,10 @@ module.AvailableSettings = {
 		Tooltip = "Choose whether to show display names, usernames, or both.",
 		PossibleValues = {"Display Name", "Username", "Both"},
 		Default = "Display Name",
+		Callback = function(val)
+			local DynamicNames = require(script.Parent.DynamicNames)
+			DynamicNames.UpdateAll(val)
+		end
 	},
 	{
 		Name = "Animate UI Transitions",
