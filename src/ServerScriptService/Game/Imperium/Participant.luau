@@ -490,6 +490,10 @@ local function TryPlayMove(participant: Types.Participant): ()
     participant.IsMoving = true
 
     local function play()
+        if participant.HasDisconnected then
+            return
+        end
+
         SetWaitingText(nil, -1)
         SetTimeMilestone(nil)
         if participant.JailedOn ~= 0 then
@@ -500,6 +504,11 @@ local function TryPlayMove(participant: Types.Participant): ()
                 return play()
             else
                 local result = RollDice(participant)
+
+                if participant.HasDisconnected then
+                    return
+                end
+
                 if result.IsDoubles then
                     participant.DoublesStreak += 1
                     SendNotification("After rolling doubles, [PLAYER] is leaving jail.", {participant.Player})
@@ -511,6 +520,11 @@ local function TryPlayMove(participant: Types.Participant): ()
         end
 
         local result = RollDice(participant)
+
+        if participant.HasDisconnected then
+            return
+        end
+
         if result.IsDoubles then
             participant.DoublesStreak += 1
             local doublesLimit = boardConfig.DoublesConsecutiveJailAmount
