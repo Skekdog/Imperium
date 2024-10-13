@@ -191,7 +191,7 @@ local MAX_DIRECT_MOVE_DURATION = 8
 local MOVEMENT_EPSILON = 2.5
 local JAIL_EPSILON = 1.5
 local CHAR_HEIGHT = 3
-local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
+local function moveCharacter(participant: Types.Participant, char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
     if not char then
         return
     end
@@ -231,7 +231,7 @@ local function moveCharacter(char: Model?, tile: Types.Tile, direct: boolean?, e
         end
         hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
         task.wait() -- We don't need to wait really because MoveTo is blocking, but why not
-    until GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION
+    until (GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION) or participant.HasDisconnected
     
     if not reached then
         root.Position = targetPosition
@@ -267,6 +267,10 @@ end
 local function MoveTo(participant: Types.Participant, position: number, moveDirectly: boolean?, intialMove: boolean?, noRentPayment: boolean?): ()
     assert(position <= #participant.Board.Tiles and position > 0, `Participant {participant.Player} failed to move to position {position} as this exceeds the board limits`)
 
+    if participant.HasDisconnected then
+        return
+    end
+
     participant.PreviousPosition = participant.Position
     local passGo = (participant.Position == 1) or ((participant.Position > position) and (position ~= 1))
     if passGo and not moveDirectly and participant.Round.Turn ~= 1 then
@@ -297,21 +301,24 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         end
 
         for i = 1, rowDiff do
+            if participant.HasDisconnected then
+                return
+            end
             local nextCorner = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, numTiles), numTiles)
 
             currentPosition = nextCorner
             currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
 
             local nextTile = participant.Board.Tiles[currentPosition]
-            moveCharacter(participant.Player.Character, nextTile, false, GetTime() - startTime, isJailed)
+            moveCharacter(participant, participant.Player.Character, nextTile, false, GetTime() - startTime, isJailed)
         end
-        moveCharacter(participant.Player.Character, tile, nil, nil, isJailed)
+        moveCharacter(participant, participant.Player.Character, tile, nil, nil, isJailed)
     else
-        moveCharacter(participant.Player.Character, tile, moveDirectly, nil, isJailed)
+        moveCharacter(participant, participant.Player.Character, tile, moveDirectly, nil, isJailed)
     end
 
     local asset = tile.Asset
-    if asset then
+    if asset and not participant.HasDisconnected then
         local owner = asset.Owner
 
         if owner ~= participant then
@@ -473,7 +480,7 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
         end
     end
 
-    moveCharacter(participant.Player.Character, participant.Board:FindTileByName("Jail"), true, nil, false)
+    moveCharacter(participant, participant.Player.Character, participant.Board:FindTileByName("Jail"), true, nil, false)
 
     if not skipTurn then
         participant:TryPlayMove()
