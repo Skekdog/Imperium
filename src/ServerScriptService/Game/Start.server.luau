@@ -18,7 +18,7 @@ local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateS
 
 if not info then
     local temp = {
-        Players = if RunService:IsStudio() then 1 else 8,
+        Players = if RunService:IsStudio() then 3 else 8,
         TurnTime = GameConfiguration.TurnTime.Default,
         AuctionTime = GameConfiguration.AuctionTime.Default,
         BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
@@ -101,10 +101,6 @@ Players.PlayerRemoving:Connect(function(plr)
     if participant then
         SendNotification(`{plr.Name} has left the game. Their assets will be auctioned off when their turn starts.`) -- todo: Format names correctly as per client settings. Can't just pass the player instance because they're gone
         participant.HasDisconnected = true
-
-        if round.CurrentParticipant == participant then
-            participant:RemoveParticipant()
-        end
     end
 end)
 
