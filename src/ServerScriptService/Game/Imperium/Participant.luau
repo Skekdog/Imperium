@@ -325,7 +325,7 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         end
 
         if position < currentPosition and targetRow == currentRow and not moveDirectly then
-            rowDiff = 4
+            rowDiff += 3
         end
 
         for i = 1, rowDiff do
