@@ -35,6 +35,13 @@ local settings: Settings = {
         PossibleValues = {"Classic (UK)", "Classic (US)"},
         Order = 2,
     },
+    FreeParkingBonusEnabled = {
+        Name = "FreeParkingBonusEnabled",
+        DisplayName = "Free Parking Bonus",
+        Default = "Disabled",
+        PossibleValues = {"Enabled", "Disabled"},
+        Order = 3,
+    },
     StartingMoney = {
         Name = "StartingMoney",
         DisplayName = "Starting Money",
@@ -42,13 +49,6 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 5000,
         Min = 100,
-        Order = 3,
-    },
-    FreeParkingBonusEnabled = {
-        Name = "FreeParkingBonusEnabled",
-        DisplayName = "Free Parking Bonus",
-        Default = "Disabled",
-        PossibleValues = {"Enabled", "Disabled"},
         Order = 4,
     },
     TurnTime = {

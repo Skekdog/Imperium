@@ -336,7 +336,7 @@ for _, setting in GameConfiguration do
         local selectionSetting = settingsOverview.SelectionSettingTemplate:Clone()
 
         selectionSetting.Name = setting.Name
-        selectionSetting.Title.Text = setting.Name
+        selectionSetting.Title.Text = setting.DisplayName
         selectionSetting.LayoutOrder = setting.Order
 
         for i, v in setting.PossibleValues do
