@@ -30,6 +30,10 @@ local function GoToJail(tile: Types.TileDescription, participant: Types.Particip
     participant:SendToJail()
 end
 
+local function FreeParking(tile: Types.TileDescription, participant: Types.Participant): ()
+    participant:TryReceiveFreeParkingMoney()
+end
+
 local function TaxTile(tile: Types.TileDescription, participant: Types.Participant): ()
     if tile.Name == "Super Tax" then
         participant:TransferMoneyTo("Bank", 100)
@@ -418,6 +422,7 @@ module.Tiles = {
     {
         Name = "Free Parking",
         Icon = FreeParkingIcon,
+        OnEnter = FreeParking,
     },
     {
         AssetDescription = {

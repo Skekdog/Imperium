@@ -89,6 +89,7 @@ local round = Round.new(board, tiles, {
     AuctionTime = info.AuctionTime,
     BankruptcyTime = info.BankruptcyTime,
     StartingMoney = info.StartingMoney,
+    FreeParkingBonusEnabled = if info.FreeParkingBonusEnabled == "Enabled" then true else false,
 })
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)

@@ -57,6 +57,10 @@ local GoIcon = "rbxassetid://135653151798874"
 local GoToJailIcon = "rbxassetid://114111426528418"
 local FreeParkingIcon = "rbxassetid://138390415994185"
 
+local function FreeParking(tile: Types.TileDescription, participant: Types.Participant): ()
+    participant:TryReceiveFreeParkingMoney()
+end
+
 local function GetRentForUtility(asset: Types.Asset, participant: Types.Participant): number
     local roll = math.abs(participant.Position - participant.PreviousPosition)
 
@@ -418,6 +422,7 @@ module.Tiles = {
     {
         Name = "Free Parking",
         Icon = FreeParkingIcon,
+        OnEnter = FreeParking,
     },
     {
         AssetDescription = {

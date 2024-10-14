@@ -17,18 +17,10 @@ export type SerialisedSettings = {
     BankruptcyTime: number,
     Map: string,
     Board: string,
+    FreeParkingBonusEnabled: "Enabled" | "Disabled",
 }
 
 local settings: Settings = {
-    StartingMoney = {
-        Name = "StartingMoney",
-        DisplayName = "Starting Money",
-        Default = 1500,
-        PossibleValues = "number",
-        Max = 5000,
-        Min = 100,
-        Order = 0,
-    },
     Map = {
         Name = "Map",
         DisplayName = "Map",
@@ -43,6 +35,22 @@ local settings: Settings = {
         PossibleValues = {"Classic (UK)", "Classic (US)"},
         Order = 2,
     },
+    StartingMoney = {
+        Name = "StartingMoney",
+        DisplayName = "Starting Money",
+        Default = 1500,
+        PossibleValues = "number",
+        Max = 5000,
+        Min = 100,
+        Order = 3,
+    },
+    FreeParkingBonusEnabled = {
+        Name = "FreeParkingBonusEnabled",
+        DisplayName = "Free Parking Bonus",
+        Default = "Disabled",
+        PossibleValues = {"Enabled", "Disabled"},
+        Order = 4,
+    },
     TurnTime = {
         Name = "TurnTime",
         DisplayName = "Turn Time",
@@ -50,7 +58,7 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 45,
         Min = 5,
-        Order = 3,
+        Order = 5,
     },
     AuctionTime = {
         Name = "AuctionTime",
@@ -59,7 +67,7 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 25,
         Min = 5,
-        Order = 4,
+        Order = 6,
     },
     BankruptcyTime = {
         Name = "BankruptcyTime",
@@ -68,7 +76,7 @@ local settings: Settings = {
         PossibleValues = "number",
         Max = 180,
         Min = 30,
-        Order = 5,
+        Order = 7,
     }
 }
 

@@ -36,6 +36,7 @@ export type GameConfiguration = {
     PlayerTurnTime: number,
     BankruptcyTime: number,
     StartingMoney: number,
+    FreeParkingBonusEnabled: boolean,
 }
 
 export type AssetDescription = {
@@ -176,7 +177,7 @@ export type Participant = {
     GiveJailCards: (Participant, amount: number) -> (),
     GiveMoney: (Participant, amount: number) -> (),
 
-    TransferMoneyTo: (Participant, to: AssetOwner, amount: number, noNotification: boolean?) -> (),
+    TransferMoneyTo: (Participant, to: AssetOwner | "FreeParking", amount: number, noNotification: boolean?) -> (),
     TransferJailCards: (Participant, to: AssetOwner, amount: number) -> (),
 
     DrawCard: (Participant, card: CardDescription, cardType: CardType) -> (),
@@ -191,6 +192,8 @@ export type Participant = {
 
     HasMonopoly: (Participant, colour: string) -> boolean,
     CanAfford: (Participant, amount: number) -> boolean,
+
+    TryReceiveFreeParkingMoney: (Participant) -> (),
 
     RemoveParticipant: (Participant) -> (),
 }
@@ -211,6 +214,8 @@ export type Round = {
     Board: Board,
     Started: boolean,
     Turn: Turn,
+
+    FreeParkingMoney: number,
    
     Participants: {Participant},
     CurrentParticipant: Participant?,

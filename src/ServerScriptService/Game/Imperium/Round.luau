@@ -155,6 +155,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.BoardConfiguration = boardConfiguration
     round.GameConfiguration = gameConfiguration
 
+    round.FreeParkingMoney = 0
     round.Started = false
     round.Turn = 0
 

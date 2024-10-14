@@ -158,32 +158,53 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
     return true
 end
 
-local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner, amount: number, noNotification: boolean?): ()
+local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOwner | "FreeParking", amount: number, noNotification: boolean?): ()
     assert(to ~= participant, "Can't transfer money to same participant")
     if amount == 0 then
         return
     end
     
     if not participant:CanAfford(amount) then
-        local survived = BankruptcyWarning(participant, amount, to)
+        local survived = BankruptcyWarning(participant, amount, if typeof(to) == "string" then "Bank" else to)
         if not survived then
             return
         end
     end
     if not noNotification then
         local players = {participant.Player}
-        if to ~= "Bank" then
+        if typeof(to) ~= "string" then
             table.insert(players, to.Player)
         end
 
         local lt = amount < 0
-        SendNotification(`[PLAYER] {if lt then "received" else "paid"} {GetCurrencySymbol()}{math.abs(amount)} {if lt then "from" else "to"} {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
+        local notif: string
+        if to == "FreeParking" then
+            if lt then
+                notif = `[PLAYER] paid a fine of {GetCurrencySymbol()}{math.abs(amount)} {if participant.Round.GameConfiguration.FreeParkingBonusEnabled then "to free parking" else ""}.`
+            else
+                notif = `[PLAYER] received {GetCurrencySymbol()}{math.abs(amount)} {if participant.Round.GameConfiguration.FreeParkingBonusEnabled then "from free parking" else ""}.`
+            end
+        else
+            notif = `[PLAYER] {if lt then "received" else "paid"} {GetCurrencySymbol()}{math.abs(amount)} {if lt then "from" else "to"} {if to == "Bank" then "the bank" else "[PLAYER]"}.`
+        end
+        SendNotification(notif, players)
     end
 
     GiveMoney(participant, -amount)
-    if to ~= "Bank" then
+    if typeof(to) ~= "string" then
         GiveMoney(to, amount)
     end
+end
+
+local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
+    local round = participant.Round
+
+    if participant.HasDisconnected or not round.GameConfiguration.FreeParkingBonusEnabled then
+        return
+    end
+
+    participant:GiveMoney(round.FreeParkingMoney)
+    round.FreeParkingMoney = 0
 end
 
 local MAX_MOVE_DURATION = 15
@@ -751,6 +772,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
         Result = 0,
         IsDoubles = false,
     }
+
+    participant.TryReceiveFreeParkingMoney = TryReceiveFreeParkingMoney
 
     participant.TradeManager = TradeManager.new(participant)
 
