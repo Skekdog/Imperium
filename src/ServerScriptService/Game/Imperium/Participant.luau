@@ -212,7 +212,8 @@ local MAX_DIRECT_MOVE_DURATION = 8
 local MOVEMENT_EPSILON = 2.5
 local JAIL_EPSILON = 1.5
 local CHAR_HEIGHT = 3
-local function moveCharacter(participant: Types.Participant, char: Model?, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
+local function moveCharacter(participant: Types.Participant, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
+    local char = participant.Player.Character
     if not char then
         return
     end
@@ -337,11 +338,11 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
             currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
 
             local nextTile = participant.Board.Tiles[currentPosition]
-            moveCharacter(participant, participant.Player.Character, nextTile, false, GetTime() - startTime, isJailed)
+            moveCharacter(participant, nextTile, false, GetTime() - startTime, isJailed)
         end
-        moveCharacter(participant, participant.Player.Character, tile, nil, nil, isJailed)
+        moveCharacter(participant, tile, nil, nil, isJailed)
     else
-        moveCharacter(participant, participant.Player.Character, tile, moveDirectly, nil, isJailed)
+        moveCharacter(participant, tile, moveDirectly, nil, isJailed)
     end
 
     local asset = tile.Asset
@@ -507,7 +508,7 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
         end
     end
 
-    moveCharacter(participant, participant.Player.Character, participant.Board:FindTileByName("Jail"), true, nil, false)
+    moveCharacter(participant, participant.Board:FindTileByName("Jail"), true, nil, false)
 
     if not skipTurn then
         participant:TryPlayMove()
