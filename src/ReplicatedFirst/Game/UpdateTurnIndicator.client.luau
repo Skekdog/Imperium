@@ -34,7 +34,8 @@ local function setWaitingText(): ()
         return setPlayerText()
     end
 
-    object.Frame.Turn.Text = text
+    object.Frame.Turn:SetAttribute("Format", text)
+    object.Frame.Turn:AddTag("DynamicNames")
 end
 ReplicatedStorage:GetAttributeChangedSignal("WaitingText"):Connect(setWaitingText)
 setWaitingText()
