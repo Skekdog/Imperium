@@ -633,7 +633,7 @@ local function TryPayFine(participant: Types.Participant): ()
         return
     end
 
-    participant:TransferMoneyTo("Bank", participant.Round.BoardConfiguration.JailFine, true)
+    participant:TransferMoneyTo("FreeParking", participant.Round.BoardConfiguration.JailFine, true)
 
     SendNotification(`[PLAYER] paid a fine of {GetCurrencySymbol()}{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
     LeaveJail(participant)
