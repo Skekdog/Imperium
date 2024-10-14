@@ -299,6 +299,16 @@ ui.Object.Create.TextButton.Activated:Connect(function()
     switchView("HostView")
 end)
 
+local confirmTeleport = UIManager.WaitForUI("ConfirmTeleport") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.ConfirmTeleport)}
+ui.Object.OtherGames.Thumbnail.Activated:Connect(function()
+    confirmTeleport:ToggleVisible()
+end)
+
+confirmTeleport.Object.Yes.Activated:Connect(function()
+    clientServer:WaitForChild("TeleportToTYT"):FireServer()
+    confirmTeleport:ToggleVisible()
+end)
+
 hostView.Start.Activated:Connect(function()
     PlayClickSound()
     clientServer.StartLobby:FireServer()

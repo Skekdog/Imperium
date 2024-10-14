@@ -7,3 +7,4 @@ end
 
 UIManager.RegisterUI(UIManager.UnregisteredUIs.LobbyUI)
 UIManager.RegisterUI(UIManager.UnregisteredUIs.Notification)
+UIManager.RegisterUI(UIManager.UnregisteredUIs.ConfirmTeleport)
