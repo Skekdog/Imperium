@@ -179,10 +179,10 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
         local lt = amount < 0
         local notif: string
         if to == "FreeParking" then
-            if lt then
-                notif = `[PLAYER] paid a fine of {GetCurrencySymbol()}{math.abs(amount)} {if participant.Round.GameConfiguration.FreeParkingBonusEnabled then "to free parking" else ""}.`
+            if not lt then
+                notif = `[PLAYER] paid a fine of {GetCurrencySymbol()}{math.abs(amount)}{if participant.Round.GameConfiguration.FreeParkingBonusEnabled then " to free parking" else ""}.`
             else
-                notif = `[PLAYER] received {GetCurrencySymbol()}{math.abs(amount)} {if participant.Round.GameConfiguration.FreeParkingBonusEnabled then "from free parking" else ""}.`
+                notif = `[PLAYER] received {GetCurrencySymbol()}{math.abs(amount)}{if participant.Round.GameConfiguration.FreeParkingBonusEnabled then " from free parking" else ""}.`
             end
         else
             notif = `[PLAYER] {if lt then "received" else "paid"} {GetCurrencySymbol()}{math.abs(amount)} {if lt then "from" else "to"} {if to == "Bank" then "the bank" else "[PLAYER]"}.`
