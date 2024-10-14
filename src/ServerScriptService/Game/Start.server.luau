@@ -25,6 +25,7 @@ if not info then
         StartingMoney = GameConfiguration.StartingMoney.Default,
         Map = GameConfiguration.Map.Default,
         Board = GameConfiguration.Board.Default,
+        FreeParkingBonusEnabled = GameConfiguration.FreeParkingBonusEnabled.Default,
     } :: Teleport.GameInfo
     info = temp
 end

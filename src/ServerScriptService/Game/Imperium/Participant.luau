@@ -193,6 +193,8 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
     GiveMoney(participant, -amount)
     if typeof(to) ~= "string" then
         GiveMoney(to, amount)
+    elseif to == "FreeParking" then
+        participant.Round.FreeParkingMoney += amount
     end
 end
 
@@ -203,7 +205,7 @@ local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
         return
     end
 
-    participant:GiveMoney(round.FreeParkingMoney)
+    participant:TransferMoneyTo("FreeParking", -round.FreeParkingMoney)
     round.FreeParkingMoney = 0
 end
 

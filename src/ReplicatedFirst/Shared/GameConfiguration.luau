@@ -17,7 +17,7 @@ export type SerialisedSettings = {
     BankruptcyTime: number,
     Map: string,
     Board: string,
-    FreeParkingBonusEnabled: "Enabled" | "Disabled",
+    FreeParkingBonusEnabled: string,
 }
 
 local settings: Settings = {
