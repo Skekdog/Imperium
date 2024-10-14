@@ -564,7 +564,7 @@ local function TryPlayMove(participant: Types.Participant): ()
             participant.DoublesStreak += 1
             local doublesLimit = boardConfig.DoublesConsecutiveJailAmount
             if participant.DoublesStreak >= doublesLimit then
-                SendNotification(`[PLAYER] rolled doubles {doublesLimit} times and was sent to jail.`, {participant.Player})
+                SendNotification(`[PLAYER] rolled doubles {doublesLimit} times in a row and was sent to jail.`, {participant.Player})
                 return SendToJail(participant)
             end
 
