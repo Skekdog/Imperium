@@ -319,14 +319,18 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         local currentPosition = participant.PreviousPosition
         local currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
 
-        local rowDiff = math.max(targetRow - currentRow, 1)
-        if targetRow == currentRow and position > currentPosition then
+        local rowDiff: number?
+        if moveDirectly or (currentPosition < position and targetRow == currentRow) then
             rowDiff = 0
+        elseif targetRow == currentRow then
+            rowDiff = 4
+        elseif targetRow < currentRow then
+            rowDiff = 4 - math.abs(targetRow - currentRow)
+        elseif targetRow > currentRow then
+            rowDiff = math.abs(targetRow - currentRow)
         end
 
-        if position < currentPosition and targetRow == currentRow and not moveDirectly then
-            rowDiff += 3
-        end
+        assert(rowDiff, "Failed to calculate row difference")
 
         for i = 1, rowDiff do
             if participant.HasDisconnected then
@@ -560,7 +564,7 @@ local function TryPlayMove(participant: Types.Participant): ()
             return
         end
 
-        if result.IsDoubles then
+        if false and result.IsDoubles then
             participant.DoublesStreak += 1
             local doublesLimit = boardConfig.DoublesConsecutiveJailAmount
             if participant.DoublesStreak >= doublesLimit then
