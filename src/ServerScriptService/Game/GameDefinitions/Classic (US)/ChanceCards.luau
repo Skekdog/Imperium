@@ -111,7 +111,7 @@ module[11] = {
 module[12] = {
     Title = "Pay poor tax of $15.",
     Effect = function(participant: Types.Participant): ()
-        participant:TransferMoneyTo("Bank", 15)
+        participant:TransferMoneyTo("FreeParking", 15)
     end
 }
 

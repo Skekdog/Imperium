@@ -36,9 +36,9 @@ end
 
 local function TaxTile(tile: Types.TileDescription, participant: Types.Participant): ()
     if tile.Name == "Super Tax" then
-        participant:TransferMoneyTo("Bank", 100)
+        participant:TransferMoneyTo("FreeParking", 100)
     elseif tile.Name == "Income Tax" then
-        participant:TransferMoneyTo("Bank", 200)
+        participant:TransferMoneyTo("FreeParking", 200)
     end
 end
 
