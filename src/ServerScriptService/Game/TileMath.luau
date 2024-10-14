@@ -19,7 +19,7 @@ function module.GetLastCornerPosition(position: number, numTiles: number): numbe
 end
 
 function module.GetWrapAround(position: number, numTiles: number): number
-    return math.max(position % (numTiles + 1), 1)
+    return ((position - 1) % numTiles) + 1
 end
 
 return module

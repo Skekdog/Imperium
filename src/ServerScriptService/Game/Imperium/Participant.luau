@@ -564,7 +564,7 @@ local function TryPlayMove(participant: Types.Participant): ()
             return
         end
 
-        if false and result.IsDoubles then
+        if result.IsDoubles then
             participant.DoublesStreak += 1
             local doublesLimit = boardConfig.DoublesConsecutiveJailAmount
             if participant.DoublesStreak >= doublesLimit then
