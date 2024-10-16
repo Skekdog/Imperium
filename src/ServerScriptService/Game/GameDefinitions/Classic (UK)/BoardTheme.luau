@@ -62,10 +62,11 @@ local GoToJailIcon = "rbxassetid://114111426528418"
 local FreeParkingIcon = "rbxassetid://138390415994185"
 
 local function GetRentForUtility(asset: Types.Asset, participant: Types.Participant): number
+    assert(asset.Owner ~= "Bank", "Cannot get rent for utility owned by bank")
     local roll = participant.LastRoll.Result
 
     local ownedUtilities = 0
-    for _, asset in participant.Assets do
+    for _, asset in asset.Owner.Assets do
         if asset.AssetDescription.Colour == "Utility" then
             ownedUtilities += 1
         end
