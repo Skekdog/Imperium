@@ -151,7 +151,7 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
 end
 
 local animateDevelopmentRemote = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateDevelopmentModel")
-function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number, playSound: boolean): ()
+function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number, playSound: boolean, shouldReplaceWithHouses: boolean): ()
     assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
     local tile = asset.Owner.Round.Board:FindTileByName(asset.AssetDescription.Name)
 
@@ -167,7 +167,7 @@ function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "H
 
     animateDevelopmentRemote:FireAllClients(model, targetCFrame)
 
-    if development == "Hotel" then
+    if development == "Hotel" and shouldReplaceWithHouses then
         for i = 1, asset.Houses do
             addDevelopmentModel(asset, "House", i, false)
         end
@@ -191,7 +191,7 @@ function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel",
 
     if development == "Hotel" then
         for i = 1, asset.Houses do
-            tryRemoveDevelopmentModel(asset, "House", i, false)
+            tryRemoveDevelopmentModel(asset, "House", i, false, false)
         end
     end
 
@@ -244,11 +244,11 @@ local function TrySellDevelopment(asset: Types.Asset): ()
     local development: "House" | "Hotel"
     if asset.Hotels > 0 then
         development = "Hotel"
-        tryRemoveDevelopmentModel(asset, development, asset.Hotels, true)
+        tryRemoveDevelopmentModel(asset, development, asset.Hotels, true, true)
         asset.Hotels -= 1
     elseif asset.Houses > 0 then
         development = "House"
-        tryRemoveDevelopmentModel(asset, development, asset.Houses, true)
+        tryRemoveDevelopmentModel(asset, development, asset.Houses, true, false)
         asset.Houses -= 1
     else
         return
@@ -304,11 +304,11 @@ local function TrySellAllDevelopments(asset: Types.Asset): ()
         end
 
         for i = 1, v.Houses do
-            tryRemoveDevelopmentModel(v, "House", i, true)
+            tryRemoveDevelopmentModel(v, "House", i, true, false)
         end
 
         for i = 1, v.Hotels do
-            tryRemoveDevelopmentModel(v, "Hotel", i, true)
+            tryRemoveDevelopmentModel(v, "Hotel", i, true, false)
         end
 
         v.Houses = 0
