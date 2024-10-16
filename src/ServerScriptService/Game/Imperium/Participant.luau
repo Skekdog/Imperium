@@ -194,7 +194,7 @@ local function TransferMoneyTo(participant: Types.Participant, to: Types.AssetOw
     if typeof(to) ~= "string" then
         GiveMoney(to, amount)
     elseif to == "FreeParking" then
-        participant.Round.FreeParkingMoney += amount
+        participant.Round:SetFreeParkingMoney(participant.Round:GetFreeParkingMoney() + amount)
     end
 end
 
@@ -205,8 +205,8 @@ local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
         return
     end
 
-    participant:TransferMoneyTo("FreeParking", -round.FreeParkingMoney)
-    round.FreeParkingMoney = 0
+    participant:TransferMoneyTo("FreeParking", -round:GetFreeParkingMoney())
+    round:SetFreeParkingMoney(0)
 end
 
 local MAX_MOVE_DURATION = 15
@@ -521,6 +521,7 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
     end
 end
 
+local count = 0
 local function TryPlayMove(participant: Types.Participant): ()
     for _, v in participant.Round.Participants do
         assert(not v.IsMoving, `{v.Player.Name} is already moving`)
@@ -580,7 +581,14 @@ local function TryPlayMove(participant: Types.Participant): ()
             participant.DoublesStreak = 0
         end
 
-        MoveBy(participant, result.Result)
+        if count == 0 then
+            MoveToTileByName(participant, "Income Tax")
+        elseif count == 1 then
+            MoveToTileByName(participant, "Free Parking")
+        else
+            MoveBy(participant, result.Result)
+        end
+        count = count + 1
     end
 
     play()

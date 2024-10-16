@@ -148,6 +148,15 @@ local function StartRound(round: Types.Round): ()
     StartNextParticipantTurn(round)
 end
 
+local function SetFreeParkingMoney(round: Types.Round, amount: number): ()
+    round._freeParkingMoney = amount
+    ReplicatedStorage:SetAttribute("FreeParkingMoney", amount)
+end
+
+local function GetFreeParkingMoney(round: Types.Round): number
+    return round._freeParkingMoney
+end
+
 function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     local round = {}
 
@@ -155,7 +164,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.BoardConfiguration = boardConfiguration
     round.GameConfiguration = gameConfiguration
 
-    round.FreeParkingMoney = 0
+    round._freeParkingMoney = 0
     round.Started = false
     round.Turn = 0
 
@@ -167,6 +176,9 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.TryGetParticipant = TryGetParticipant
     round.StartRound = StartRound
     round.SetNextParticipant = SetNextParticipant
+
+    round.SetFreeParkingMoney = SetFreeParkingMoney
+    round.GetFreeParkingMoney = GetFreeParkingMoney
 
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))

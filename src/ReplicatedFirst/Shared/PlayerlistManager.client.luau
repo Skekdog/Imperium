@@ -141,7 +141,13 @@ local roundInfo = ui.Info.RoundInfo.Info
 if IsLobby() then
 	roundInfo.Gamemode.Text = "Board Theme: Lobby"
 	roundInfo.Map.Text = "Map: Lobby"
+	roundInfo.FreeParkingMoney.Text = "Free Parking Money: Disabled"
 else
 	roundInfo.Gamemode.Text = "Board Theme: " .. AwaitReplicatedAttribute("BoardTheme")
 	roundInfo.Map.Text = "Map: " .. AwaitReplicatedAttribute("Map")
+	roundInfo.FreeParkingMoney.Text = "Free Parking Money: " .. AwaitReplicatedAttribute("FreeParkingMoney") or "Disabled"
+
+	ReplicatedStorage:GetAttributeChangedSignal("FreeParkingMoney"):Connect(function()
+		roundInfo.FreeParkingMoney.Text = "Free Parking Money: " .. AwaitReplicatedAttribute("FreeParkingMoney")
+	end)
 end

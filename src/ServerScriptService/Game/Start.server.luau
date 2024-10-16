@@ -44,6 +44,10 @@ ReplicatedStorage:SetAttribute("CurrencySymbol", board.CurrencySymbol)
 ReplicatedStorage:SetAttribute("BoardTheme", info.Board)
 ReplicatedStorage:SetAttribute("Map", info.Map)
 
+if info.FreeParkingBonusEnabled == "Enabled" then
+    ReplicatedStorage:SetAttribute("FreeParkingMoney", 0)
+end
+
 local tiles = {}
 for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))

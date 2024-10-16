@@ -215,7 +215,9 @@ export type Round = {
     Started: boolean,
     Turn: Turn,
 
-    FreeParkingMoney: number,
+    _freeParkingMoney: number,
+    SetFreeParkingMoney: (Round, amount: number) -> (),
+    GetFreeParkingMoney: (Round) -> number,
    
     Participants: {Participant},
     CurrentParticipant: Participant?,
