@@ -23,6 +23,8 @@ for _, layer in {"Popup", "HUD", "Special", "Buttons"} do
 
 	if layer == "Buttons" then
 		screenUi.ScreenInsets = Enum.ScreenInsets.None
+	elseif layer == "HUD" then
+		screenUi.ClipToDeviceSafeArea = true
 	end
 
 	screenUi.Parent = Players.LocalPlayer.PlayerGui
