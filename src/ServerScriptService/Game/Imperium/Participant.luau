@@ -521,7 +521,6 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
     end
 end
 
-local count = 0
 local function TryPlayMove(participant: Types.Participant): ()
     for _, v in participant.Round.Participants do
         assert(not v.IsMoving, `{v.Player.Name} is already moving`)
@@ -581,14 +580,7 @@ local function TryPlayMove(participant: Types.Participant): ()
             participant.DoublesStreak = 0
         end
 
-        if count == 0 then
-            MoveToTileByName(participant, "Income Tax")
-        elseif count == 1 then
-            MoveToTileByName(participant, "Free Parking")
-        else
-            MoveBy(participant, result.Result)
-        end
-        count = count + 1
+        MoveBy(participant, result.Result)
     end
 
     play()
