@@ -149,6 +149,9 @@ local function StartRound(round: Types.Round): ()
 end
 
 local function SetFreeParkingMoney(round: Types.Round, amount: number): ()
+    if not round.GameConfiguration.FreeParkingBonusEnabled then
+        return
+    end
     round._freeParkingMoney = amount
     ReplicatedStorage:SetAttribute("FreeParkingMoney", amount)
 end
