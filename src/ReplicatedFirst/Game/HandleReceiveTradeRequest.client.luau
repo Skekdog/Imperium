@@ -1,9 +1,8 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
-local offerQueue: {Player} = table.create(4, Players.LocalPlayer)
+local offerQueue: {Player} = {}
 local currentOffer: Player?
 
 local bidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")

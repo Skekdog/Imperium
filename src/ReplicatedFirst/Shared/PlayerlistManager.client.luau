@@ -30,10 +30,6 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 
 	clone.Trade.Visible = true --status ~= "Spectating" and plr ~= Players.LocalPlayer
 
-	clone.Trade.Activated:Connect(function()
-		ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional"):WaitForChild("TradeRequest"):FireServer(plr)
-	end)
-
 	movePlr(plr, status :: any)
 end
 
@@ -65,6 +61,10 @@ local function createPlr(plr: Player)
 	plr:GetAttributeChangedSignal("Money"):Connect(update)
 	plr:GetAttributeChangedSignal("Wins"):Connect(update)
 	plr:GetAttributeChangedSignal("Status"):Connect(update)
+
+	clone.Trade.Activated:Connect(function()
+		ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional"):WaitForChild("TradeRequest"):FireServer(plr)
+	end)
 
 	updatePlr(plr, clone)
 
