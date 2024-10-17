@@ -114,6 +114,7 @@ export type Tile = {
 export type TradeManager = {
     Participant: Participant,
     TradingWith: Participant?,
+    SentOfferTo: Participant?,
 
     HasAcceptedTrade: boolean,
     OfferedAssets: {Asset},

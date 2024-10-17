@@ -1,5 +1,8 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(script.Parent.Types)
 local module = {}
+
+local bidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
 
 local function isTradeActive(tradeManager: Types.TradeManager): boolean
     return not not tradeManager.TradingWith
@@ -103,9 +106,12 @@ local function DeclineTrade(tradeManager: Types.TradeManager): ()
 end
 
 local function SendTradeOffer(tradeManager: Types.TradeManager, to: Types.Participant): ()
-    if isTradeActive(tradeManager) then
+    if isTradeActive(tradeManager) or tradeManager.SentOfferTo then
         return
     end
+
+    tradeManager.SentOfferTo = to
+    bidirectional:WaitForChild("TradeRequest"):FireClient(to.Player, tradeManager.Participant.Player)
 end
 
 local function RespondTradeOffer(tradeManager: Types.TradeManager, accepted: boolean): ()
@@ -118,6 +124,7 @@ function module.new(participant: Types.Participant): Types.TradeManager
     local tradeManager = {}
 
     tradeManager.Participant = participant
+    tradeManager.SentOfferTo = nil
     tradeManager.TradingWith = nil
     tradeManager.HasAcceptedTrade = false
     tradeManager.OfferedAssets = {}
