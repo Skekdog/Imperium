@@ -12,11 +12,13 @@ local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local PayFine = require(script.Parent.PayFine)
 local RollDice = require(script.Parent.RollDice)
 local ToggleMovementEnabled = require(script.Parent.ToggleMovementEnabled)
+local TradingUI = require(script.Parent.TradingUI)
 local UseGetOutOfJailFreeCard = require(script.Parent.UseGetOutOfJailFreeCard)
 local ViewDeed = require(script.Parent.ViewDeed)
 
-local gameServerClient = ReplicatedStorage:WaitForChild("Game").ServerClient
-local gameClientServer = ReplicatedStorage:WaitForChild("Game").ClientServer
+local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
+local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
+local gameBidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
 local player = Players.LocalPlayer
@@ -154,6 +156,10 @@ gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(function(
 end)
 gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(function(model: Model, targetCFrame: CFrame)
     LerpModelCFrame(model, targetCFrame, 1)
+end)
+
+gameBidirectional:WaitForChild("BeginTrading").OnClientEvent:Connect(function(plr: Player)
+    TradingUI(plr)
 end)
 
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)

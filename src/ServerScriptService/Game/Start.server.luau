@@ -18,7 +18,7 @@ local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateS
 
 if not info then
     local temp = {
-        Players = if RunService:IsStudio() then 1 else 8,
+        Players = if RunService:IsStudio() then 2 else 8,
         TurnTime = GameConfiguration.TurnTime.Default,
         AuctionTime = GameConfiguration.AuctionTime.Default,
         BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
@@ -208,6 +208,28 @@ bidirectional:WaitForChild("TradeRequest").OnServerEvent:Connect(function(plr, t
     end
 
     requestingParticipant.TradeManager:SendTradeOffer(targetParticipant)
+end)
+
+bidirectional:WaitForChild("AnswerTradeOffer").OnServerEvent:Connect(function(plr, target: unknown, accepted: unknown)
+    if typeof(accepted) ~= "boolean" or typeof(target) ~= "Instance" or not target:IsA("Player") then
+        return
+    end
+
+    local responder = round:TryGetParticipant(plr)
+    if not responder then
+        return
+    end
+
+    local trader = round:TryGetParticipant(target)
+    if not trader then
+        return
+    end
+
+    if trader.TradeManager.SentOfferTo ~= responder then
+        return
+    end
+
+    responder.TradeManager:RespondTradeOffer(accepted)
 end)
 
 round:StartRound()

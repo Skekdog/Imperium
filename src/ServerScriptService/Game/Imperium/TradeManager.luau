@@ -111,13 +111,30 @@ local function SendTradeOffer(tradeManager: Types.TradeManager, to: Types.Partic
     end
 
     tradeManager.SentOfferTo = to
+    to.TradeManager.SentOfferTo = tradeManager.Participant
     bidirectional:WaitForChild("TradeRequest"):FireClient(to.Player, tradeManager.Participant.Player)
+end
+
+local function processResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
+    if accepted then
+        bidirectional:WaitForChild("BeginTrading"):FireClient(with.Player, tradeManager.Participant.Player)
+    end
+
+    tradeManager.TradingWith = if accepted then with else nil
+    tradeManager.SentOfferTo = nil
 end
 
 local function RespondTradeOffer(tradeManager: Types.TradeManager, accepted: boolean): ()
     if isTradeActive(tradeManager) and accepted then
         return RespondTradeOffer(tradeManager, false)
     end
+
+    if not tradeManager.SentOfferTo then
+        return
+    end
+
+    processResponse(tradeManager.SentOfferTo.TradeManager, tradeManager.Participant, accepted)
+    processResponse(tradeManager, tradeManager.SentOfferTo, accepted)
 end
 
 function module.new(participant: Types.Participant): Types.TradeManager
