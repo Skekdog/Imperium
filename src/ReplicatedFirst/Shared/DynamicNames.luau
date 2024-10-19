@@ -54,6 +54,13 @@ local function setupListener(textLabel: TextLabel): ()
     textLabel:GetAttributeChangedSignal("Format"):Connect(function()
         module.UpdateLabel(lastMode or "Both", textLabel)
     end)
+
+    textLabel.AttributeChanged:Connect(function(name)
+        if name:sub(1, 7) == "Player_" then
+            module.UpdateLabel(lastMode or "Both", textLabel)
+        end
+    end)
+
     module.UpdateLabel(lastMode or "Both", textLabel)
 end
 
