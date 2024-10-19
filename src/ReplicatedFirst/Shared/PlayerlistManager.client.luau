@@ -27,6 +27,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	local status = plr:GetAttribute("Status") or "Spectating"
 	clone.Money.Text = tostring(plr:GetAttribute("Money") or 0)
 	clone.Wins.Text = tostring(plr:GetAttribute("Wins") or 0)
+	clone.JailCards.Text = tostring(plr:GetAttribute("GetOutOfJailFreeCards") or 0)
 
 	clone.Trade.Visible = status ~= "Spectating" and plr ~= Players.LocalPlayer
 
@@ -55,6 +56,7 @@ local function createPlr(plr: Player)
 
 	plr:GetAttributeChangedSignal("Money"):Connect(update)
 	plr:GetAttributeChangedSignal("Wins"):Connect(update)
+	plr:GetAttributeChangedSignal("GetOutOfJailFreeCards"):Connect(update)
 	plr:GetAttributeChangedSignal("Status"):Connect(update)
 
 	clone.Trade.Activated:Connect(function()
