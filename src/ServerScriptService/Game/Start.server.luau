@@ -30,7 +30,7 @@ info.StartingMoney = info.StartingMoney or GameConfiguration.StartingMoney.Defau
 info.Map = info.Map or GameConfiguration.Map.Default :: string
 info.Board = info.Board or GameConfiguration.Board.Default :: string
 info.FreeParkingBonusEnabled = info.FreeParkingBonusEnabled or GameConfiguration.FreeParkingBonusEnabled.Default :: string
-info.Players = info.Players or (if RunService:IsStudio() then 1 else 8)
+info.Players = info.Players or (if RunService:IsStudio() then 2 else 8)
 
 local map = ServerStorage.Game.Maps:FindFirstChild(info.Map)
 assert(map, `Map {info.Map} not found`)
