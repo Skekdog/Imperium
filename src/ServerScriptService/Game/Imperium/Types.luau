@@ -123,6 +123,8 @@ export type TradeManager = {
     OfferedMoney: number,
     OfferedJailCards: number,
 
+    UpdateOffer: (TradeManager, ClientTypes.TradeOfferUpdate) -> (),
+    
     OfferAsset: (TradeManager, assetName: string) -> (),
     OfferMoney: (TradeManager, amount: number) -> (),
     OfferJailCards: (TradeManager, amount: number) -> (),

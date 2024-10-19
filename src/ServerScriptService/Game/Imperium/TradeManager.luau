@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 local Types = require(script.Parent.Types)
 local module = {}
 
@@ -149,6 +150,16 @@ local function RespondRequest(tradeManager: Types.TradeManager, accepted: boolea
     processRequestResponse(tradeManager, sentTo, accepted)
 end
 
+local function UpdateOffer(tradeManager: Types.TradeManager, offer: ClientTypes.TradeOfferUpdate): ()
+    if offer.Kind == "Money" then
+        OfferMoney(tradeManager, offer.Amount)
+    elseif offer.Kind == "Asset" then
+        OfferAsset(tradeManager, offer.Name)
+    elseif offer.Kind == "JailCards" then
+        OfferJailCards(tradeManager, offer.Amount)
+    end
+end
+
 function module.new(participant: Types.Participant): Types.TradeManager
     local tradeManager = {}
 
@@ -159,6 +170,8 @@ function module.new(participant: Types.Participant): Types.TradeManager
     tradeManager.OfferedAssets = {}
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
+
+    tradeManager.UpdateOffer = UpdateOffer
 
     tradeManager.OfferAsset = OfferAsset
     tradeManager.OfferMoney = OfferMoney
