@@ -63,7 +63,7 @@ local function createPlr(plr: Player)
 	plr:GetAttributeChangedSignal("Status"):Connect(update)
 
 	clone.Trade.Activated:Connect(function()
-		ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional"):WaitForChild("TradeRequest"):FireServer(plr)
+		ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("RequestTrade"):FireServer(plr)
 	end)
 
 	updatePlr(plr, clone)

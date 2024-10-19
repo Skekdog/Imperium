@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(script.Parent.Types)
 local module = {}
 
-local bidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
+local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
 local function isTradeActive(tradeManager: Types.TradeManager): boolean
     return not not tradeManager.TradingWith
@@ -112,12 +112,12 @@ local function SendTradeOffer(tradeManager: Types.TradeManager, to: Types.Partic
 
     tradeManager.SentOfferTo = to
     to.TradeManager.SentOfferTo = tradeManager.Participant
-    bidirectional:WaitForChild("TradeRequest"):FireClient(to.Player, tradeManager.Participant.Player)
+    tradeRemotes:WaitForChild("RequestTrade"):FireClient(to.Player, tradeManager.Participant.Player)
 end
 
 local function processResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
     if accepted then
-        bidirectional:WaitForChild("BeginTrading"):FireClient(with.Player, tradeManager.Participant.Player)
+        tradeRemotes:WaitForChild("RespondedTradeRequest"):FireClient(with.Player, tradeManager.Participant.Player)
     end
 
     tradeManager.TradingWith = if accepted then with else nil

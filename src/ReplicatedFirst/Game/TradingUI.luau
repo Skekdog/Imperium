@@ -24,7 +24,7 @@ local youAccepted = false
 local theyAccepted = false
 
 local serverClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
-local bidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
+local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
 local clickCons: {[TextButton]: RBXScriptConnection?} = {}
 
@@ -39,12 +39,12 @@ end
 
 local function offerAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
     button.Parent = yourOffer :: any
-    bidirectional:WaitForChild("UpdateOffer"):FireServer(asset.Name, "Add")
+    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(asset.Name, "Add")
 end
 
 local function retractAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
     button.Parent = yourItems :: any
-    bidirectional:WaitForChild("UpdateOffer"):FireServer(asset.Name, "Remove")
+    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(asset.Name, "Remove")
 end
 
 serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Player, asset: ClientTypes.ClientAssetView)
@@ -84,7 +84,7 @@ serverClient:WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: Pla
     button:Destroy()
 end)
 
-bidirectional:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Player, assetName: string, mode: "Add" | "Remove")
+tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Player, assetName: string, mode: "Add" | "Remove")
     local inventory = inventories[plr]
     assert(inventory, "No inventory found for player: " .. plr.Name)
 
@@ -110,7 +110,7 @@ local function updateAcceptance(): ()
     end
 end
 
-bidirectional:WaitForChild("AnswerTradeOffer").OnClientEvent:Connect(function(plr: Player, accepted: boolean)
+tradeRemotes:WaitForChild("TradeAcceptance").OnClientEvent:Connect(function(plr: Player, accepted: boolean)
     if plr == Players.LocalPlayer then
         youAccepted = accepted
     elseif plr == currentTrader then
@@ -159,11 +159,11 @@ return function(target: Player): ()
     object.ThemTitle:AddTag("DynamicNames")
 
     bindToClick(confirmButton, function()
-        bidirectional:WaitForChild("AnswerTradeOffer"):FireServer(not youAccepted)
+        tradeRemotes:WaitForChild("TradeAcceptance"):FireServer(not youAccepted)
     end)
 
     bindToClick(rejectButton, function()
-        bidirectional:WaitForChild("AnswerTradeOffer"):FireServer(nil)
+        tradeRemotes:WaitForChild("TradeAcceptance"):FireServer(nil)
     end)
 
     ui:ToggleVisible(true)

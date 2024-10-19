@@ -18,7 +18,7 @@ local ViewDeed = require(script.Parent.ViewDeed)
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
-local gameBidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
+local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
 local player = Players.LocalPlayer
@@ -158,8 +158,10 @@ gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(f
     LerpModelCFrame(model, targetCFrame, 1)
 end)
 
-gameBidirectional:WaitForChild("BeginTrading").OnClientEvent:Connect(function(plr: Player)
-    TradingUI(plr)
+tradeRemotes:WaitForChild("RespondedTradeRequest").OnClientEvent:Connect(function(plr: Player, accepted: boolean)
+    if accepted then
+        TradingUI(plr)
+    end
 end)
 
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)

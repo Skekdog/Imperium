@@ -5,7 +5,7 @@ local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local offerQueue: {Player} = {}
 local currentOffer: Player?
 
-local bidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
+local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
 local ui = UIManager.WaitForUI("TradeRequest") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.TradeRequest)}
 
@@ -30,7 +30,7 @@ local function processNext(): ()
     end
 end
 
-bidirectional:WaitForChild("TradeRequest").OnClientEvent:Connect(function(from: Player): ()
+tradeRemotes:WaitForChild("RequestTrade").OnClientEvent:Connect(function(from: Player): ()
     if table.find(offerQueue, from) or currentOffer == from then
         return
     end
@@ -47,7 +47,7 @@ ui.Object.Response.Accept.Activated:Connect(function(): ()
 
     ui:ToggleVisible(false)
 
-    bidirectional:WaitForChild("AnswerTradeOffer"):FireServer(currentOffer, true)
+    tradeRemotes:WaitForChild("AnswerTradeRequest"):FireServer(currentOffer, true)
     processNext()
 end)
 
@@ -56,6 +56,6 @@ ui.Object.Response.Reject.Activated:Connect(function(): ()
 
     ui:ToggleVisible(false)
 
-    bidirectional:WaitForChild("AnswerTradeOffer"):FireServer(currentOffer, false)
+    tradeRemotes:WaitForChild("AnswerTradeRequest"):FireServer(currentOffer, false)
     processNext()
 end)

@@ -191,8 +191,8 @@ gameClientServer.UnmortgageProperty.OnServerEvent:Connect(function(plr, property
     asset:TryUnMortgage()
 end)
 
-local bidirectional = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Bidirectional")
-bidirectional:WaitForChild("TradeRequest").OnServerEvent:Connect(function(plr, to: unknown)
+local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
+tradeRemotes:WaitForChild("RequestTrade").OnServerEvent:Connect(function(plr, to: unknown)
     if typeof(to) ~= "Instance" or not to:IsA("Player") then
         return
     end
@@ -210,7 +210,7 @@ bidirectional:WaitForChild("TradeRequest").OnServerEvent:Connect(function(plr, t
     requestingParticipant.TradeManager:SendTradeOffer(targetParticipant)
 end)
 
-bidirectional:WaitForChild("AnswerTradeOffer").OnServerEvent:Connect(function(plr, target: unknown, accepted: unknown)
+tradeRemotes:WaitForChild("AnswerTradeRequest").OnServerEvent:Connect(function(plr, target: unknown, accepted: unknown)
     if typeof(accepted) ~= "boolean" or typeof(target) ~= "Instance" or not target:IsA("Player") then
         return
     end
