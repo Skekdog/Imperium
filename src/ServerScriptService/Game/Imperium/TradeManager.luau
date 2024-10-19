@@ -87,17 +87,33 @@ local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean):
     Reset(tradeManager)
 end
 
-local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: boolean): ()
+local function processUpdatedAcceptance(tradeManager: Types.TradeManager): ()
+    if not isTradeActive(tradeManager) then
+        return
+    end
+
+    assert(tradeManager.TradingWith)
+
+    if tradeManager.TradingWith.TradeManager.HasAcceptedProposal and tradeManager.HasAcceptedProposal then
+        return FinishTrade(tradeManager, true)
+    end
+
+    tradeRemotes:WaitForChild("TradeAcceptance"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
+    tradeRemotes:WaitForChild("TradeAcceptance"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
+end
+
+local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: boolean?): ()
     if not isTradeActive(tradeManager) then
         return
     end
     assert(tradeManager.TradingWith)
+
+    if accepted == nil then
+        return FinishTrade(tradeManager, false)
+    end
     
     tradeManager.HasAcceptedProposal = accepted
-
-    if tradeManager.TradingWith.TradeManager.HasAcceptedProposal and accepted then
-        FinishTrade(tradeManager, true)
-    end
+    processUpdatedAcceptance(tradeManager)
 end
 
 local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Participant): ()
@@ -111,9 +127,7 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
 end
 
 local function processRequestResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
-    if accepted then
-        tradeRemotes:WaitForChild("RespondedTradeRequest"):FireClient(with.Player, tradeManager.Participant.Player)
-    end
+    tradeRemotes:WaitForChild("RespondedTradeRequest"):FireClient(with.Player, tradeManager.Participant.Player, accepted)
 
     tradeManager.TradingWith = if accepted then with else nil
     tradeManager.SentOfferTo = nil

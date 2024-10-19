@@ -130,7 +130,7 @@ export type TradeManager = {
     RequestTradeWith: (TradeManager, with: Participant) -> (),
     RespondRequest: (TradeManager, accepted: boolean) -> (),
 
-    SetProposalAccepted: (TradeManager, accepted: boolean) -> (),
+    SetProposalAccepted: (TradeManager, accepted: boolean?) -> (),
     FinishTrade: (TradeManager, accepted: boolean) -> (),
 
     Reset: (TradeManager) -> (),
