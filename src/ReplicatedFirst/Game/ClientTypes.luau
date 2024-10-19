@@ -14,4 +14,22 @@ export type ClientAssetView = {
     SellHouseValue: number?,
 }
 
+type TradeOfferJailCardsUpdate = {
+    Kind: "JailCards",
+    Amount: number,
+}
+
+type TradeOfferMoneyUpdate = {
+    Kind: "Money",
+    Amount: number,
+}
+
+type TradeOfferAssetUpdate = {
+    Kind: "Asset",
+    Name: string,
+    Mode: "Add" | "Remove",
+}
+
+export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate | TradeOfferAssetUpdate
+
 return {}

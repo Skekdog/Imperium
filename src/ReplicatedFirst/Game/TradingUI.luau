@@ -39,12 +39,22 @@ end
 
 local function offerAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
     button.Parent = yourOffer :: any
-    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(asset.Name, "Add")
+    local offer: ClientTypes.TradeOfferUpdate = {
+        Kind = "Asset",
+        Name = asset.Name,
+        Mode = "Add",
+    }
+    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(offer)
 end
 
 local function retractAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
     button.Parent = yourItems :: any
-    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(asset.Name, "Remove")
+    local offer: ClientTypes.TradeOfferUpdate = {
+        Kind = "Asset",
+        Name = asset.Name,
+        Mode = "Remove",
+    }
+    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(offer)
 end
 
 serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Player, asset: ClientTypes.ClientAssetView)
@@ -84,16 +94,18 @@ serverClient:WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: Pla
     button:Destroy()
 end)
 
-tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Player, assetName: string, mode: "Add" | "Remove")
+tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Player, offer: ClientTypes.TradeOfferUpdate)
     local inventory = inventories[plr]
     assert(inventory, "No inventory found for player: " .. plr.Name)
 
-    local button = inventory[assetName]
-    assert(button, "No button found for asset: " .. assetName)
-    if mode == "Add" then
-        button.Parent = theirOffer :: any
-    elseif mode == "Remove" then
-        button.Parent = theirItems :: any
+    if offer.Kind == "Asset" then
+        local button = inventory[offer.Name]
+        assert(button, "No button found for asset: " .. offer.Name)
+        if offer.Mode == "Add" then
+            button.Parent = theirOffer :: any
+        elseif offer.Mode == "Remove" then
+            button.Parent = theirItems :: any
+        end
     end
 end)
 

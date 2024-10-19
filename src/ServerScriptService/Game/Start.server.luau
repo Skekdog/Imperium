@@ -7,6 +7,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local Tile = require(script.Parent.Imperium.Tile)
 local Types = require(script.Parent.Imperium.Types)
+local ClientTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
@@ -243,6 +244,37 @@ tradeRemotes:WaitForChild("TradeAcceptance").OnServerEvent:Connect(function(plr,
     end
 
     participant.TradeManager:SetProposalAccepted(accepted)
+end)
+
+local function isTradeOfferUpdate(value: ClientTypes.TradeOfferUpdate): boolean
+    if typeof(value) ~= "table" then
+        return false
+    end
+
+    if typeof(value.Kind) ~= "string" then
+        return false
+    end
+
+    if value.Kind == "JailCards" then
+        return typeof(value.Amount) == "number"
+    elseif value.Kind == "Money" then
+        return typeof(value.Amount) == "number"
+    elseif value.Kind == "Asset" then
+        return typeof(value.Name) == "string" and (value.Mode == "Add" or value.Mode == "Remove")
+    else
+        return false
+    end
+end
+
+tradeRemotes:WaitForChild("UpdateOffer").OnServerEvent:Connect(function(plr, offer: ClientTypes.TradeOfferUpdate)
+    if not isTradeOfferUpdate(offer) then
+        return
+    end
+
+    local participant = round:TryGetParticipant(plr)
+    if not participant then
+        return
+    end
 end)
 
 round:StartRound()
