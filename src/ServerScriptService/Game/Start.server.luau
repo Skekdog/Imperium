@@ -15,22 +15,22 @@ local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local SetWaitingText = require(script.Parent.SetWaitingText)
 
-local info = MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") :: Teleport.GameInfo?
+local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
 if not info then
-    local temp = {
-        Players = if RunService:IsStudio() then 1 else 8,
-        TurnTime = GameConfiguration.TurnTime.Default,
-        AuctionTime = GameConfiguration.AuctionTime.Default,
-        BankruptcyTime = GameConfiguration.BankruptcyTime.Default,
-        StartingMoney = GameConfiguration.StartingMoney.Default,
-        Map = GameConfiguration.Map.Default,
-        Board = GameConfiguration.Board.Default,
-        FreeParkingBonusEnabled = GameConfiguration.FreeParkingBonusEnabled.Default,
-    } :: Teleport.GameInfo
-    info = temp
+    info = {} :: Teleport.GameInfo
 end
 assert(info)
+
+-- Lobby and game setting definitions may be out-of-sync with each other, so apply defaults on each setting
+info.AuctionTime = info.AuctionTime or GameConfiguration.AuctionTime.Default :: number
+info.BankruptcyTime = info.BankruptcyTime or GameConfiguration.BankruptcyTime.Default :: number
+info.TurnTime = info.TurnTime or GameConfiguration.TurnTime.Default :: number
+info.StartingMoney = info.StartingMoney or GameConfiguration.StartingMoney.Default :: number
+info.Map = info.Map or GameConfiguration.Map.Default :: string
+info.Board = info.Board or GameConfiguration.Board.Default :: string
+info.FreeParkingBonusEnabled = info.FreeParkingBonusEnabled or GameConfiguration.FreeParkingBonusEnabled.Default :: string
+info.Players = info.Players or (if RunService:IsStudio() then 1 else 8)
 
 local map = ServerStorage.Game.Maps:FindFirstChild(info.Map)
 assert(map, `Map {info.Map} not found`)
