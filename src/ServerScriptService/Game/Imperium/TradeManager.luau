@@ -182,13 +182,23 @@ local function RespondRequest(tradeManager: Types.TradeManager, accepted: boolea
 end
 
 local function UpdateOffer(tradeManager: Types.TradeManager, offer: ClientTypes.TradeOfferUpdate): ()
+    if not isTradeActive(tradeManager) then
+        return
+    end
+    assert(tradeManager.TradingWith)
+
     if offer.Kind == "Money" then
         OfferMoney(tradeManager, offer.Amount)
     elseif offer.Kind == "Asset" then
         OfferAsset(tradeManager, offer.Name)
     elseif offer.Kind == "JailCards" then
         OfferJailCards(tradeManager, offer.Amount)
+    else
+        error("Invalid trade offer kind")
     end
+
+    tradeManager:SetProposalAccepted(false)
+    tradeManager.TradingWith.TradeManager:SetProposalAccepted(false)
 end
 
 function module.new(participant: Types.Participant): Types.TradeManager
