@@ -207,7 +207,7 @@ tradeRemotes:WaitForChild("RequestTrade").OnServerEvent:Connect(function(plr, to
         return
     end
 
-    requestingParticipant.TradeManager:SendTradeOffer(targetParticipant)
+    requestingParticipant.TradeManager:RequestTradeWith(targetParticipant)
 end)
 
 tradeRemotes:WaitForChild("AnswerTradeRequest").OnServerEvent:Connect(function(plr, target: unknown, accepted: unknown)
@@ -229,7 +229,7 @@ tradeRemotes:WaitForChild("AnswerTradeRequest").OnServerEvent:Connect(function(p
         return
     end
 
-    responder.TradeManager:RespondTradeOffer(accepted)
+    responder.TradeManager:RespondRequest(accepted)
 end)
 
 round:StartRound()

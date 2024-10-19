@@ -53,8 +53,11 @@ local function OfferJailCards(tradeManager: Types.TradeManager, amount: number):
 end
 
 local function Reset(tradeManager: Types.TradeManager): ()
+    tradeManager.SentOfferTo = nil
     tradeManager.TradingWith = nil
-    tradeManager.HasAcceptedTrade = false
+
+    tradeManager.HasAcceptedProposal = false
+
     tradeManager.OfferedAssets = {}
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
@@ -84,28 +87,20 @@ local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean):
     Reset(tradeManager)
 end
 
-local function SetTradeAccepted(tradeManager: Types.TradeManager, accepted: boolean): ()
+local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: boolean): ()
     if not isTradeActive(tradeManager) then
         return
     end
     assert(tradeManager.TradingWith)
     
-    tradeManager.HasAcceptedTrade = accepted
+    tradeManager.HasAcceptedProposal = accepted
 
-    if tradeManager.TradingWith.TradeManager.HasAcceptedTrade and accepted then
+    if tradeManager.TradingWith.TradeManager.HasAcceptedProposal and accepted then
         FinishTrade(tradeManager, true)
     end
 end
 
-local function DeclineTrade(tradeManager: Types.TradeManager): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    
-    FinishTrade(tradeManager, false)
-end
-
-local function SendTradeOffer(tradeManager: Types.TradeManager, to: Types.Participant): ()
+local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Participant): ()
     if isTradeActive(tradeManager) or tradeManager.SentOfferTo then
         return
     end
@@ -115,7 +110,7 @@ local function SendTradeOffer(tradeManager: Types.TradeManager, to: Types.Partic
     tradeRemotes:WaitForChild("RequestTrade"):FireClient(to.Player, tradeManager.Participant.Player)
 end
 
-local function processResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
+local function processRequestResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
     if accepted then
         tradeRemotes:WaitForChild("RespondedTradeRequest"):FireClient(with.Player, tradeManager.Participant.Player)
     end
@@ -124,9 +119,9 @@ local function processResponse(tradeManager: Types.TradeManager, with: Types.Par
     tradeManager.SentOfferTo = nil
 end
 
-local function RespondTradeOffer(tradeManager: Types.TradeManager, accepted: boolean): ()
+local function RespondRequest(tradeManager: Types.TradeManager, accepted: boolean): ()
     if isTradeActive(tradeManager) and accepted then
-        return RespondTradeOffer(tradeManager, false)
+        return RespondRequest(tradeManager, false)
     end
 
     local sentTo = tradeManager.SentOfferTo
@@ -134,17 +129,17 @@ local function RespondTradeOffer(tradeManager: Types.TradeManager, accepted: boo
         return
     end
 
-    processResponse(sentTo.TradeManager, tradeManager.Participant, accepted)
-    processResponse(tradeManager, sentTo, accepted)
+    processRequestResponse(sentTo.TradeManager, tradeManager.Participant, accepted)
+    processRequestResponse(tradeManager, sentTo, accepted)
 end
 
 function module.new(participant: Types.Participant): Types.TradeManager
     local tradeManager = {}
 
     tradeManager.Participant = participant
-    tradeManager.SentOfferTo = nil
-    tradeManager.TradingWith = nil
-    tradeManager.HasAcceptedTrade = false
+
+    tradeManager.HasAcceptedProposal = false
+
     tradeManager.OfferedAssets = {}
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
@@ -152,12 +147,14 @@ function module.new(participant: Types.Participant): Types.TradeManager
     tradeManager.OfferAsset = OfferAsset
     tradeManager.OfferMoney = OfferMoney
     tradeManager.OfferJailCards = OfferJailCards
-    tradeManager.Reset = Reset
+
+    tradeManager.SetProposalAccepted = SetProposalAccepted
     tradeManager.FinishTrade = FinishTrade
-    tradeManager.SetTradeAccepted = SetTradeAccepted
-    tradeManager.DeclineTrade = DeclineTrade
-    tradeManager.SendTradeOffer = SendTradeOffer
-    tradeManager.RespondTradeOffer = RespondTradeOffer
+
+    tradeManager.RequestTradeWith = RequestTradeWith
+    tradeManager.RespondRequest = RespondRequest
+
+    tradeManager.Reset = Reset
 
     return tradeManager
 end
