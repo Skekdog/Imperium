@@ -194,7 +194,7 @@ end)
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 tradeRemotes:WaitForChild("RequestTrade").OnServerEvent:Connect(function(plr, to: unknown)
-    if typeof(to) ~= "Instance" or not to:IsA("Player") then
+    if typeof(to) ~= "Instance" or not to:IsA("Player") or to == plr then
         return
     end
 

@@ -155,6 +155,8 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
         return
     end
 
+    assert(to ~= tradeManager.Participant, "Can't trade with yourself")
+
     tradeManager.SentOfferTo = to
     to.TradeManager.SentOfferTo = tradeManager.Participant
     tradeRemotes:WaitForChild("RequestTrade"):FireClient(to.Player, tradeManager.Participant.Player)
