@@ -86,7 +86,7 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
 
     local duration = participant.Round.GameConfiguration.PlayerTurnTime
     SetTimeMilestone(duration)
-    while typeof(response) == "nil" and GetTime() - startTime < duration and not participant.HasDisconnected do
+    while response == nil and GetTime() - startTime < duration and not participant.HasDisconnected do
         task.wait()
     end
 
