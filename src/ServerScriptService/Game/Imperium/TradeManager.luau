@@ -129,12 +129,13 @@ local function RespondTradeOffer(tradeManager: Types.TradeManager, accepted: boo
         return RespondTradeOffer(tradeManager, false)
     end
 
-    if not tradeManager.SentOfferTo then
+    local sentTo = tradeManager.SentOfferTo
+    if not sentTo then
         return
     end
 
-    processResponse(tradeManager.SentOfferTo.TradeManager, tradeManager.Participant, accepted)
-    processResponse(tradeManager, tradeManager.SentOfferTo, accepted)
+    processResponse(sentTo.TradeManager, tradeManager.Participant, accepted)
+    processResponse(tradeManager, sentTo, accepted)
 end
 
 function module.new(participant: Types.Participant): Types.TradeManager
