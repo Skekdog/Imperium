@@ -40,11 +40,6 @@ local function createPlr(plr: Player)
 	clone.Username:SetAttribute("Format", "[PLAYER]")
 	clone.Username:SetAttribute("Player_1", GetPlayerName(plr))
 	clone.Username:AddTag("DynamicNames")
-	
-	clone.Username.TextColor3 = Color3.new()
-
-	clone.Money.Text = tostring(plr:GetAttribute("Money") or 0)
-	clone.Wins.Text = tostring(plr:GetAttribute("Wins") or 0)
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
