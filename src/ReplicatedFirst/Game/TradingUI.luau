@@ -97,7 +97,7 @@ tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Pla
     end
 end)
 
-local function updateAcceptance(): ()
+local function updatedAcceptance(): ()
     local num = 0
     if theyAccepted then
         num += 1
@@ -117,7 +117,11 @@ tradeRemotes:WaitForChild("TradeAcceptance").OnClientEvent:Connect(function(plr:
         theyAccepted = accepted
     end
 
-    updateAcceptance()
+    updatedAcceptance()
+end)
+
+tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function()
+    ui:ToggleVisible(false)
 end)
 
 local function clearObject(object: ScrollingFrame): ()
@@ -153,6 +157,7 @@ return function(target: Player): ()
     currentTrader = target
     youAccepted = false
     theyAccepted = false
+    updatedAcceptance()
 
     object.ThemTitle:SetAttribute("Player_1", GetPlayerName(target))
     object.ThemTitle:SetAttribute("Format", "[PLAYER]")

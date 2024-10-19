@@ -53,7 +53,7 @@ for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))
 end
 
-local MAX_PLAYER_LOAD_WAIT_TIME = 120
+local MAX_PLAYER_LOAD_WAIT_TIME = 2
 local INTERMISSION_DURATION = 5
 
 PhysicsService:RegisterCollisionGroup("Characters")

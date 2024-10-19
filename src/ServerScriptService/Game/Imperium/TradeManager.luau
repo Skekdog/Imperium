@@ -61,6 +61,8 @@ local function Reset(tradeManager: Types.TradeManager): ()
     tradeManager.OfferedAssets = {}
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
+
+    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player)
 end
 
 local function finishTradeForParticipant(participant: Types.Participant, to: Types.Participant): ()
