@@ -38,7 +38,6 @@ local function bindToClick(button: TextButton, callback: () -> ())
 end
 
 local function offerAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
-    button.Parent = yourOffer :: any
     local offer: ClientTypes.TradeOfferUpdate = {
         Kind = "Asset",
         Name = asset.Name,
@@ -48,7 +47,6 @@ local function offerAsset(button: CreateAssetButton.Button, asset: ClientTypes.C
 end
 
 local function retractAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
-    button.Parent = yourItems :: any
     local offer: ClientTypes.TradeOfferUpdate = {
         Kind = "Asset",
         Name = asset.Name,
@@ -64,7 +62,7 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Pla
     local button = (inventory[asset.Name] or CreateAssetButton(UDim2.new(1, 0, 0.15, 0), asset)) :: CreateAssetButton.Button
     inventory[asset.Name] = button
 
-    if currentTrader == plr and false then
+    if currentTrader == plr then
         button.Parent = theirItems :: any
     end
 
@@ -102,9 +100,9 @@ tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Pla
         local button = inventory[offer.Name]
         assert(button, "No button found for asset: " .. offer.Name)
         if offer.Mode == "Add" then
-            button.Parent = theirOffer :: any
+            button.Parent = if plr == Players.LocalPlayer then yourOffer :: any else theirOffer :: any
         elseif offer.Mode == "Remove" then
-            button.Parent = theirItems :: any
+            button.Parent = if plr == Players.LocalPlayer then yourItems :: any else theirItems :: any
         end
     end
 end)

@@ -13,6 +13,7 @@ local function OfferAsset(tradeManager: Types.TradeManager, assetName: string): 
     if not isTradeActive(tradeManager) then
         return
     end
+    assert(tradeManager.TradingWith)
 
     local asset: Types.Asset?
     for _, v in tradeManager.Participant.Assets do
@@ -26,31 +27,61 @@ local function OfferAsset(tradeManager: Types.TradeManager, assetName: string): 
         return
     end
 
-    for _, v in tradeManager.OfferedAssets do
+    local indexToRemove: number?
+    for i, v in tradeManager.OfferedAssets do
         if v.AssetDescription.Name == assetName then
-            return
+            indexToRemove = i
+            break
         end
     end
 
-    table.insert(tradeManager.OfferedAssets, asset)
+    if indexToRemove then
+        table.remove(tradeManager.OfferedAssets, indexToRemove)
+    else
+        table.insert(tradeManager.OfferedAssets, asset)
+    end
+
+    local offer: ClientTypes.TradeOfferUpdate = {
+        Kind = "Asset",
+        Name = assetName,
+        Mode = if indexToRemove then "Remove" else "Add",
+    }
+    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, offer)
+    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
 end
 
 local function OfferMoney(tradeManager: Types.TradeManager, amount: number): ()
     if not isTradeActive(tradeManager) then
         return
     end
+    assert(tradeManager.TradingWith)
 
     amount = math.clamp(amount, 0, tradeManager.Participant.Money)
     tradeManager.OfferedMoney = amount
+
+    local offer: ClientTypes.TradeOfferUpdate = {
+        Kind = "Money",
+        Amount = tradeManager.OfferedMoney,
+    }
+    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, offer)
+    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
 end
 
 local function OfferJailCards(tradeManager: Types.TradeManager, amount: number): ()
     if not isTradeActive(tradeManager) then
         return
     end
+    assert(tradeManager.TradingWith)
 
     amount = math.clamp(amount, 0, tradeManager.Participant.JailCards)
     tradeManager.OfferedJailCards = amount
+
+    local offer: ClientTypes.TradeOfferUpdate = {
+        Kind = "JailCards",
+        Amount = tradeManager.OfferedJailCards,
+    }
+    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, offer)
+    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
 end
 
 local function Reset(tradeManager: Types.TradeManager): ()
