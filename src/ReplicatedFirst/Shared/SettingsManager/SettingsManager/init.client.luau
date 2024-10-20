@@ -285,7 +285,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				if msg then msg:Destroy() end
 				updateBinds({t})
 				ScreenMessage("Success", "Keybinding updated!")
-				ScreenMessage("Info", "Note: due to a bug, keybindings will not update until rejoining the game. Sorry!")
 				CAS:UnbindAction("SelectKeybind")
 				return
 			end, false, 100000, Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1, Enum.UserInputType.MouseButton3)

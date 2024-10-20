@@ -195,11 +195,17 @@ for _, v in module.AvailableSettings do
 	module.Settings[v.Name] = {Value = v.Default, Definition = v}
 end
 
+module.KeybindUpdatedEvent = script.KeybindUpdated
+
 function module.SetSetting(setting: string, settingValue: Setting)
 	local ref = module.Settings[setting]
 	ref.Value = settingValue
 	if ref.Definition.Callback then
 		ref.Definition.Callback(settingValue, setting)
+	end
+
+	if ref.Definition.PossibleValues == "Keybind" then
+		module.KeybindUpdatedEvent:Fire(setting, settingValue)
 	end
 end
 
