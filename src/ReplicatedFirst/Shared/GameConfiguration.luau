@@ -31,7 +31,7 @@ local settings: Settings = {
     Board = {
         Name = "Board",
         DisplayName = "Board",
-        Default = "Classic (US)",
+        Default = "Classic (UK)",
         PossibleValues = {"Classic (UK)", "Classic (US)"},
         Order = 2,
     },
