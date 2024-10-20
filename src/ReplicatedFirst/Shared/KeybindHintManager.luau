@@ -27,7 +27,7 @@ local function loadInstance(instance: Instance): ()
     assert(SettingsManager.Settings[control], "Control not found: " .. control)
 
     local position = instance:GetAttribute("Position") :: UDim2?
-    assert(typeof(position) == "UDim2", "Expected attribute 'Position' to be a UDim2")
+    assert(typeof(position) == "UDim2" or position == nil, "Expected attribute 'Position' to be a UDim2 or nil")
 
     local size = instance:GetAttribute("Size") :: UDim2?
     assert(typeof(size) == "UDim2" or size == nil, "Expected attribute 'Size' to be a UDim2 or nil")
@@ -39,9 +39,9 @@ local function loadInstance(instance: Instance): ()
 
     local label = Instance.new("TextLabel")
     setText(control, label)
-    label.Position = position
-    label.AnchorPoint = anchorPoint or Vector2.zero
-    label.Size = size or UDim2.fromScale(0.1, 0.1)
+    label.Position = position or UDim2.fromScale(1, 0)
+    label.AnchorPoint = anchorPoint or Vector2.new(0.5, 0.5)
+    label.Size = size or UDim2.fromScale(0.45, 0.6)
     label.TextScaled = true
     label.Font = Enum.Font.SourceSans
     label.BackgroundTransparency = 1
