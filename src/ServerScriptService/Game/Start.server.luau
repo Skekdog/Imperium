@@ -237,7 +237,7 @@ tradeRemotes:WaitForChild("AnswerTradeRequest").OnServerEvent:Connect(function(p
         return
     end
 
-    responder.TradeManager:RespondRequest(accepted)
+    trader.TradeManager:RespondRequest(accepted)
 end)
 
 tradeRemotes:WaitForChild("TradeAcceptance").OnServerEvent:Connect(function(plr, accepted: unknown)

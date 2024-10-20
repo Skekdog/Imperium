@@ -170,6 +170,10 @@ tradeRemotes:WaitForChild("SetNewRequestsBlocked").OnClientEvent:Connect(functio
     TradeOfferState.CanSendNewRequest = not blocked
 end)
 
+tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function()
+    TradeOfferState.CanSendNewRequest = true
+end)
+
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
 
 local castParams = RaycastParams.new()

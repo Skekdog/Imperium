@@ -158,7 +158,6 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
     assert(to ~= tradeManager.Participant, "Can't trade with yourself")
 
     tradeManager.SentOfferTo = to
-    to.TradeManager.SentOfferTo = tradeManager.Participant
     tradeRemotes:WaitForChild("SetNewRequestsBlocked"):FireClient(tradeManager.Participant.Player, true)
     tradeRemotes:WaitForChild("RequestTrade"):FireClient(to.Player, tradeManager.Participant.Player)
 end
@@ -171,13 +170,13 @@ local function processRequestResponse(tradeManager: Types.TradeManager, with: Ty
 end
 
 local function RespondRequest(tradeManager: Types.TradeManager, accepted: boolean): ()
-    if isTradeActive(tradeManager) and accepted then
-        return RespondRequest(tradeManager, false)
-    end
-
     local sentTo = tradeManager.SentOfferTo
     if not sentTo then
         return
+    end
+
+    if (isTradeActive(tradeManager) or isTradeActive(sentTo.TradeManager)) and accepted then
+        return RespondRequest(tradeManager, false)
     end
 
     processRequestResponse(sentTo.TradeManager, tradeManager.Participant, accepted)
