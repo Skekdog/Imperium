@@ -12,7 +12,7 @@ local module = {}
 local function SetNextParticipant(round: Types.Round): Types.Participant
     local lastIndex: number? = 0
     if round.CurrentParticipant then
-        if #Players:GetPlayers() < 1 then
+        if #Players:GetPlayers() < 1 or #round.Participants < 1 then
             task.wait(100) -- Do not continue the game
         end
         lastIndex = table.find(round.Participants, round.CurrentParticipant)
