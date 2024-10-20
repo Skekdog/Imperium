@@ -117,6 +117,8 @@ export type TradeManager = {
     SentOfferTo: Participant?,
     TradingWith: Participant?,
 
+    LastTradeRequestTimes: {[Participant]: number?},
+
     HasAcceptedProposal: boolean,
     
     OfferedAssets: {Asset},
@@ -129,7 +131,7 @@ export type TradeManager = {
     OfferMoney: (TradeManager, amount: number) -> (),
     OfferJailCards: (TradeManager, amount: number) -> (),
 
-    RequestTradeWith: (TradeManager, with: Participant) -> (),
+    RequestTradeWith: (TradeManager, with: Participant) -> ClientTypes.TradeRequestInvokeResult,
     RespondRequest: (TradeManager, accepted: boolean) -> (),
 
     SetProposalAccepted: (TradeManager, accepted: boolean?) -> (),

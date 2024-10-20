@@ -1,7 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
+local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local Types = require(script.Parent.Types)
 local module = {}
+
+local TRADE_COOLDOWN = 5
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
@@ -150,16 +153,28 @@ local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: b
     processUpdatedAcceptance(tradeManager)
 end
 
-local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Participant): ()
+local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Participant): ClientTypes.TradeRequestInvokeResult
     if isTradeActive(tradeManager) or tradeManager.SentOfferTo then
-        return
+        return "SelfAlreadyTrading"
+    end
+
+    if isTradeActive(to.TradeManager) or to.TradeManager.SentOfferTo then
+        return "OtherAlreadyTrading"
+    end
+
+    if tradeManager.LastTradeRequestTimes[to] and GetTime() - (tradeManager.LastTradeRequestTimes[to] :: number) < TRADE_COOLDOWN then
+        return "Cooldown"
     end
 
     assert(to ~= tradeManager.Participant, "Can't trade with yourself")
 
     tradeManager.SentOfferTo = to
-    tradeRemotes:WaitForChild("SetNewRequestsBlocked"):FireClient(tradeManager.Participant.Player, true)
-    tradeRemotes:WaitForChild("RequestTrade"):FireClient(to.Player, tradeManager.Participant.Player)
+    to.TradeManager.SentOfferTo = tradeManager.Participant
+    tradeRemotes:WaitForChild("ReceiveTradeRequest"):FireClient(to.Player, tradeManager.Participant.Player)
+
+    tradeManager.LastTradeRequestTimes[to] = GetTime()
+
+    return "Success"
 end
 
 local function processRequestResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
@@ -225,6 +240,8 @@ function module.new(participant: Types.Participant): Types.TradeManager
 
     tradeManager.RequestTradeWith = RequestTradeWith
     tradeManager.RespondRequest = RespondRequest
+
+    tradeManager.LastTradeRequestTimes = {}
 
     tradeManager.Reset = Reset
 

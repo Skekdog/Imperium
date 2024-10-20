@@ -200,7 +200,7 @@ gameClientServer.UnmortgageProperty.OnServerEvent:Connect(function(plr, property
 end)
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
-tradeRemotes:WaitForChild("RequestTrade").OnServerEvent:Connect(function(plr, to: unknown)
+tradeRemotes:WaitForChild("RequestTrade").OnServerInvoke = function(plr, to: unknown): ClientTypes.TradeRequestInvokeResult
     if typeof(to) ~= "Instance" or not to:IsA("Player") or to == plr then
         return
     end
@@ -215,8 +215,8 @@ tradeRemotes:WaitForChild("RequestTrade").OnServerEvent:Connect(function(plr, to
         return
     end
 
-    requestingParticipant.TradeManager:RequestTradeWith(targetParticipant)
-end)
+    return requestingParticipant.TradeManager:RequestTradeWith(targetParticipant)
+end
 
 tradeRemotes:WaitForChild("AnswerTradeRequest").OnServerEvent:Connect(function(plr, target: unknown, accepted: unknown)
     if typeof(accepted) ~= "boolean" or typeof(target) ~= "Instance" or not target:IsA("Player") then

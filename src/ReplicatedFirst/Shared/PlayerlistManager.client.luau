@@ -2,10 +2,10 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.GetPlayerName)
 local IsLobby = require(script.Parent.IsLobby)
+local ClientTypes = require(script.Parent.Parent.Game.ClientTypes)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local ScreenMessage = require(script.Parent.ScreenMessage)
-local TradeOfferState = require(script.Parent.TradeOfferState)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local list = ui.List
@@ -62,10 +62,18 @@ local function createPlr(plr: Player)
 	plr:GetAttributeChangedSignal("Status"):Connect(update)
 
 	clone.Trade.Activated:Connect(function()
-		if not TradeOfferState.CanSendNewRequest then
-			return ScreenMessage("Error", "You have already an ongoing trade / trade request!")
+		local response: ClientTypes.TradeRequestInvokeResult = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("RequestTrade"):InvokeServer(plr)
+		if response == "Cooldown" then
+			ScreenMessage("Error", "Please wait before sending another trade request.")
+		elseif response == "SelfAlreadyTrading" then
+			ScreenMessage("Error", "You already have an active trade / request with someone.")
+		elseif response == "OtherAlreadyTrading" then
+			ScreenMessage("Error", "They already have an active trade / request with someone.")
+		elseif response == "Success" then
+			return
+		else
+			ScreenMessage("Error", "An unknown error occurred.")
 		end
-		ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("RequestTrade"):FireServer(plr)
 	end)
 
 	updatePlr(plr, clone)
