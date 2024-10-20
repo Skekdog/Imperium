@@ -96,7 +96,6 @@ local function updateOfferMoneyButtons(): ()
 
     local makeFrameVisible = false
     for i, v in offerMoneyButtons do
-        print(v, offeredMoney)
         if v > 0 then
             i.Visible = offeredMoney + v <= money
         else
