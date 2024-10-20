@@ -13,8 +13,13 @@ local function replacePlayers(str: string, players: {string}, mode: Mode): strin
     local i = 1
     -- Replace [PLAYER] with the corresponding player name from the table
     str = string.gsub(str, "%[PLAYER%]", function()
+        if not players[i] then
+            return "[PLAYER]"
+        end
+
         local playerName = GetPlayerName(players[i], mode)
-        i = i + 1
+        i += 1
+        
         return playerName or "[PLAYER]"
     end)
     return str
