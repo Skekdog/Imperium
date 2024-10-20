@@ -54,7 +54,7 @@ for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))
 end
 
-local MAX_PLAYER_LOAD_WAIT_TIME = 120
+local MAX_PLAYER_LOAD_WAIT_TIME = 2
 local INTERMISSION_DURATION = 5
 
 PhysicsService:RegisterCollisionGroup("Characters")
@@ -79,8 +79,15 @@ Players.PlayerAdded:Connect(function(plr)
     plr:LoadCharacter()
 end)
 
-local startWait = GetTime()
 local players = #Players:GetPlayers()
+
+SetWaitingText("Waiting for players...", math.huge)
+while players < 1 do
+    task.wait()
+    players = #Players:GetPlayers()
+end
+
+local startWait = GetTime()
 
 SetWaitingText("Waiting for players...", MAX_PLAYER_LOAD_WAIT_TIME)
 
