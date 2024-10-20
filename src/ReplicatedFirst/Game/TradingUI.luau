@@ -245,9 +245,9 @@ tradeRemotes:WaitForChild("TradeAcceptance").OnClientEvent:Connect(function(plr:
     updatedAcceptance()
 end)
 
-tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function(wasRejected: boolean?)
+tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function(wasRejected: Player?)
     ui:ToggleVisible(false)
-    if wasRejected then
+    if wasRejected and wasRejected ~= Players.LocalPlayer then
         ScreenMessage("Error", "The other player rejected your trade.")
     end
 end)

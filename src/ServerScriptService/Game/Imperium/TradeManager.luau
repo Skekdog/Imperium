@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+
 local Types = require(script.Parent.Types)
 local module = {}
 
@@ -88,7 +89,7 @@ local function OfferJailCards(tradeManager: Types.TradeManager, amount: number):
     tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
 end
 
-local function Reset(tradeManager: Types.TradeManager, wasRejected: boolean?): ()
+local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player?): ()
     tradeManager.SentOfferTo = nil
     tradeManager.TradingWith = nil
 
@@ -98,7 +99,7 @@ local function Reset(tradeManager: Types.TradeManager, wasRejected: boolean?): (
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
 
-    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player, wasRejected)
+    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player, wasRejectedBy)
 end
 
 local function finishTradeForParticipant(participant: Types.Participant, to: Types.Participant): ()
@@ -121,8 +122,8 @@ local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean):
         finishTradeForParticipant(tradeManager.TradingWith, tradeManager.Participant)
     end
 
-    Reset(tradeManager.TradingWith.TradeManager, not accepted)
-    Reset(tradeManager, not accepted)
+    Reset(tradeManager.TradingWith.TradeManager, if not accepted then tradeManager.Participant.Player else nil)
+    Reset(tradeManager, if not accepted then tradeManager.Participant.Player else nil)
 end
 
 local function processUpdatedAcceptance(tradeManager: Types.TradeManager): ()
