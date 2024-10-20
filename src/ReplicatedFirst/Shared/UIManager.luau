@@ -153,10 +153,14 @@ function UIManager.RegisterUI(object: GuiObject): UI
 
 		local but = sb.Button:Clone()
 		but.Name = self.Name
+
+		but.Text = self.DisplayName
 		
-		local key = ControlManager.GetFirstKeyCode(self.Name, true)
-		local keyHint = if key ~= "" and key ~= "NONE" then ` [{key}]` else ""
-		but.Text = self.DisplayName..keyHint
+		but:SetAttribute("Control", self.Name)
+		but:SetAttribute("NoStyle", true)
+		but:SetAttribute("Position", UDim2.fromScale(1, 1))
+		but:SetAttribute("Size", UDim2.fromScale(0.45, 1))
+		but:AddTag("ControlHint")
 
 		but.Visible = true
 		but.Parent = sb

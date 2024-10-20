@@ -6,7 +6,7 @@ local boundInstances: {[string]: {TextLabel}} = {}
 
 local function setText(control: string, label: TextLabel): ()
     local text = ControlManager.GetFirstKeyCode(control, true)
-    if text == "" then
+    if text == "" or text == "NONE" then
         label.Text = ""
         return
     end
@@ -49,6 +49,8 @@ local function loadInstance(instance: Instance): ()
 
     if not noStyle then
         label:AddTag("StyledUI")
+    else
+        label.TextColor3 = Color3.new(1, 1, 1)
     end
 
     label.Parent = instance
