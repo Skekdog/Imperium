@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(script.Parent.ClientTypes)
 local CreateAssetButton = require(script.Parent.CreateAssetButton)
+local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
@@ -104,6 +105,24 @@ tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Pla
         elseif offer.Mode == "Remove" then
             button.Parent = if plr == Players.LocalPlayer then yourItems :: any else theirItems :: any
         end
+    elseif offer.Kind == "Money" then
+        local label = (if plr == Players.LocalPlayer then yourOffer.OfferedMoney else theirOffer.OfferedMoney) :: TextLabel
+        if offer.Amount <= 0 then
+            label.Visible = false
+            return
+        end
+        label.Text = `{GetCurrencySymbol()}{offer.Amount}`
+        label.Visible = true
+    elseif offer.Kind == "JailCards" then
+        local label = (if plr == Players.LocalPlayer then yourOffer.OfferedJailCards else theirOffer.OfferedJailCards) :: TextLabel
+        if offer.Amount <= 0 then
+            label.Visible = false
+            return
+        end
+        label.Text = `{offer.Amount} Jail Card{if offer.Amount == 1 then "" else "s"}`
+        label.Visible = true
+    else
+        error("Unknown offer kind: " .. offer.Kind)
     end
 end)
 
