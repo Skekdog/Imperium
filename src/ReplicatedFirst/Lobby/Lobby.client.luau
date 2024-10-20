@@ -5,10 +5,13 @@ local TweenService = game:GetService("TweenService")
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local KeybindHintManager = require(script.Parent.Parent.Shared.KeybindHintManager)
 local Notification = require(script.Parent.Parent.Shared.Notification)
 local PlayClickSound = require(script.Parent.Parent.Shared.PlayClickSound)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
+
+KeybindHintManager()
 
 local serverClient = ReplicatedStorage:WaitForChild("Lobby"):WaitForChild("ServerClient")
 local clientServer = ReplicatedStorage:WaitForChild("Lobby"):WaitForChild("ClientServer")
