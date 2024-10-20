@@ -109,6 +109,10 @@ function module.new(boardConfiguration: Types.BoardConfiguration, position: numb
         model:SetAttribute("MortgageValue", tileDescription.AssetDescription.Price / 2)
 
         model:SetAttribute("RentDescription", serialiseRentTable(tileDescription.AssetDescription.RentDescription))
+    elseif tileDescription.TextDescription then
+        model:SetAttribute("Name", name)
+        model:SetAttribute("TextDescription", tileDescription.TextDescription)
+        model:SetAttribute("Colour", boardConfiguration.Colours[colour] or boardConfiguration.Colours.Default)
     end
 
     if tile.TileDescription.AssetDescription then

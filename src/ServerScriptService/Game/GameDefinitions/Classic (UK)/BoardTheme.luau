@@ -42,24 +42,67 @@ local function TaxTile(tile: Types.TileDescription, participant: Types.Participa
     end
 end
 
-local ChanceTile: Types.TileDescription = {
-    Name = "Chance",
-    Icon = "rbxassetid://132370212979970",
-    Colour = "Chance",
-    OnEnter = DrawCard,
-}
-
-local CommunityChestTile: Types.TileDescription = {
-    Name = "Community Chest",
-    Icon = "rbxassetid://118048991405187",
-    Colour = "Community Chest",
-    OnEnter = DrawCard,
-}
-
 local TaxIcon = "rbxassetid://83973123711431"
 local GoIcon = "rbxassetid://135653151798874"
 local GoToJailIcon = "rbxassetid://114111426528418"
 local FreeParkingIcon = "rbxassetid://138390415994185"
+local ChanceIcon = "rbxassetid://132370212979970"
+local CommunityChestIcon = "rbxassetid://118048991405187"
+
+local ChanceTile: Types.TileDescription = {
+    Name = "Chance",
+    Icon = ChanceIcon,
+    Colour = "Chance",
+    OnEnter = DrawCard,
+    TextDescription = "Draw a Chance card. These can be quite dangerous."
+}
+
+local CommunityChestTile: Types.TileDescription = {
+    Name = "Community Chest",
+    Icon = CommunityChestIcon,
+    Colour = "Community Chest",
+    OnEnter = DrawCard,
+    TextDescription = "Draw a Community Chest card. These are usually helpful."
+}
+
+local IncomeTaxTile: Types.TileDescription = {
+    Name = "Income Tax",
+    Icon = TaxIcon,
+    OnEnter = TaxTile,
+    TextDescription = "Pay £200 in Tax."
+}
+
+local SuperTaxTile: Types.TileDescription = {
+    Name = "Super Tax",
+    Icon = TaxIcon,
+    OnEnter = TaxTile,
+    TextDescription = "Pay £100 in Tax."
+}
+
+local FreeParkingTile: Types.TileDescription = {
+    Name = "Free Parking",
+    Icon = FreeParkingIcon,
+    OnEnter = FreeParking,
+    TextDescription = "Collect all Free Parking Bonus money, accumulated from Taxes and Fines. Current Bonus can be viewed in the Playerlist."
+}
+
+local GoToJailTile: Types.TileDescription = {
+    Name = "Go to Jail",
+    OnEnter = GoToJail,
+    Icon = GoToJailIcon,
+    TextDescription = "Go straight to jail. Do not pass Go, do not collect £200."
+}
+
+local GoTile: Types.TileDescription = {
+    Name = "Go",
+    Icon = GoIcon,
+    TextDescription = "Collect £200 upon passing this tile."
+}
+
+local JailTile: Types.TileDescription = {
+    Name = "Jail",
+    TextDescription = "Jailed players are sent here, but anyone passing by is \"Just Visiting\".",
+}
 
 local function GetRentForUtility(asset: Types.Asset, participant: Types.Participant): number
     assert(asset.Owner ~= "Bank", "Cannot get rent for utility owned by bank")
@@ -133,10 +176,7 @@ module.FreeParkingBonusEnabled = false
 module.FreeParkingBonusInitial = 0
 
 module.Tiles = {
-    {
-        Name = "Go",
-        Icon = GoIcon,
-    } :: Types.TileDescription,
+    GoTile :: Types.TileDescription,
     {
         AssetDescription = {
             Name = "Old Kent Road",
@@ -180,11 +220,7 @@ module.Tiles = {
             }
         }
     },
-    {
-        Name = "Income Tax",
-        Icon = TaxIcon,
-        OnEnter = TaxTile
-    },
+    IncomeTaxTile,
     {
         AssetDescription = {
             Name = "King's Cross Station",
@@ -263,10 +299,7 @@ module.Tiles = {
             }
         }
     },
-    {
-        Name = "Jail",
-        Icon = "",
-    },
+    JailTile,
     {
         AssetDescription = {
             Name = "Pall Mall",
@@ -420,11 +453,7 @@ module.Tiles = {
             }
         }
     },
-    {
-        Name = "Free Parking",
-        Icon = FreeParkingIcon,
-        OnEnter = FreeParking,
-    },
+    FreeParkingTile,
     {
         AssetDescription = {
             Name = "Strand",
@@ -578,11 +607,7 @@ module.Tiles = {
             }
         }
     },
-    {
-        Name = "Go to Jail",
-        OnEnter = GoToJail,
-        Icon = GoToJailIcon,
-    },
+    GoToJailTile,
     {
         AssetDescription = {
             Name = "Regent Street",
@@ -683,11 +708,7 @@ module.Tiles = {
             }
         }
     },
-    {
-        Name = "Super Tax",
-        OnEnter = TaxTile,
-        Icon = TaxIcon,
-    },
+    SuperTaxTile,
     {
         AssetDescription = {
             Name = "Mayfair",

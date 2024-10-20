@@ -4,6 +4,11 @@ local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local ui = UIManager.WaitForUI("PropertyDeed") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.PropertyDeed)}
 local object = ui.Object
 
+local rentInfoFrame = object.Frame.RentInfo
+local tileDescriptionFrame = object.Frame.TileDescription
+local mortgageValueFrame = object.Frame.MortgageValue
+local pricingInfoFrame = object.Frame.PricingInfo
+
 return function(tile: Model?): ()
     if not tile then
         return ui:ToggleVisible(false)
@@ -26,17 +31,31 @@ return function(tile: Model?): ()
     local housePrice = tile:GetAttribute("HousePrice") :: string?
     if housePrice then
         object.Frame.PricingInfo.House.Value.Text = currency .. housePrice
+        pricingInfoFrame.House.Visible = true
+    else
+        pricingInfoFrame.House.Visible = false
     end
 
     local hotelPrice = tile:GetAttribute("HotelPrice") :: string?
     if hotelPrice then
         object.Frame.PricingInfo.Hotel.Value.Text = currency .. hotelPrice
+        pricingInfoFrame.Hotel.Visible = true
+    else
+        pricingInfoFrame.Hotel.Visible = false
     end
 
     for _, v in object.Frame.RentInfo:GetChildren() do
         if v:IsA("Frame") and v.Name ~= "Template" then
             v:Destroy()
         end
+    end
+
+    local description = tile:GetAttribute("TextDescription") :: string?
+    if description then
+        tileDescriptionFrame.Text = description
+        tileDescriptionFrame.Visible = true
+    else
+        tileDescriptionFrame.Visible = false
     end
 
     local rentDescription = tile:GetAttribute("RentDescription") :: string?
@@ -50,11 +69,17 @@ return function(tile: Model?): ()
             line.LayoutOrder = i
             line.Parent = object.Frame.RentInfo
         end
+        rentInfoFrame.Visible = true
+    else
+        rentInfoFrame.Visible = false
     end
 
     local mortgageValue = tile:GetAttribute("MortgageValue") :: string?
     if mortgageValue then
-        object.Frame.MortgageValue.Value.Text = currency .. mortgageValue
+        mortgageValueFrame.Value.Text = currency .. mortgageValue
+        mortgageValueFrame.Visible = true
+    else
+        mortgageValueFrame.Visible = false
     end
 
     ui:ToggleVisible(true)
