@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Board = require(script.Parent.Board)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local WaitForever = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.WaitForever)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Participant = require(script.Parent.Participant)
@@ -13,7 +14,7 @@ local function SetNextParticipant(round: Types.Round): Types.Participant
     local lastIndex: number? = 0
     if round.CurrentParticipant then
         if #Players:GetPlayers() < 1 or #round.Participants < 1 then
-            task.wait(100) -- Do not continue the game
+            WaitForever()
         end
         lastIndex = table.find(round.Participants, round.CurrentParticipant)
         assert(lastIndex, "Round has no current participant")

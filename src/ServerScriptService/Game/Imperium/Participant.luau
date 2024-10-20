@@ -5,6 +5,7 @@ local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local PlaySound = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.PlaySound)
+local WaitForever = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.WaitForever)
 local ProfileManager = require(script.Parent.Parent.Parent.Shared.ProfileManager)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Parent.Shared.Teleport)
@@ -656,7 +657,7 @@ local function GetTheDub(participant: Types.Participant): ()
     task.wait(15)
     Teleport(Players:GetPlayers(), "Lobby")
 
-    task.wait(100) -- Do not continue the game
+    WaitForever()
 end
 
 local function HasMonopoly(participant: Types.Participant, colour: string): boolean
