@@ -5,6 +5,7 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local TRADE_COOLDOWN = 5
+local TRADE_TIMEOUT = 10
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
@@ -153,6 +154,8 @@ local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: b
     processUpdatedAcceptance(tradeManager)
 end
 
+local onRequestResponded: {(tradeManager: Types.TradeManager, accepted: boolean) -> ()} = {}
+
 local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Participant): ClientTypes.TradeRequestInvokeResult
     if isTradeActive(tradeManager) or tradeManager.SentOfferTo then
         return "SelfAlreadyTrading"
@@ -173,6 +176,26 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
     tradeRemotes:WaitForChild("ReceiveTradeRequest"):FireClient(to.Player, tradeManager.Participant.Player)
 
     tradeManager.LastTradeRequestTimes[to] = GetTime()
+
+    local responded = false
+    local function onResponded(otherTradeManager: Types.TradeManager, accepted: boolean): ()
+        if otherTradeManager == tradeManager then
+            responded = true
+        end
+    end
+
+    table.insert(onRequestResponded, onResponded)
+
+    while not responded and GetTime() - (tradeManager.LastTradeRequestTimes[to] :: number) < TRADE_TIMEOUT do
+        task.wait()
+    end
+
+    table.remove(onRequestResponded, table.find(onRequestResponded, onResponded))
+
+    if not responded then
+        to.TradeManager:RespondRequest(false)
+        return "Timeout"
+    end
 
     return "Success"
 end
@@ -196,6 +219,10 @@ local function RespondRequest(tradeManager: Types.TradeManager, accepted: boolea
 
     processRequestResponse(sentTo.TradeManager, tradeManager.Participant, accepted)
     processRequestResponse(tradeManager, sentTo, accepted)
+
+    for _, v in onRequestResponded do
+        v(tradeManager, accepted)
+    end
 end
 
 local function UpdateOffer(tradeManager: Types.TradeManager, offer: ClientTypes.TradeOfferUpdate): ()

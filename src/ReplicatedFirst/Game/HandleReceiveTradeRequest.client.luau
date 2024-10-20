@@ -24,6 +24,13 @@ tradeRemotes:WaitForChild("ReceiveTradeRequest").OnClientEvent:Connect(function(
     end
 end)
 
+tradeRemotes:WaitForChild("RespondedTradeRequest").OnClientEvent:Connect(function(with: Player, accepted: boolean): ()
+    if currentOffer == with and not accepted then
+        currentOffer = nil
+        ui:ToggleVisible(false)
+    end
+end)
+
 ui.Object.Response.Accept.Activated:Connect(function(): ()
     assert(currentOffer, "No current offer")
     ui:ToggleVisible(false)

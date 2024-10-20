@@ -69,6 +69,8 @@ local function createPlr(plr: Player)
 			ScreenMessage("Error", "You already have an active trade / request with someone.")
 		elseif response == "OtherAlreadyTrading" then
 			ScreenMessage("Error", "They already have an active trade / request with someone.")
+		elseif response == "Timeout" then
+			ScreenMessage("Error", "Your trade request timed out.")
 		elseif response == "Success" then
 			return
 		else
