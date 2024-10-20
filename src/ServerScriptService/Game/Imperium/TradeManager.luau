@@ -159,6 +159,7 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
 
     tradeManager.SentOfferTo = to
     to.TradeManager.SentOfferTo = tradeManager.Participant
+    tradeRemotes:WaitForChild("SetNewRequestsBlocked"):FireClient(tradeManager.Participant.Player, true)
     tradeRemotes:WaitForChild("RequestTrade"):FireClient(to.Player, tradeManager.Participant.Player)
 end
 

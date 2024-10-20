@@ -4,6 +4,8 @@ local GetPlayerName = require(script.Parent.GetPlayerName)
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
+local ScreenMessage = require(script.Parent.ScreenMessage)
+local TradeOfferState = require(script.Parent.TradeOfferState)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local list = ui.List
@@ -60,6 +62,9 @@ local function createPlr(plr: Player)
 	plr:GetAttributeChangedSignal("Status"):Connect(update)
 
 	clone.Trade.Activated:Connect(function()
+		if not TradeOfferState.CanSendNewRequest then
+			return ScreenMessage("Error", "You have already an ongoing trade / trade request!")
+		end
 		ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("RequestTrade"):FireServer(plr)
 	end)
 

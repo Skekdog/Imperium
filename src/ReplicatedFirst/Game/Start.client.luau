@@ -8,6 +8,7 @@ local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local LerpModelCFrame = require(script.Parent.LerpModelCFrame)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local Notification = require(script.Parent.Parent.Shared.Notification)
+local TradeOfferState = require(script.Parent.Parent.Shared.TradeOfferState)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local PayFine = require(script.Parent.PayFine)
 local RollDice = require(script.Parent.RollDice)
@@ -159,9 +160,14 @@ gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(f
 end)
 
 tradeRemotes:WaitForChild("RespondedTradeRequest").OnClientEvent:Connect(function(plr: Player, accepted: boolean)
+    TradeOfferState.CanSendNewRequest = not accepted
     if accepted then
         TradingUI(plr)
     end
+end)
+
+tradeRemotes:WaitForChild("SetNewRequestsBlocked").OnClientEvent:Connect(function(blocked: boolean)
+    TradeOfferState.CanSendNewRequest = not blocked
 end)
 
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
