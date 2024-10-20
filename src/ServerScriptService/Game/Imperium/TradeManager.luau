@@ -177,24 +177,26 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
 
     tradeManager.LastTradeRequestTimes[to] = GetTime()
 
-    local responded = false
+    local responded: boolean?
     local function onResponded(otherTradeManager: Types.TradeManager, accepted: boolean): ()
         if otherTradeManager == tradeManager then
-            responded = true
+            responded = accepted
         end
     end
 
     table.insert(onRequestResponded, onResponded)
 
-    while not responded and GetTime() - (tradeManager.LastTradeRequestTimes[to] :: number) < TRADE_TIMEOUT do
+    while responded == nil and GetTime() - (tradeManager.LastTradeRequestTimes[to] :: number) < TRADE_TIMEOUT do
         task.wait()
     end
 
     table.remove(onRequestResponded, table.find(onRequestResponded, onResponded))
 
-    if not responded then
+    if responded == nil then
         to.TradeManager:RespondRequest(false)
         return "Timeout"
+    elseif responded == false then
+        return "Declined"
     end
 
     return "Success"
