@@ -88,7 +88,7 @@ local function OfferJailCards(tradeManager: Types.TradeManager, amount: number):
     tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
 end
 
-local function Reset(tradeManager: Types.TradeManager): ()
+local function Reset(tradeManager: Types.TradeManager, wasRejected: boolean?): ()
     tradeManager.SentOfferTo = nil
     tradeManager.TradingWith = nil
 
@@ -98,7 +98,7 @@ local function Reset(tradeManager: Types.TradeManager): ()
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
 
-    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player)
+    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player, wasRejected)
 end
 
 local function finishTradeForParticipant(participant: Types.Participant, to: Types.Participant): ()
@@ -121,8 +121,8 @@ local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean):
         finishTradeForParticipant(tradeManager.TradingWith, tradeManager.Participant)
     end
 
-    Reset(tradeManager.TradingWith.TradeManager)
-    Reset(tradeManager)
+    Reset(tradeManager.TradingWith.TradeManager, not accepted)
+    Reset(tradeManager, not accepted)
 end
 
 local function processUpdatedAcceptance(tradeManager: Types.TradeManager): ()

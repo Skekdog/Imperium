@@ -4,6 +4,7 @@ local ClientTypes = require(script.Parent.ClientTypes)
 local CreateAssetButton = require(script.Parent.CreateAssetButton)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local ScreenMessage = require(script.Parent.Parent.Shared.ScreenMessage)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
 type Inventory = {[string]: typeof(CreateAssetButton(nil :: any, nil :: any))?}
@@ -244,8 +245,11 @@ tradeRemotes:WaitForChild("TradeAcceptance").OnClientEvent:Connect(function(plr:
     updatedAcceptance()
 end)
 
-tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function()
+tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function(wasRejected: boolean?)
     ui:ToggleVisible(false)
+    if wasRejected then
+        ScreenMessage("Error", "The other player rejected your trade.")
+    end
 end)
 
 local function clearObject(object: ScrollingFrame): ()
