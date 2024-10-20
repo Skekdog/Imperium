@@ -15,6 +15,10 @@ local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local SetWaitingText = require(script.Parent.SetWaitingText)
 
+local MAX_PLAYER_LOAD_WAIT_TIME = 120
+local INTERMISSION_DURATION = 5
+local MIN_STUDIO_PLAYERS = 1
+
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
 if not info then
@@ -30,7 +34,7 @@ info.StartingMoney = info.StartingMoney or GameConfiguration.StartingMoney.Defau
 info.Map = info.Map or GameConfiguration.Map.Default :: string
 info.Board = info.Board or GameConfiguration.Board.Default :: string
 info.FreeParkingBonusEnabled = info.FreeParkingBonusEnabled or GameConfiguration.FreeParkingBonusEnabled.Default :: string
-info.Players = info.Players or (if RunService:IsStudio() then 3 else 8)
+info.Players = info.Players or (if RunService:IsStudio() then MIN_STUDIO_PLAYERS else 8)
 
 local map = ServerStorage.Game.Maps:FindFirstChild(info.Map)
 assert(map, `Map {info.Map} not found`)
@@ -53,9 +57,6 @@ local tiles = {}
 for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))
 end
-
-local MAX_PLAYER_LOAD_WAIT_TIME = 120
-local INTERMISSION_DURATION = 5
 
 PhysicsService:RegisterCollisionGroup("Characters")
 PhysicsService:RegisterCollisionGroup("Dice")
