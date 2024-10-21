@@ -32,6 +32,6 @@ type TradeOfferAssetUpdate = {
 
 export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate | TradeOfferAssetUpdate
 
-export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined"?
+export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt"?
 
 return {}

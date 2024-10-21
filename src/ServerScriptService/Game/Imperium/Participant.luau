@@ -140,6 +140,7 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
+    participant.IsGoingBankrupt = true
     local players = {participant.Player}
     if to ~= "Bank" then
         table.insert(players, to.Player)
@@ -156,6 +157,8 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
         task.wait()
     end
     ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", 0)
+
+    participant.IsGoingBankrupt = false
 
     if participant.Money < targetAmount then
         GoBankrupt(participant, to)
@@ -786,6 +789,8 @@ function module.new(player: Player, round: Types.Round): Types.Participant
         Result = 0,
         IsDoubles = false,
     }
+
+    participant.IsGoingBankrupt = false
 
     participant.TryReceiveFreeParkingMoney = TryReceiveFreeParkingMoney
 

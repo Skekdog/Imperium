@@ -148,6 +148,8 @@ export type Participant = {
     IsInGame: boolean,
     HasDisconnected: boolean,
 
+    IsGoingBankrupt: boolean,
+
     Money: number,
     JailCards: number,
     Assets: {Asset},

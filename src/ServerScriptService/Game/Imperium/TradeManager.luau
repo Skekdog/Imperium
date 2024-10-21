@@ -170,6 +170,10 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
         return "Cooldown"
     end
 
+    if to.IsGoingBankrupt or tradeManager.Participant.IsGoingBankrupt then
+        return "Bankrupt"
+    end
+
     assert(to ~= tradeManager.Participant, "Can't trade with yourself")
 
     tradeManager.SentOfferTo = to

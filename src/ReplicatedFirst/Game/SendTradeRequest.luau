@@ -15,6 +15,8 @@ return function(plr: Player): ()
         ScreenMessage("Error", "Trade request timed out.")
     elseif response == "Declined" then
         ScreenMessage("Error", "Target declined your trade request.")
+    elseif response == "Bankrupt" then
+        ScreenMessage("Error", "Unable to trade during bankruptcy.")
     elseif response == "Success" then
         return
     else
