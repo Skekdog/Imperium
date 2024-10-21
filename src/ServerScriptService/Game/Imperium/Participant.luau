@@ -124,8 +124,8 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
     if to ~= "Bank" then
         table.insert(players, to.Player)
     end
+    
     SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
-    AwardBadge(participant.Player, "Bankrupt!")
 
     participant:TransferMoneyTo(to, participant.Money, true)
     participant:TransferJailCards(to, participant.JailCards)
@@ -135,6 +135,8 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
     participant:RemoveParticipant()
+
+    AwardBadge(participant.Player, "Bankrupt!")
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
@@ -150,7 +152,7 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
     local start = GetTime()
     local maxTime = start + participant.Round.GameConfiguration.BankruptcyTime
     SetTimeMilestone(participant.Round.GameConfiguration.BankruptcyTime)
-    while GetTime() < maxTime and participant.Money < targetAmount do
+    while GetTime() < maxTime and participant.Money < targetAmount and not participant.HasDisconnected do
         task.wait()
     end
     ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", 0)
