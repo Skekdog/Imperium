@@ -292,6 +292,12 @@ return function(target: Player): ()
     offeredMoney = 0
     offeredJailCards = 0
 
+    theirOffer.OfferedMoney.Visible = false
+    yourOffer.OfferedMoney.Visible = false
+
+    theirOffer.OfferedJailCards.Visible = false
+    yourOffer.OfferedJailCards.Visible = false
+
     updateOfferJailCardButtons()
     updateOfferMoneyButtons()
 
