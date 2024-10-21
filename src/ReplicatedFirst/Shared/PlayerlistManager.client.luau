@@ -38,9 +38,7 @@ local function createPlr(plr: Player)
 	local clone = ui.PlayerFrame:Clone()
 	players[plr.Name] = clone
 
-	clone.Username:SetAttribute("Format", "[PLAYER]")
-	clone.Username:SetAttribute("Player_1", GetPlayerName(plr))
-	clone.Username:AddTag("DynamicNames")
+	clone.Username.Text = GetPlayerName(plr, "Both")
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
