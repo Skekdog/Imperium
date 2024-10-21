@@ -124,14 +124,14 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
     if to ~= "Bank" then
         table.insert(players, to.Player)
     end
-    
+
     SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
 
-    participant:TransferMoneyTo(to, participant.Money, true)
-    participant:TransferJailCards(to, participant.JailCards)
     for _, asset in participant.Assets do
         asset:TransferTo(to)
     end
+    participant:TransferMoneyTo(to, participant.Money, true)
+    participant:TransferJailCards(to, participant.JailCards)
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
     participant:RemoveParticipant()
