@@ -120,7 +120,11 @@ local function GiveMoney(participant: Types.Participant, amount: number): ()
 end
 
 local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner): ()
-    SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, {participant.Player})
+    local players = {participant.Player}
+    if to ~= "Bank" then
+        table.insert(players, to.Player)
+    end
+    SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
     AwardBadge(participant.Player, "Bankrupt!")
 
     participant:TransferMoneyTo(to, participant.Money, true)
