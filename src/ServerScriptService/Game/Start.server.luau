@@ -17,7 +17,7 @@ local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
-local MIN_STUDIO_PLAYERS = 1
+local MIN_STUDIO_PLAYERS = 3
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
@@ -116,6 +116,13 @@ Players.PlayerRemoving:Connect(function(plr)
     if participant then
         SendNotification(`{plr.Name} has left the game. Their assets will be auctioned off when their turn starts.`) -- todo: Format names correctly as per client settings. Can't just pass the player instance because they're gone
         participant.HasDisconnected = true
+
+        if participant.TradeManager.TradingWith then
+            participant.TradeManager.OfferedAssets = {}
+            participant.TradeManager.OfferedMoney = 0
+            participant.TradeManager.OfferedJailCards = 0
+            participant.TradeManager:FinishTrade(false)
+        end
     end
 end)
 
