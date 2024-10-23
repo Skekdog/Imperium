@@ -17,7 +17,8 @@ local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
-local MIN_STUDIO_PLAYERS = 3
+local MIN_STUDIO_PLAYERS = 1
+local MIN_PLAYERS_OR_EXIT = 1
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
@@ -96,6 +97,13 @@ SetWaitingText("Waiting for players...", MAX_PLAYER_LOAD_WAIT_TIME)
 while (players < info.Players) and (GetTime() - startWait < MAX_PLAYER_LOAD_WAIT_TIME) do
     task.wait()
     players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
+end
+
+if players < MIN_PLAYERS_OR_EXIT then
+    for _, v in Players:GetPlayers() do
+        v:Kick("Not enough players to start the game.")
+    end
+    return
 end
 
 local round = Round.new(board, tiles, {

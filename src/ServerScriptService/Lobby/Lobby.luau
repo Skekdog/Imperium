@@ -8,6 +8,7 @@ local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local serverClient = ReplicatedStorage.Lobby.ServerClient
 
 local MAX_PLAYERS = 8
+local MIN_PLAYERS = 1
 
 local lobbies: {[number]: LobbyTypes.Lobby?} = {}
 
@@ -25,6 +26,10 @@ local function Kick(lobby: LobbyTypes.Lobby, plr: Player): ()
 end
 
 local function Start(lobby: LobbyTypes.Lobby): ()
+    if #lobby.Players < MIN_PLAYERS then
+        return SendNotification("Not enough players to start the game.", nil, lobby.Players)
+    end
+
     local info = {
         Players = #lobby.Players,
     } :: Teleport.GameInfo
