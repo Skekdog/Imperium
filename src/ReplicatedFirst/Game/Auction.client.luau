@@ -11,21 +11,27 @@ local auctionPropertyUI = UIManager.WaitForUI("AuctionProperty") :: UIManager.UI
 local object = auctionPropertyUI.Object
 
 local function resetAuction(description: {Name: string}?): ()
+    print("received auction event, ", if description then description.Name else "no description")
     local currency = GetCurrencySymbol()
     object.CurrentBid.Text = `{currency}0`
     object.CurrentWinner.Text = ""
     
+    print("IsSpectating: ", IsSpectating())
     if not description or IsSpectating() then
+        print("hiding auction")
         return auctionPropertyUI:ToggleVisible(false)
     end
 
     auctionPropertyUI:ToggleVisible(true)
     object.PropertyName.Text = description.Name
+    print("showing auction")
 end
 resetAuction()
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
+print("connecting to startauction event client")
 gameServerClient:WaitForChild("StartAuction").OnClientEvent:Connect(resetAuction)
+print("connected to start auction event client")
 
 gameServerClient:WaitForChild("UpdateAuction").OnClientEvent:Connect(function(highestBidder: Player, highestBid: number)
     local currency = GetCurrencySymbol()
