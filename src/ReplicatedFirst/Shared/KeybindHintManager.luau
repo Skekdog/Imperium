@@ -1,5 +1,6 @@
 local CollectionService = game:GetService("CollectionService")
 local ControlManager = require(script.Parent.ControlManager)
+local SettingCallback = require(script.Parent.SettingCallback)
 local SettingsManager = require(script.Parent.SettingsManager)
 
 local boundInstances: {[string]: {TextLabel}} = {}
@@ -13,10 +14,10 @@ local function setText(control: string, label: TextLabel): ()
     label.Text = `[{text}]`
 end
 
-SettingsManager.KeybindUpdatedEvent.Event:Connect(function(actionName: string)
-    if boundInstances[actionName] then
-        for _, v in boundInstances[actionName] do
-            setText(actionName, v)
+SettingCallback.Listen(function(name, value)
+    if boundInstances[name] then
+        for _, v in boundInstances[name] do
+            setText(name, v)
         end
     end
 end)

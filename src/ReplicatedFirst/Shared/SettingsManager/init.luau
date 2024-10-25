@@ -1,7 +1,5 @@
 local HTTPService = game:GetService("HttpService")
-local Lighting = game:GetService("Lighting")
-local UserInputService = game:GetService("UserInputService")
-local IsLobby = require(script.Parent.IsLobby)
+local SettingCallback = require(script.Parent.SettingCallback)
 
 export type SettingDefinition = {
 	Name: string,
@@ -12,7 +10,6 @@ export type SettingDefinition = {
 	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
 	Default: Setting,
 	SpecifyToggle: boolean?, -- Whether the user can change if this is toggled or not. Only for keybinds.
-	Callback: ((val: Setting?, name: string?) -> ())?,
 }
 
 export type Keybind = Enum.UserInputType | Enum.KeyCode
@@ -34,9 +31,6 @@ module.AvailableSettings = {
 		Tooltip = "Select a theme for the UI.",
 		PossibleValues = {"Dark", "Light", "Blue"},
 		Default = "Dark",
-		Callback = function(val) -- Can't directly reference this because cyclic dependency!
-			require(script.Parent.ThemesManager).UpdateTheme(val)
-		end :: any,
 	},
 	{
 		Name = "Night Sky",
@@ -45,11 +39,6 @@ module.AvailableSettings = {
 		Tooltip = "Enables or disables the night sky. Does not take effect in the lobby.",
 		PossibleValues = "Boolean",
 		Default = false,
-		Callback = function(val)
-			if not IsLobby() then
-				Lighting.ClockTime = if val then 0 else 14
-			end
-		end,
 	},
 	{
 		Name = "Player Names",
@@ -58,10 +47,6 @@ module.AvailableSettings = {
 		Tooltip = "Choose whether to show display names, usernames, or both.",
 		PossibleValues = {"Display Name", "Username", "Both"},
 		Default = "Display Name",
-		Callback = function(val)
-			local DynamicNames = require(script.Parent.DynamicNames)
-			DynamicNames.UpdateAll(val)
-		end
 	},
 	{
 		Name = "Animate UI Transitions",
@@ -70,23 +55,6 @@ module.AvailableSettings = {
 		Tooltip = "Enables animated transitions for all UI.",
 		PossibleValues = "Boolean",
 		Default = true,
-	},
-	{
-		Name = "Always Show Sidebar",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "This setting has no effect if a keyboard is not connected.",
-		PossibleValues = "Boolean",
-		Default = true,
-		Callback = function(val)
-			if not UserInputService.KeyboardEnabled then
-				return
-			end
-			local sidebar = require(script.Parent.UIManager).WaitForUI("Sidebar")
-			if sidebar then
-				sidebar:ToggleVisible(val :: boolean)
-			end
-		end
 	},
 	{
 		Name = "Close Scale",
@@ -195,18 +163,11 @@ for _, v in module.AvailableSettings do
 	module.Settings[v.Name] = {Value = v.Default, Definition = v}
 end
 
-module.KeybindUpdatedEvent = script.KeybindUpdated
-
 function module.SetSetting(setting: string, settingValue: Setting)
 	local ref = module.Settings[setting]
 	ref.Value = settingValue
-	if ref.Definition.Callback then
-		ref.Definition.Callback(settingValue, setting)
-	end
-
-	if ref.Definition.PossibleValues == "Keybind" then
-		module.KeybindUpdatedEvent:Fire(setting, settingValue)
-	end
+	
+	SettingCallback.Fire(setting, settingValue)
 end
 
 function module.GetSetting(settingName: string): Setting
