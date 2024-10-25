@@ -202,7 +202,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			for i, v in binds do
 				local bind = m.Keybinds.__KeybindFrame:Clone()
 				
-				bind.LayoutOrder = (i + numBoundKeys)*2 -- Separator in between, hence *2
+				bind.LayoutOrder = i + numBoundKeys
 
 				bind.Name = name .. tostring(i + numBoundKeys)
 				
@@ -218,15 +218,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 
 				bind.Visible = true
 				bind.Parent = m.Keybinds
-
-				if (numBoundKeys+i) > 1 then
-					local sep = m.Keybinds.__Separator:Clone()
-					sep.Name = "Separator"
-					sep.Visible = true
-					sep.LayoutOrder = bind.LayoutOrder-1
-					sep.Name = "Separator"..tostring(sep.LayoutOrder)
-					sep.Parent = m.Keybinds
-				end
 
 				local function removeBind()
 					local binds = SM.GetSetting(name) :: SM.KeybindSetting
