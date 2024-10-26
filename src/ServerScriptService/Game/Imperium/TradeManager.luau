@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
+local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
 
 local Types = require(script.Parent.Types)
 local module = {}
@@ -118,6 +119,7 @@ local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean):
     assert(tradeManager.TradingWith)
 
     if accepted then
+        SendNotification("[PLAYER] accepted a trade with [PLAYER].", {tradeManager.Participant.Player, tradeManager.TradingWith.Player})
         finishTradeForParticipant(tradeManager.Participant, tradeManager.TradingWith)
         finishTradeForParticipant(tradeManager.TradingWith, tradeManager.Participant)
     end

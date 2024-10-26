@@ -612,6 +612,7 @@ local function TransferJailCards(participant: Types.Participant, to: Types.Asset
     participant.Player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
 
     if to ~= "Bank" then
+        SendNotification(`[PLAYER] gave {amount} jail cards to [PLAYER].`, {participant.Player, to.Player})
         to:GiveJailCards(amount)
     end
 end

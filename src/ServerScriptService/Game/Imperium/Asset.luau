@@ -43,6 +43,10 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
         round = to.Round
     end
 
+    if to ~= "Bank" and asset.Owner ~= "Bank" then
+        SendNotification(`[PLAYER] transferred {asset.AssetDescription.Name} to [PLAYER].`, {asset.Owner.Player, to.Player})
+    end
+
     asset:TrySellAllDevelopments()
 
     local colour = asset.AssetDescription.Colour
