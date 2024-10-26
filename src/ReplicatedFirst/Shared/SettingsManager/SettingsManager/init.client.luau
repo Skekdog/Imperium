@@ -25,7 +25,6 @@ if options then
 		SM.SetSetting(i, v)
 	end
 end
-ReplicatedFirst:SetAttribute("ControlsReady", true)
 
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 local ScreenMessage = require(script.Parent.Parent.ScreenMessage)

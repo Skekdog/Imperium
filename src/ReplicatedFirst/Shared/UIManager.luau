@@ -147,9 +147,6 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	
 	if self.Sidebar then
 		local sb = UIManager.GetUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
-		if not ReplicatedFirst:GetAttribute("ControlsReady") then
-			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
-		end
 
 		local but = sb.Button:Clone()
 		but.Name = self.Name
