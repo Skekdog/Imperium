@@ -2,6 +2,9 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local CAS = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CHECKBOX_ON = "rbxassetid://70556080680796"
+local CHECKBOX_OFF = "rbxassetid://101035239747030"
+
 local SM = require(script.Parent)
 
 -- This must be run before anything yields, especially todo with ui
@@ -244,13 +247,13 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		if setting.SpecifyToggle then
 			local toggleButton = m.Toggled
 			toggleButton.Visible = true
-			toggleButton.Image = if (SM.GetSetting(name) :: SM.KeybindSetting).Toggled then "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOn@3x.png" else "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOff@3x.png"
+			toggleButton.Image = if (SM.GetSetting(name) :: SM.KeybindSetting).Toggled then CHECKBOX_ON else CHECKBOX_OFF
 			toggleButton.MouseButton1Click:Connect(function()
 				local cur = SM.GetSetting(name) :: SM.KeybindSetting
 				cur.Toggled = not cur.Toggled
 				SM.SetSetting(name, cur)
 				
-				toggleButton.Image = if cur.Toggled then "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOn@3x.png" else "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOff@3x.png"
+				toggleButton.Image = if cur.Toggled then CHECKBOX_ON else CHECKBOX_OFF
 			end)
 		end
 		
