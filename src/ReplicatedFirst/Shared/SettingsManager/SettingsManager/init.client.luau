@@ -244,13 +244,13 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		if setting.SpecifyToggle then
 			local toggleButton = m.Toggled
 			toggleButton.Visible = true
-			toggleButton.Image = (SM.GetSetting(name) :: SM.KeybindSetting).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
+			toggleButton.Image = if (SM.GetSetting(name) :: SM.KeybindSetting).Toggled then "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOn@3x.png" else "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOff@3x.png"
 			toggleButton.MouseButton1Click:Connect(function()
 				local cur = SM.GetSetting(name) :: SM.KeybindSetting
 				cur.Toggled = not cur.Toggled
 				SM.SetSetting(name, cur)
 				
-				toggleButton.Image = cur.Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
+				toggleButton.Image = if cur.Toggled then "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOn@3x.png" else "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOff@3x.png"
 			end)
 		end
 		
