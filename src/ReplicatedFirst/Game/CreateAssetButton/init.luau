@@ -1,4 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(script.Parent.ClientTypes)
+
+local colourOrders = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ColourOrders")
 
 export type Button = typeof(script.AssetButton)
 
@@ -14,8 +17,7 @@ return function(size: UDim2, asset: ClientTypes.ClientAssetView): Button
 
     button.Size = size
 
-    -- todo: this can cause problems if there are two similar colours. woo.
-    button.LayoutOrder = (tonumber(asset.Colour:ToHex(), 16) or error("Failed to convert colour to hex")) + asset.Position
+    button.LayoutOrder = colourOrders:GetAttribute(asset.Colour:ToHex()) :: number * 1000 + asset.Position
 
     button.Name = "Asset_" .. name
     button.Visible = true

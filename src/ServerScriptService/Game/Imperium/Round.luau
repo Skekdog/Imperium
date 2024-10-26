@@ -6,6 +6,7 @@ local WaitForever = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.S
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
 local SetWaitingText = require(script.Parent.Parent.SetWaitingText)
 local Participant = require(script.Parent.Participant)
+local TileUtils = require(script.Parent.TileUtils)
 local Types = require(script.Parent.Types)
 
 local module = {}
@@ -193,6 +194,14 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     ReplicatedStorage:SetAttribute("FineAmount", boardConfiguration.JailFine)
 
     round.CurrentParticipant = round.Participants[#round.Participants]
+
+    local colourOrders = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ColourOrders")
+    for i, tile in tiles do
+        local color = TileUtils.GetColor3(tile.TileDescription, round):ToHex()
+        if not colourOrders:GetAttribute(color) then
+            colourOrders:SetAttribute(color, i)
+        end
+    end
 
     return round
 end

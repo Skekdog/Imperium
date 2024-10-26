@@ -16,7 +16,12 @@
         },
         "ReplicatedStorage": {
             "Shared": {"$path": "src/ReplicatedStorage/Shared"},
-            "Game": {"$path": "src/ReplicatedStorage/Game"},
+            "Game": {
+                "$path": "src/ReplicatedStorage/Game",
+                "ColourOrders": {
+                    "$className": "Folder"
+                }
+            },
             "$properties": {
                 "Attributes": {
                     "TimeMilestone": {"Float64": 0},
