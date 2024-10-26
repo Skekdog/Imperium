@@ -30,7 +30,7 @@ local function moveDown(frame: Frame)
 	end
 end
 
-local function makeLabel(text: string, players: {Player}?): ()
+local function makeLabel(text: string, players: {Player | string}?): ()
 	local label = ui.Label:Clone()
 
 	if players then
@@ -60,7 +60,7 @@ local function makeLabel(text: string, players: {Player}?): ()
 	task.delay(2, fade, label, true)
 end
 
-local function makeLog(msg: string, players: {Player}?): ()
+local function makeLog(msg: string, players: {Player | string}?): ()
 	local eventLog = UIManager.TryGetUI("EventLog") :: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.EventLog)})?
 	if not eventLog then
 		return
@@ -87,7 +87,7 @@ local function makeLog(msg: string, players: {Player}?): ()
 	UIAnimation.Animate(label, TweenInfo.new(0.25), {Size = UDim2.fromScale(1, 0.15)})
 end
 
-return function(msg: string, players: {Player}?)
+return function(msg: string, players: {Player | string}?)
 	makeLabel(msg, players)
 	makeLog(msg, players)
 end

@@ -122,7 +122,7 @@ SetWaitingText(nil, 0)
 Players.PlayerRemoving:Connect(function(plr)
     local participant = round:TryGetParticipant(plr)
     if participant then
-        SendNotification(`{plr.Name} has left the game. Their assets will be auctioned off when their turn starts.`) -- todo: Format names correctly as per client settings. Can't just pass the player instance because they're gone
+        SendNotification(`[PLAYER] has left the game. Their assets will be auctioned off when their turn starts.`, {participant.Player})
         participant.HasDisconnected = true
 
         if participant.TradeManager.TradingWith then
