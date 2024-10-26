@@ -1,5 +1,5 @@
 return {
-    Default = Color3.new(0.5, 0.5, 0.5),
+    Default = Color3.new(1, 0.75, 0.75),
 
     ["Dark Blue"] = Color3.new(0, 0, 1),
     ["Light Blue"] = Color3.new(0, 1, 1),
@@ -11,7 +11,7 @@ return {
     ["Brown"] = Color3.new(0.5, 0.25, 0.25),
 
     ["Utility"] = Color3.new(0.75, 0.75, 1),
-    ["Station"] = Color3.new(0.75, 1, 0.75),
+    ["Station"] = Color3.new(0.9, 0.9, 0.6),
 
     ["Community Chest"] = Color3.new(0.475, 0.85, 0.8),
     ["Chance"] = Color3.new(1, 0.75, 0.65),
