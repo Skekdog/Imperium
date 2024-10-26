@@ -15,6 +15,12 @@ local TileMath = require(script.Parent.Parent.TileMath)
 local TradeManager = require(script.Parent.TradeManager)
 local Types = require(script.Parent.Types)
 
+local MAX_MOVE_DURATION = 15
+local MAX_DIRECT_MOVE_DURATION = 8
+local MOVEMENT_EPSILON = 2.5
+local JAIL_EPSILON = 1.5
+local CHAR_HEIGHT = 3
+
 local module = {}
 
 local function animateJailBars(round: Types.Round, locked: boolean): ()
@@ -219,11 +225,6 @@ local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
     round:SetFreeParkingMoney(0)
 end
 
-local MAX_MOVE_DURATION = 15
-local MAX_DIRECT_MOVE_DURATION = 8
-local MOVEMENT_EPSILON = 2.5
-local JAIL_EPSILON = 1.5
-local CHAR_HEIGHT = 3
 local function moveCharacter(participant: Types.Participant, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
     local char = participant.Player.Character
     if not char then
@@ -240,7 +241,8 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
         return
     end
 
-    local targetPart = tile.Model.PrimaryPart :: BasePart
+    local targetPart = tile.Model.PrimaryPart
+    assert(targetPart, "Tile has no primary part")
 
     local startTime = GetTime() - (elapsedTime or 0)
     local reached = false
