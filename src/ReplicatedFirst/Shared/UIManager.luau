@@ -4,6 +4,7 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
+local CreateSidebarButton = require(script.Parent.CreateSidebarButton)
 local ControlManager = require(ReplicatedFirst.Shared.ControlManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 
@@ -146,22 +147,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	end
 	
 	if self.Sidebar then
-		local sb = UIManager.GetUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
-
-		local but = sb.Button:Clone()
-		but.Name = self.Name
-
-		but.Text = self.DisplayName
-		
-		but:SetAttribute("Control", self.Name)
-		but:SetAttribute("NoStyle", true)
-		but:SetAttribute("Position", UDim2.fromScale(1, 1))
-		but:SetAttribute("Size", UDim2.fromScale(0.45, 1))
-		but:AddTag("ControlHint")
-
-		but.Visible = true
-		but.Parent = sb
-		but.MouseButton1Click:Connect(function()
+		CreateSidebarButton(self.Name, self.DisplayName, function()
 			self:ToggleVisible()
 		end)
 	end
