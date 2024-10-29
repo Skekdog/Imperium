@@ -84,7 +84,7 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
         end
     
         local tile = participant.Board:TryFindTileByName(propertyName)
-        if not tile or not tile.Asset or tile.Position ~= participant.Position then
+        if not tile or tile.Asset ~= asset then
             return
         end
 
