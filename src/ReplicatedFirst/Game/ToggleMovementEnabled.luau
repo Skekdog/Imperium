@@ -10,8 +10,29 @@ end
 local originalMoveFunction = Controls.moveFunction
 local originalGetIsJumping = activeController.GetIsJumping
 
+local isEnabled = true
+
+task.defer(function()
+    while true do
+        task.wait()
+
+        local char = Players.LocalPlayer.Character
+        if not char then
+            continue
+        end
+
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if not humanoid then
+            continue
+        end
+
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, isEnabled)
+    end
+end)
+
 --todo: if there is ever a case where this is called with enabled = true, it's untested. jump function is especially dodgy.
 return function(enabled: boolean): ()
+    isEnabled = enabled
     if enabled then
         Controls.moveFunction = originalMoveFunction
         activeController.GetIsJumping = originalGetIsJumping
