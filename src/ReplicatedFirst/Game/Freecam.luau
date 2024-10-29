@@ -20,6 +20,7 @@ local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local Settings = UserSettings()
 local GameSettings = Settings.GameSettings
+local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
 
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then
@@ -187,9 +188,11 @@ local Input = {} do
 			keyboard.S - keyboard.W
 		)*NAV_KEYBOARD_SPEED
 
+		local kTouch = Controls:GetMoveVector()
+
 		local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
 
-		return (kGamepad + kKeyboard)*(navSpeed*(shift and NAV_SHIFT_MUL or 1))
+		return (kGamepad + kKeyboard + kTouch)*(navSpeed*(shift and NAV_SHIFT_MUL or 1))
 	end
 
 	function Input.Pan(dt)
