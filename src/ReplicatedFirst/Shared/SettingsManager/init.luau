@@ -134,7 +134,7 @@ module.AvailableSettings = {
 		Tooltip = "Closes the fore-most UI.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.X, Enum.KeyCode.ButtonB}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.N, Enum.KeyCode.X, Enum.KeyCode.ButtonB}, Toggled = true},
 	},
 	{
 		Name = "Playerlist",
