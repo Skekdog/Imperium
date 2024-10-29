@@ -27,7 +27,7 @@ module.AvailableSettings = {
 	{
 		Name = "Your Turn Alert",
 		Tab = "Sound",
-		Category = "General",
+		Category = "Alerts",
 		Tooltip = "Plays a sound when your turn begins.",
 		PossibleValues = "Boolean",
 		Default = true,
@@ -35,7 +35,7 @@ module.AvailableSettings = {
 	{
 		Name = "Bankruptcy Alert",
 		Tab = "Sound",
-		Category = "General",
+		Category = "Alerts",
 		Tooltip = "Continually plays an alert sound when you are going bankrupt.",
 		PossibleValues = "Boolean",
 		Default = true,
@@ -148,7 +148,7 @@ module.AvailableSettings = {
 	{
 		Name = "Asset Manager",
 		Tab = "Keybinds",
-		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Category = "Menus",
 		Tooltip = "Opens the asset manager.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -157,7 +157,7 @@ module.AvailableSettings = {
 	{
 		Name = "Confirm Purchase",
 		Tab = "Keybinds",
-		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Category = "Menus",
 		Tooltip = "Opens the confirm purchase menu. Can also be opened by typing !purchase in chat.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
