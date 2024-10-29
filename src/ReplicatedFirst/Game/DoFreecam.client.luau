@@ -22,5 +22,3 @@ but:AddTag("ControlHint")
 but.Visible = true
 but.Parent = sb
 but.MouseButton1Click:Connect(Freecam)
-
---todo: this doesn't work on mobile
