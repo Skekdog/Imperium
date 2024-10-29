@@ -387,7 +387,7 @@ local function StartFreecam()
 
 	local cameraCFrame = Camera.CFrame
 	cameraRot = Vector2.new(cameraCFrame:toEulerAnglesYXZ())
-	cameraPos = cameraCFrame.p
+	cameraPos = cameraCFrame.p + Vector3.new(1.5, 3, 0)
 	cameraFov = Camera.FieldOfView
 
 	velSpring:Reset(Vector3.new())
