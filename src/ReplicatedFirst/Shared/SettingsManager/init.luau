@@ -74,6 +74,15 @@ module.AvailableSettings = {
 	},
 
 	{
+		Name = "Freecam",
+		Tab = "Keybinds",
+		Category = "Controls",
+		Tooltip = "Enables or disables freecam.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes = {Enum.KeyCode.P, Enum.KeyCode.ButtonSelect}, Toggled = true},
+	},
+	{
 		Name = "Roll Dice",
 		Tab = "Keybinds",
 		Category = "Controls",
@@ -126,7 +135,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the asset manager.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.C, Enum.KeyCode.ButtonR2}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.C, Enum.KeyCode.ButtonL2}, Toggled = true},
 	},
 	{
 		Name = "Confirm Purchase",
@@ -135,7 +144,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the confirm purchase menu. Can also be opened by typing !purchase in chat.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.Y, Enum.KeyCode.ButtonR1}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.Y, Enum.KeyCode.ButtonL1}, Toggled = true},
 	},
 	{
 		Name = "Settings",
