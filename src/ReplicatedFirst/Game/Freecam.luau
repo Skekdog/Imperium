@@ -68,7 +68,7 @@ while Camera.ViewportSize.Magnitude < 10 do
 	task.wait()
 end
 
-local MOBILE_PAN_SENSITIVITY_MULTIPLIER = Camera.ViewportSize.Magnitude / 400
+local MOBILE_PAN_SENSITIVITY_MULTIPLIER = 2
 
 local VEL_STIFFNESS = 100.0 -- normal value is 1.5
 local PAN_STIFFNESS = 100.0 -- normal value is 1.0
