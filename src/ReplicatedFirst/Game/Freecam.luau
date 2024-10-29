@@ -64,7 +64,11 @@ local FOV_GAIN = 300
 
 local PITCH_LIMIT = rad(90)
 
-local MOBILE_PAN_SENSITIVITY_MULTIPLIER = 2
+while Camera.ViewportSize.Magnitude < 10 do
+	task.wait()
+end
+
+local MOBILE_PAN_SENSITIVITY_MULTIPLIER = Camera.ViewportSize.Magnitude / 400
 
 local VEL_STIFFNESS = 100.0 -- normal value is 1.5
 local PAN_STIFFNESS = 100.0 -- normal value is 1.0
@@ -249,6 +253,12 @@ local Input = {} do
 
 		local function TouchRotate(action, state, input)
 			local delta = input.Delta
+
+			-- Assume this is just a tap
+			if delta.Magnitude < 1 then
+				return Enum.ContextActionResult.Pass
+			end
+
 			mouse.Delta = Vector2.new(-delta.y, -delta.x) * MOBILE_PAN_SENSITIVITY_MULTIPLIER
 			return Enum.ContextActionResult.Sink
 		end
