@@ -207,7 +207,7 @@ local Input = {} do
 			thumbstickCurve(gamepad.Thumbstick2.Y),
 			thumbstickCurve(-gamepad.Thumbstick2.X)
 		)*PAN_GAMEPAD_SPEED
-		local kMouse = mouse.Delta*PAN_MOUSE_SPEED
+		local kMouse = mouse.Delta*PAN_MOUSE_SPEED / dt / 60
 		mouse.Delta = Vector2.new()
 		return kGamepad + kMouse
 	end
