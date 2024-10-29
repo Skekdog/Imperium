@@ -4,7 +4,7 @@ local SettingCallback = require(script.Parent.SettingCallback)
 export type SettingDefinition = {
 	Name: string,
 	DisplayName: string?,
-	Tab: "Display" | "Gameplay" | "Controls" | "Touch" | "General" | "Keybinds",
+	Tab: "Display" | "Keybinds" | "Sound",
 	Category: string,
 	Tooltip: string,
 	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
@@ -24,6 +24,15 @@ local module = {}
 module.SETTINGS_VERSION = 3
 module.Settings = {}
 module.AvailableSettings = {
+	{
+		Name = "Your Turn Alert",
+		Tab = "Sound",
+		Category = "General",
+		Tooltip = "Plays a sound when your turn begins.",
+		PossibleValues = "Boolean",
+		Default = true,
+	},
+
 	{
 		Name = "UI Theme",
 		Tab = "Display",

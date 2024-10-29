@@ -9,6 +9,8 @@ local LerpModelCFrame = require(script.Parent.LerpModelCFrame)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
 local KeybindHintManager = require(script.Parent.Parent.Shared.KeybindHintManager)
 local Notification = require(script.Parent.Parent.Shared.Notification)
+local PlaySound = require(script.Parent.Parent.Shared.PlaySound)
+local SettingsManager = require(script.Parent.Parent.Shared.SettingsManager)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local PayFine = require(script.Parent.PayFine)
 local RollDice = require(script.Parent.RollDice)
@@ -45,6 +47,10 @@ gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
     rollDice:ToggleVisible(isPlayer)
     payFine:ToggleVisible(isPlayer and isJailed and player:GetAttribute("Money") :: number >= ReplicatedStorage:GetAttribute("FineAmount") :: number)
     useCard:ToggleVisible(isPlayer and isJailed and player:GetAttribute("GetOutOfJailFreeCards") :: number > 0)
+
+    if isPlayer and SettingsManager.GetSetting("Your Turn Alert") then
+        PlaySound("TurnBeginAlert")
+    end
 end)
 
 ReplicatedStorage:GetAttributeChangedSignal("FineAmount"):Connect(function()
