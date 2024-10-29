@@ -63,9 +63,9 @@ local FOV_GAIN = 300
 
 local PITCH_LIMIT = rad(90)
 
-local VEL_STIFFNESS = 5.0 -- normal value is 1.5
-local PAN_STIFFNESS = 8.0 -- normal value is 1.0
-local FOV_STIFFNESS = 6.0 -- normal value is 4.0
+local VEL_STIFFNESS = 100.0 -- normal value is 1.5
+local PAN_STIFFNESS = 100.0 -- normal value is 1.0
+local FOV_STIFFNESS = 100.0 -- normal value is 4.0
 
 ------------------------------------------------------------------------
 
