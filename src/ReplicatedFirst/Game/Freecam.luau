@@ -56,12 +56,15 @@ end
 
 local FREECAM_ENABLED_ATTRIBUTE_NAME = "FreecamEnabled"
 local INPUT_PRIORITY = Enum.ContextActionPriority.High.Value
+local REDUCED_INPUT_PRIORITY = Enum.ContextActionPriority.Medium.Value
 
 local NAV_GAIN = Vector3.new(1, 1, 1)*64
 local PAN_GAIN = Vector2.new(0.75, 1)*8
 local FOV_GAIN = 300
 
 local PITCH_LIMIT = rad(90)
+
+local MOBILE_PAN_SENSITIVITY_MULTIPLIER = 2
 
 local VEL_STIFFNESS = 100.0 -- normal value is 1.5
 local PAN_STIFFNESS = 100.0 -- normal value is 1.0
@@ -244,6 +247,12 @@ local Input = {} do
 			return Enum.ContextActionResult.Sink
 		end
 
+		local function TouchRotate(action, state, input)
+			local delta = input.Delta
+			mouse.Delta = Vector2.new(-delta.y, -delta.x) * MOBILE_PAN_SENSITIVITY_MULTIPLIER
+			return Enum.ContextActionResult.Sink
+		end
+
 		local function Zero(t)
 			for k, v in pairs(t) do
 				t[k] = v*0
@@ -260,11 +269,12 @@ local Input = {} do
 				Enum.KeyCode.Q,
 				Enum.KeyCode.Up, Enum.KeyCode.Down
 			)
-			ContextActionService:BindActionAtPriority("FreecamMousePan",          MousePan,   false, INPUT_PRIORITY, Enum.UserInputType.MouseMovement)
-			ContextActionService:BindActionAtPriority("FreecamMouseWheel",        MouseWheel, false, INPUT_PRIORITY, Enum.UserInputType.MouseWheel)
-			ContextActionService:BindActionAtPriority("FreecamGamepadButton",     GpButton,   false, INPUT_PRIORITY, Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY)
-			ContextActionService:BindActionAtPriority("FreecamGamepadTrigger",    Trigger,    false, INPUT_PRIORITY, Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
-			ContextActionService:BindActionAtPriority("FreecamGamepadThumbstick", Thumb,      false, INPUT_PRIORITY, Enum.KeyCode.Thumbstick1, Enum.KeyCode.Thumbstick2)
+			ContextActionService:BindActionAtPriority("FreecamMousePan",          MousePan,    false, INPUT_PRIORITY,         Enum.UserInputType.MouseMovement)
+			ContextActionService:BindActionAtPriority("FreecamTouchRotate",       TouchRotate, false, REDUCED_INPUT_PRIORITY, Enum.UserInputType.Touch)
+			ContextActionService:BindActionAtPriority("FreecamMouseWheel",        MouseWheel,  false, INPUT_PRIORITY,         Enum.UserInputType.MouseWheel)
+			ContextActionService:BindActionAtPriority("FreecamGamepadButton",     GpButton,    false, INPUT_PRIORITY,         Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY)
+			ContextActionService:BindActionAtPriority("FreecamGamepadTrigger",    Trigger,     false, INPUT_PRIORITY,         Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
+			ContextActionService:BindActionAtPriority("FreecamGamepadThumbstick", Thumb,       false, INPUT_PRIORITY,         Enum.KeyCode.Thumbstick1, Enum.KeyCode.Thumbstick2)
 		end
 
 		function Input.StopCapture()
@@ -278,6 +288,7 @@ local Input = {} do
 			ContextActionService:UnbindAction("FreecamGamepadButton")
 			ContextActionService:UnbindAction("FreecamGamepadTrigger")
 			ContextActionService:UnbindAction("FreecamGamepadThumbstick")
+			ContextActionService:UnbindAction("FreecamTouchRotate")
 		end
 	end
 end
