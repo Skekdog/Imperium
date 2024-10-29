@@ -1,9 +1,12 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
+local PlaySound = require(script.Parent.Parent.Shared.PlaySound)
+local SettingsManager = require(script.Parent.Parent.Shared.SettingsManager)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 local UIManager = require(ReplicatedFirst.Shared.UIManager)
 
@@ -48,7 +51,15 @@ ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(fun
         Position = UDim2.fromScale(0.5, if neededMoney > 0 then 1 else 0.7)
     })
 
-    object.Bankruptcy.Text = `GOING BANKRUPT (NEED ANOTHER {GetCurrencySymbol()}{neededMoney})`
+    if neededMoney > 0 then
+        object.Bankruptcy.Text = `GOING BANKRUPT (NEED ANOTHER {GetCurrencySymbol()}{neededMoney})`
+
+        if SettingsManager.GetSetting("Bankruptcy Alert") and ReplicatedStorage:GetAttribute("CurrentPlayer") == Players.LocalPlayer.Name then
+            PlaySound("BankruptcyAlert")
+        end
+    else
+        SoundService:FindFirstChild("BankruptcyAlert"):Stop()
+    end
 end)
 
 task.spawn(function()

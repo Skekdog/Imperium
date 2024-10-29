@@ -32,6 +32,14 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = true,
 	},
+	{
+		Name = "Bankruptcy Alert",
+		Tab = "Sound",
+		Category = "General",
+		Tooltip = "Continually plays an alert sound when you are going bankrupt.",
+		PossibleValues = "Boolean",
+		Default = true,
+	},
 
 	{
 		Name = "UI Theme",
