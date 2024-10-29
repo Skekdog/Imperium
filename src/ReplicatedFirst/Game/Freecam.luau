@@ -251,7 +251,7 @@ local Input = {} do
 			return Enum.ContextActionResult.Sink
 		end
 
-		local function TouchRotate(action, state, input)
+		local function TouchPan(action, state, input)
 			local delta = input.Delta
 
 			-- Assume this is just a tap
@@ -280,7 +280,7 @@ local Input = {} do
 				Enum.KeyCode.Up, Enum.KeyCode.Down
 			)
 			ContextActionService:BindActionAtPriority("FreecamMousePan",          MousePan,    false, INPUT_PRIORITY,         Enum.UserInputType.MouseMovement)
-			ContextActionService:BindActionAtPriority("FreecamTouchRotate",       TouchRotate, false, REDUCED_INPUT_PRIORITY, Enum.UserInputType.Touch)
+			ContextActionService:BindActionAtPriority("FreecamTouchPan",       TouchPan,    false, REDUCED_INPUT_PRIORITY, Enum.UserInputType.Touch)
 			ContextActionService:BindActionAtPriority("FreecamMouseWheel",        MouseWheel,  false, INPUT_PRIORITY,         Enum.UserInputType.MouseWheel)
 			ContextActionService:BindActionAtPriority("FreecamGamepadButton",     GpButton,    false, INPUT_PRIORITY,         Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY)
 			ContextActionService:BindActionAtPriority("FreecamGamepadTrigger",    Trigger,     false, INPUT_PRIORITY,         Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
@@ -294,11 +294,11 @@ local Input = {} do
 			Zero(mouse)
 			ContextActionService:UnbindAction("FreecamKeyboard")
 			ContextActionService:UnbindAction("FreecamMousePan")
+			ContextActionService:UnbindAction("FreecamTouchPan")
 			ContextActionService:UnbindAction("FreecamMouseWheel")
 			ContextActionService:UnbindAction("FreecamGamepadButton")
 			ContextActionService:UnbindAction("FreecamGamepadTrigger")
 			ContextActionService:UnbindAction("FreecamGamepadThumbstick")
-			ContextActionService:UnbindAction("FreecamTouchRotate")
 		end
 	end
 end
