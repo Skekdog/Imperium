@@ -133,7 +133,8 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 
     SendNotification(`[PLAYER] went bankrupt. All their money and assets were transferred to {if to == "Bank" then "the bank" else "[PLAYER]"}.`, players)
 
-    for _, asset in participant.Assets do
+    for i = #participant.Assets, 1, -1 do
+        local asset = participant.Assets[i]
         asset:TransferTo(to)
     end
     participant:TransferMoneyTo(to, participant.Money, true)
