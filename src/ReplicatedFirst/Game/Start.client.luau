@@ -27,6 +27,36 @@ gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
 local player = Players.LocalPlayer
 
+local function highlightCharacter(model: Model?, enabled: boolean?)
+    if not model then
+        return
+    end
+
+    local highlight = model:FindFirstChildOfClass("Highlight") or Instance.new("Highlight")
+
+    if not highlight.Parent then
+        if model == player.Character then
+            highlight.Name = "SelfHighlight"
+            highlight.OutlineColor = Color3.new(0.23, 0.68, 1)
+        else
+            highlight.Name = "OtherHighlight"
+            highlight.OutlineColor = Color3.new(1, 1, 1)
+        end
+
+        highlight.FillTransparency = 1
+        highlight.Adornee = model
+        
+        highlight.Parent = model
+    end
+    
+    highlight.Enabled = if enabled == nil then true else enabled
+end
+
+if player.Character then
+    highlightCharacter(player.Character)
+end
+player.CharacterAdded:Connect(highlightCharacter)
+
 local rollDice = UIManager.WaitForUI("RollDice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RollDice)}
 local payFine = UIManager.WaitForUI("PayFine") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.PayFine)}
 local useCard = UIManager.WaitForUI("UseGetOutOfJailFreeCard") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.UseGetOutOfJailFreeCard)}
@@ -36,6 +66,10 @@ gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
     local isPlayer = plr == player
 
     if plr and plr:IsA("Player") then
+        for _, v in Players:GetPlayers() do -- Inside the if block because we don't want to unhighlight everyone when beginTurn is fired with empty string
+            highlightCharacter(v.Character, v == plr)
+        end
+
         local char = plr.Character
         if char then
             workspace.CurrentCamera.CameraSubject = char:FindFirstChildOfClass("Humanoid")
