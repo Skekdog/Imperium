@@ -1,7 +1,6 @@
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
@@ -184,7 +183,7 @@ ContextActionService:BindAction("View Board Property", function(_, state, input)
         return Enum.ContextActionResult.Pass
     end
 
-    local mousePos = UserInputService:GetMouseLocation()
+    local mousePos = input.Position
 
     local ray = workspace.CurrentCamera:ViewportPointToRay(mousePos.X, mousePos.Y)
     local result = workspace:Raycast(ray.Origin, ray.Direction * 1000, castParams)
