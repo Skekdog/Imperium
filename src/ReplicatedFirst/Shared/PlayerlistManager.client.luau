@@ -138,11 +138,15 @@ if IsLobby() then
 	roundInfo.Map.Text = "Map: Lobby"
 	roundInfo.FreeParkingMoney.Text = "Free Parking Money: Disabled"
 else
+	local GetCurrencySymbol = require(script.Parent.Parent.Game.GetCurrencySymbol)
+	
 	roundInfo.Gamemode.Text = "Board Theme: " .. AwaitReplicatedAttribute("BoardTheme")
 	roundInfo.Map.Text = "Map: " .. AwaitReplicatedAttribute("Map")
-	roundInfo.FreeParkingMoney.Text = "Free Parking Money: " .. AwaitReplicatedAttribute("FreeParkingMoney") or "Disabled"
+
+	local freeParkingEnabled = not not AwaitReplicatedAttribute("FreeParkingMoney")
+	roundInfo.FreeParkingMoney.Text = "Free Parking Money: " .. if freeParkingEnabled then GetCurrencySymbol() .. AwaitReplicatedAttribute("FreeParkingMoney") else "Disabled"
 
 	ReplicatedStorage:GetAttributeChangedSignal("FreeParkingMoney"):Connect(function()
-		roundInfo.FreeParkingMoney.Text = "Free Parking Money: " .. AwaitReplicatedAttribute("FreeParkingMoney")
+		roundInfo.FreeParkingMoney.Text = "Free Parking Money: " .. GetCurrencySymbol() .. AwaitReplicatedAttribute("FreeParkingMoney")
 	end)
 end
