@@ -154,6 +154,24 @@ local function CanMakeDevelopment(asset: Types.Asset, development: "House" | "Ho
     return true, cost
 end
 
+local function CanUnmakeDevelopment(asset: Types.Asset, development: "House" | "Hotel"): boolean
+    if asset.Owner == "Bank" or asset.IsMortgaged or not asset.Owner:HasMonopoly(asset.AssetDescription.Colour) then
+        return false
+    end
+
+    for _, v in asset.Owner.Assets do
+        if v.AssetDescription.Colour == asset.AssetDescription.Colour then
+            if development == "House" and (v.Houses > asset.Houses or v.Hotels > asset.Hotels) then
+                return false
+            elseif development == "Hotel" and v.Hotels > asset.Hotels then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 local animateDevelopmentRemote = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateDevelopmentModel")
 function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel", index: number, playSound: boolean, shouldReplaceWithHouses: boolean): ()
     assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
@@ -248,24 +266,32 @@ local function TrySellDevelopment(asset: Types.Asset): ()
     local development: "House" | "Hotel"
     if asset.Hotels > 0 then
         development = "Hotel"
-        tryRemoveDevelopmentModel(asset, development, asset.Hotels, true, true)
-        asset.Hotels -= 1
     elseif asset.Houses > 0 then
         development = "House"
-        tryRemoveDevelopmentModel(asset, development, asset.Houses, true, false)
-        asset.Houses -= 1
     else
         return
     end
+
+    if not CanUnmakeDevelopment(asset, development) then
+        return
+    end
+
+    if development == "Hotel" then
+        tryRemoveDevelopmentModel(asset, development, asset.Hotels, true, true)
+        asset.Hotels -= 1
+    elseif development == "House" then
+        tryRemoveDevelopmentModel(asset, development, asset.Houses, true, false)
+        asset.Houses -= 1
+    end
+
+    updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
+    SendNotification(`[PLAYER] sold a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
 
     local sellPrice = TryGetDevelopmentSellValue(asset, development, owner.Round.BoardConfiguration)
     if not sellPrice then
         return
     end
-
-    SendNotification(`[PLAYER] sold a {development} on {asset.AssetDescription.Name}.`, {owner.Player})
     owner:GiveMoney(sellPrice)
-    updateAssetsInParticipantColourGroup(owner, asset.AssetDescription.Colour, owner.Round)
 end
 
 local function getSellAllValue(asset: Types.Asset): number
@@ -485,9 +511,9 @@ local function GetClientAssetView(asset: Types.Asset, round: Types.Round): Types
         view.HousePrice = houseCost
     end
 
-    if asset.Hotels > 0 then
+    if asset.Hotels > 0 and CanUnmakeDevelopment(asset, "Hotel") then
         view.SellHotelValue = TryGetDevelopmentSellValue(asset, "Hotel", round.BoardConfiguration)
-    elseif asset.Houses > 0 then
+    elseif asset.Houses > 0 and CanUnmakeDevelopment(asset, "House") then
         view.SellHouseValue = TryGetDevelopmentSellValue(asset, "House", round.BoardConfiguration)
     end
 
@@ -528,6 +554,7 @@ function module.new(description: Types.AssetDescription): Types.Asset
     asset.TryGetDevelopmentSellValue = TryGetDevelopmentSellValue
 
     asset.CanMakeDevelopment = CanMakeDevelopment
+    asset.CanUnmakeDevelopment = CanUnmakeDevelopment
 
     asset.HasAnyDevelopments = HasAnyDevelopments
 

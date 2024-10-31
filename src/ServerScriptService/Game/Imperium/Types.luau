@@ -92,6 +92,7 @@ export type Asset = {
     TrySellDevelopment: (Asset) -> (),
     TrySellAllDevelopments: (Asset) -> (),
     CanMakeDevelopment: (Asset, development: "House" | "Hotel") -> (boolean, number),
+    CanUnmakeDevelopment: (Asset, development: "House" | "Hotel") -> boolean,
 
     GetRentCost: (Asset, participant: Participant) -> number,
 
