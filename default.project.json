@@ -30,7 +30,10 @@
             "Lobby": {"$path": "Assets/Lobby"}
         },
         "SoundService": {
-            "$path": "src/SoundService"
+            "$path": "src/SoundService",
+            "$properties": {
+                "RespectFilteringEnabled": true
+            }
         }
     }
 }

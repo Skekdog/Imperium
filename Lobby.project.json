@@ -52,7 +52,10 @@
             }
         },
         "SoundService": {
-            "$path": "src/SoundService"
+            "$path": "src/SoundService",
+            "$properties": {
+                "RespectFilteringEnabled": true
+            }
         }
     }
 }
