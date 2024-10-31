@@ -1,6 +1,6 @@
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
@@ -212,12 +212,12 @@ local castParams = RaycastParams.new()
 castParams.FilterDescendantsInstances = {workspace:WaitForChild("Board")}
 castParams.FilterType = Enum.RaycastFilterType.Include
 
-ContextActionService:BindAction("View Board Property", function(_, state, input)
-    if state ~= Enum.UserInputState.End then
-        return Enum.ContextActionResult.Pass
+local function viewDeed(_, proc: boolean): ()
+    if proc then
+        return
     end
 
-    local mousePos = input.Position
+    local mousePos = UserInputService:GetMouseLocation()
 
     local ray = workspace.CurrentCamera:ViewportPointToRay(mousePos.X, mousePos.Y)
     local result = workspace:Raycast(ray.Origin, ray.Direction * 1000, castParams)
@@ -234,6 +234,13 @@ ContextActionService:BindAction("View Board Property", function(_, state, input)
     end
 
     ViewDeed()
+end
 
-    return Enum.ContextActionResult.Pass
-end, false, Enum.UserInputType.MouseButton1, Enum.UserInputType.Touch)
+UserInputService.TouchTapInWorld:Connect(viewDeed)
+UserInputService.InputEnded:Connect(function(input, proc)
+    if input.UserInputType ~= Enum.UserInputType.MouseButton1 or input.Delta.Magnitude > 1 then
+        return
+    end
+
+    viewDeed(nil, proc)
+end)
