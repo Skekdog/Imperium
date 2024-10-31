@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-return function<T>(attribute: string): any
+return function(attribute: string): any
     local value = ReplicatedStorage:GetAttribute(attribute)
-    if value == nil then
-        ReplicatedStorage:GetAttributeChangedSignal(attribute):Wait()
-        return ReplicatedStorage:GetAttribute(attribute)
+    while value == nil do
+        value = ReplicatedStorage:GetAttribute(attribute)
+        task.wait()
     end
     return value
 end

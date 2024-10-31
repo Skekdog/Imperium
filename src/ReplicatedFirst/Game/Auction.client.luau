@@ -13,6 +13,7 @@ local object = auctionPropertyUI.Object
 local function resetAuction(description: {Name: string}?): ()
     print("received auction event, ", if description then description.Name else "no description")
     local currency = GetCurrencySymbol()
+    print("got currency symbol: ", currency)
     object.CurrentBid.Text = `{currency}0`
     object.CurrentWinner.Text = ""
     
@@ -28,6 +29,7 @@ local function resetAuction(description: {Name: string}?): ()
 end
 resetAuction()
 
+print("after reset auction")
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 print("connecting to startauction event client")
 gameServerClient:WaitForChild("StartAuction").OnClientEvent:Connect(resetAuction)
