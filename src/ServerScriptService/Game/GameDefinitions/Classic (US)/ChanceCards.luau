@@ -93,8 +93,11 @@ module[10] = {
         local houses = 0
         local hotels = 0
         for _, asset in participant.Assets do
-            houses += asset.Houses
-            hotels += asset.Hotels
+            if asset.Hotels > 0 then
+                hotels += asset.Hotels
+            else
+                houses += asset.Houses
+            end
         end
 
         participant:TransferMoneyTo("Bank", ((houses * 25) + (hotels * 100)))
