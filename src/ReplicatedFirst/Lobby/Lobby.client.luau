@@ -94,17 +94,17 @@ end
 
 local function addPlayer(slot: LobbySlot, plr: Player): ()
     local thumbnail = getThumbnail(plr)
-    local image = slot.Players.PlayerTemplate:Clone()
+    local playerFrame = slot.Players.PlayerTemplate:Clone()
 
-    image.Name = tostring(plr.UserId)
-    image.Visible = true
-    image.Image = thumbnail
-    image.Parent = slot.Players
+    playerFrame.Name = tostring(plr.UserId)
+    playerFrame.Visible = true
+    playerFrame.Avatar.Image = thumbnail
+    playerFrame.Parent = slot.Players
 
     slot.Capacity.Text = `{#slot.Players:GetChildren() - 3} / {tostring(MAX_PLAYERS)}`
 
     if slot.Parent == (hostView :: any) then
-        local button: typeof(hostView.LobbyOverview.Players.PlayerTemplate) = image :: any
+        local button: typeof(hostView.LobbyOverview.Players.PlayerTemplate) = playerFrame :: any
         button.MouseEnter:Connect(function()
             button.Kick.Visible = true
         end)
