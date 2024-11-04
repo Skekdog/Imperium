@@ -98,7 +98,13 @@ local function addPlayer(slot: LobbySlot, plr: Player): ()
 
     playerFrame.Name = tostring(plr.UserId)
     playerFrame.Visible = true
-    playerFrame.Avatar.Image = thumbnail
+    playerFrame.Frame.Avatar.Image = thumbnail
+
+    local usernameLabel = playerFrame.Frame.Username
+    usernameLabel:SetAttribute("Player_1", GetPlayerName(plr))
+    usernameLabel:SetAttribute("Format", "[PLAYER]")
+    usernameLabel:AddTag("DynamicNames")
+    
     playerFrame.Parent = slot.Players
 
     slot.Capacity.Text = `{#slot.Players:GetChildren() - 3} / {tostring(MAX_PLAYERS)}`
@@ -248,7 +254,7 @@ local function removeLobbySlot(userId: number): ()
         switchView("Browser")
         local overview: LobbyOverview = hostView.LobbyOverview
         for _, v in overview.Players:GetChildren() do
-            if v.Name ~= "PlayerTemplate" and v:IsA("ImageButton") then
+            if v.Name ~= "PlayerTemplate" and v:IsA("TextButton") then
                 v:Destroy()
             end
         end
