@@ -25,7 +25,7 @@ local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Cl
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
-local player = Players.LocalPlayer
+local localPlayer = Players.LocalPlayer
 
 local function highlightCharacter(model: Model?, enabled: boolean?)
     if not model then
@@ -35,7 +35,7 @@ local function highlightCharacter(model: Model?, enabled: boolean?)
     local highlight = model:FindFirstChildOfClass("Highlight") or Instance.new("Highlight")
 
     if not highlight.Parent then
-        if model == player.Character then
+        if model == localPlayer.Character then
             highlight.Name = "SelfHighlight"
             highlight.OutlineColor = Color3.new(0.23, 0.68, 1)
         else
@@ -49,13 +49,17 @@ local function highlightCharacter(model: Model?, enabled: boolean?)
         highlight.Parent = model
     end
     
-    highlight.Enabled = if enabled == nil then true else enabled
+    if model == localPlayer.Character then
+        highlight.Enabled = true
+    else
+        highlight.Enabled = if enabled == nil then true else enabled
+    end
 end
 
-if player.Character then
-    highlightCharacter(player.Character)
+if localPlayer.Character then
+    highlightCharacter(localPlayer.Character)
 end
-player.CharacterAdded:Connect(highlightCharacter)
+localPlayer.CharacterAdded:Connect(highlightCharacter)
 
 local rollDice = UIManager.WaitForUI("RollDice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RollDice)}
 local payFine = UIManager.WaitForUI("PayFine") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.PayFine)}
@@ -63,11 +67,11 @@ local useCard = UIManager.WaitForUI("UseGetOutOfJailFreeCard") :: UIManager.UI &
 gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
     local plr = Players:FindFirstChild(name)
 
-    local isPlayer = plr == player
+    local isLocalPlayer = plr == localPlayer
 
     if plr and plr:IsA("Player") then
         for _, v in Players:GetPlayers() do -- Inside the if block because we don't want to unhighlight everyone when beginTurn is fired with empty string
-            highlightCharacter(v.Character, v == plr)
+            highlightCharacter(v.Character, v == plr and v ~= localPlayer)
         end
 
         local char = plr.Character
@@ -76,12 +80,12 @@ gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
         end
     end
 
-    local isJailed = player:GetAttribute("IsJailed") :: boolean
-    rollDice:ToggleVisible(isPlayer)
-    payFine:ToggleVisible(isPlayer and isJailed and player:GetAttribute("Money") :: number >= ReplicatedStorage:GetAttribute("FineAmount") :: number)
-    useCard:ToggleVisible(isPlayer and isJailed and player:GetAttribute("GetOutOfJailFreeCards") :: number > 0)
+    local isJailed = localPlayer:GetAttribute("IsJailed") :: boolean
+    rollDice:ToggleVisible(isLocalPlayer)
+    payFine:ToggleVisible(isLocalPlayer and isJailed and localPlayer:GetAttribute("Money") :: number >= ReplicatedStorage:GetAttribute("FineAmount") :: number)
+    useCard:ToggleVisible(isLocalPlayer and isJailed and localPlayer:GetAttribute("GetOutOfJailFreeCards") :: number > 0)
 
-    if isPlayer and SettingsManager.GetSetting("Your Turn Alert") then
+    if isLocalPlayer and SettingsManager.GetSetting("Your Turn Alert") then
         PlaySound("TurnBeginAlert")
     end
 end)
@@ -89,11 +93,11 @@ end)
 ReplicatedStorage:GetAttributeChangedSignal("FineAmount"):Connect(function()
     payFine.Object.Text = `Pay Fine ({GetCurrencySymbol()}{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
 end)
-player:GetAttributeChangedSignal("GetOutOfJailFreeCards"):Connect(function()
-    useCard.Object.Text = `Use Card ({player:GetAttribute("GetOutOfJailFreeCards") :: number})`
+localPlayer:GetAttributeChangedSignal("GetOutOfJailFreeCards"):Connect(function()
+    useCard.Object.Text = `Use Card ({localPlayer:GetAttribute("GetOutOfJailFreeCards") :: number})`
 end)
 payFine.Object.Text = `Pay Fine ({GetCurrencySymbol()}{ReplicatedStorage:GetAttribute("FineAmount") :: number})`
-useCard.Object.Text = `Use Card ({player:GetAttribute("GetOutOfJailFreeCards") :: number})`
+useCard.Object.Text = `Use Card ({localPlayer:GetAttribute("GetOutOfJailFreeCards") :: number})`
 
 rollDice.Object.Activated:Connect(RollDice)
 payFine.Object.Activated:Connect(PayFine)
@@ -186,9 +190,9 @@ end)
 local moneyDisplay = UIManager.WaitForUI("MoneyDisplay") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.MoneyDisplay)}
 local function updateMoney()
     local currency = GetCurrencySymbol()
-    moneyDisplay.Object.Text = currency .. (player:GetAttribute("Money") :: number? or 0)
+    moneyDisplay.Object.Text = currency .. (localPlayer:GetAttribute("Money") :: number? or 0)
 end
-player:GetAttributeChangedSignal("Money"):Connect(updateMoney)
+localPlayer:GetAttributeChangedSignal("Money"):Connect(updateMoney)
 updateMoney()
 
 gameServerClient:WaitForChild("AnimateCard").OnClientEvent:Connect(AnimateDrawCard)
