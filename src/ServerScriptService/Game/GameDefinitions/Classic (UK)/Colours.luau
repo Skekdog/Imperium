@@ -10,8 +10,8 @@ return {
     ["Pink"] = Color3.new(1, 0.25, 0.75),
     ["Brown"] = Color3.new(0.5, 0.25, 0.25),
 
-    ["Utility"] = Color3.new(0.75, 0.75, 1),
-    ["Station"] = Color3.new(0.9, 0.9, 0.6),
+    ["Utility"] = Color3.new(0.56, 0.56, 0.56),
+    ["Station"] = Color3.new(0.28, 0.28, 0.28),
 
     ["Community Chest"] = Color3.new(0.475, 0.85, 0.8),
     ["Chance"] = Color3.new(1, 0.75, 0.65),
