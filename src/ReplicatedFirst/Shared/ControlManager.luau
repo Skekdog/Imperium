@@ -10,12 +10,12 @@ local SettingsManager = require(script.Parent.SettingsManager)
 
 local module = {}
 
-type params = {
+type Params = {
 	ActionName: string,
 	CreateTouchButton: boolean,
 	Callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult,
 }
-local registered: {[string]: params} = {}
+local registered: {[string]: Params} = {}
 
 export type InputMethod = "touch" | "keyboard" | "controller"
 function module.GetPreferredInputMethod(): InputMethod
@@ -34,8 +34,8 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		return "NONE"
 	end
 	if keycode.EnumType == Enum.KeyCode then
-		-- local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
-		-- if img ~= "" then return img end
+		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
+		if img ~= "" then return img end
 
 		local str = UIS:GetStringForKeyCode(keycode :: Enum.KeyCode)
 		if str ~= "" and str ~= " " then
@@ -151,7 +151,7 @@ function module.Unregister(actionName: string)
 	registered[actionName] = nil
 end
 
-function module.GetRegisteredInfo(actionName: string): params?
+function module.GetRegisteredInfo(actionName: string): Params?
 	return registered[actionName]
 end
 

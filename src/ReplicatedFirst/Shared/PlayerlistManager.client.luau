@@ -4,7 +4,6 @@ local GetPlayerName = require(script.Parent.GetPlayerName)
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
-local IsSpectating = require(script.Parent.Parent.Game.IsSpectating)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local list = ui.List
@@ -33,6 +32,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	if IsLobby() then
 		clone.Trade.Visible = false
 	else
+		local IsSpectating = require(script.Parent.Parent.Game.IsSpectating)
 		clone.Trade.Visible = status ~= "Spectating" and plr ~= Players.LocalPlayer and not IsSpectating()
 	end
 	
