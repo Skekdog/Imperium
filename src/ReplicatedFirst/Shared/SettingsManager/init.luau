@@ -97,7 +97,7 @@ module.AvailableSettings = {
 		Tooltip = "Enables or disables freecam.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.P, Enum.KeyCode.ButtonSelect}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.P, Enum.KeyCode.DPadRight}, Toggled = true},
 	},
 	{
 		Name = "Roll Dice",
