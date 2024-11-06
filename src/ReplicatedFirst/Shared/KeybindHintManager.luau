@@ -42,14 +42,13 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
         end
     elseif class == "ImageLabel" then
         assert(label:IsA("ImageLabel"))
+        label.ScaleType = Enum.ScaleType.Fit
 
         if not noStyle then
             label:AddTag("StyledUI")
         else
             label.ImageColor3 = Color3.new(1, 1, 1)
         end
-
-        Instance.new("UIAspectRatioConstraint", label)
     end
 
     label.Parent = instance
