@@ -106,7 +106,7 @@ module.AvailableSettings = {
 		Tooltip = "Rolls the dice.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.Space, Enum.KeyCode.ButtonR3}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.Space, Enum.KeyCode.ButtonX}, Toggled = true},
 	},
 	{
 		Name = "Pay Fine",
@@ -115,7 +115,7 @@ module.AvailableSettings = {
 		Tooltip = "Pays fine when in jail, if possible.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.F, Enum.KeyCode.ButtonR2}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.F, Enum.KeyCode.ButtonR1}, Toggled = true},
 	},
 	{
 		Name = "Use Jail Card",
@@ -124,7 +124,7 @@ module.AvailableSettings = {
 		Tooltip = "Uses a Get Out of Jail Free card, if possible.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.E, Enum.KeyCode.ButtonR1}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.E, Enum.KeyCode.ButtonR2}, Toggled = true},
 	},
 
 	{
@@ -143,7 +143,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the playerlist.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes = {Enum.KeyCode.Tab, Enum.KeyCode.ButtonL3}, Toggled = false},
+		Default = {Keycodes = {Enum.KeyCode.Tab, Enum.KeyCode.ButtonR3}, Toggled = false},
 	},
 	{
 		Name = "Asset Manager",
@@ -152,16 +152,16 @@ module.AvailableSettings = {
 		Tooltip = "Opens the asset manager.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.C, Enum.KeyCode.ButtonL2}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.C, Enum.KeyCode.ButtonL1}, Toggled = true},
 	},
 	{
 		Name = "Confirm Purchase",
 		Tab = "Keybinds",
 		Category = "Menus",
-		Tooltip = "Opens the confirm purchase menu. Can also be opened by typing !purchase in chat.",
+		Tooltip = "Opens the confirm purchase menu.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.KeyCode.Y, Enum.KeyCode.ButtonL1}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.Y, Enum.KeyCode.ButtonA}, Toggled = true},
 	},
 	{
 		Name = "Settings",
@@ -170,7 +170,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the settings page. Can also be opened by typing !settings in chat.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes = {Enum.KeyCode.G, Enum.KeyCode.ButtonR3}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.G, Enum.KeyCode.DPadUp}, Toggled = true},
 	},
 	{
 		Name = "EventLog",
@@ -180,7 +180,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the event log.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes = {Enum.KeyCode.B, Enum.KeyCode.ButtonR1}, Toggled = true},
+		Default = {Keycodes = {Enum.KeyCode.B, Enum.KeyCode.DPadDown}, Toggled = true},
 	},
 } :: {SettingDefinition}
 
