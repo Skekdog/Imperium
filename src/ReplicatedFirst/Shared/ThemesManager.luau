@@ -28,10 +28,9 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	-- Tag StyledUI means that a UI object will be updated to match the theme
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
 	
-	local SettingsManager = require(script.Parent.SettingsManager)
 	local UIAnimation = require(script.Parent.UIAnimation)
 	local tweenInfo = TweenInfo.new(THEME_TRANSITION_TIME, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string] or module.Themes.Dark
+	theme = theme or module.Themes.Dark
 	assert(theme)
 	
 	local inverse = v:GetAttribute("Inverse")
