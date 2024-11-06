@@ -57,16 +57,6 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
     return label :: Label
 end
 
-local function createLabels(control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?): ()
-    createLabel("ImageLabel", control, instance, position, size, anchorPoint, noStyle)
-    createLabel("TextLabel", control, instance, position, size, anchorPoint, noStyle)
-
-    if not boundInstances[control] then
-        boundInstances[control] = {}
-    end
-    table.insert(boundInstances[control], instance)
-end
-
 local function updateText(control: string, instance: Instance): ()
     local text = ControlManager.GetFirstKeyCode(control, true)
 
@@ -96,6 +86,18 @@ local function updateText(control: string, instance: Instance): ()
         textLabel.Visible = true
         setTextForTextLabel(text, textLabel)
     end
+end
+
+local function createLabels(control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?): ()
+    createLabel("ImageLabel", control, instance, position, size, anchorPoint, noStyle)
+    createLabel("TextLabel", control, instance, position, size, anchorPoint, noStyle)
+
+    if not boundInstances[control] then
+        boundInstances[control] = {}
+    end
+    table.insert(boundInstances[control], instance)
+
+    updateText(control, instance)
 end
 
 SettingCallback.Listen(function(name, value)
