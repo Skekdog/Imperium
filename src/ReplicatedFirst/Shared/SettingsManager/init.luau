@@ -40,15 +40,7 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = true,
 	},
-
-	{
-		Name = "UI Theme",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "Select a theme for the UI.",
-		PossibleValues = {"Dark", "Light", "Blue"},
-		Default = "Dark",
-	},
+	
 	{
 		Name = "Night Sky",
 		Tab = "Display",

@@ -3,6 +3,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
+local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(ReplicatedFirst.Shared.UIManager)
 
 local orders = {
@@ -49,6 +50,8 @@ ControlManager.Register("Close UI", false, function()
 	end
 	return Enum.ContextActionResult.Pass
 end)
+
+ThemesManager.UpdateTheme("Dark")
 
 ReplicatedStorage:WaitForChild("Shared").ServerClient.OpenSettings.OnClientEvent:Connect(function()
 	UIManager.WaitForUI("Settings"):ToggleVisible(true)
