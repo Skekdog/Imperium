@@ -143,7 +143,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the playerlist.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes = {Enum.KeyCode.Tab, Enum.KeyCode.ButtonR3}, Toggled = false},
+		Default = {Keycodes = {Enum.KeyCode.Tab, Enum.KeyCode.ButtonR3}, Toggled = true},
 	},
 	{
 		Name = "Asset Manager",
