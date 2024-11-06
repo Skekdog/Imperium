@@ -10,7 +10,6 @@ SettingCallback.Listen(function(name, value)
         return
     end
 
-    print(value, alert.IsPlaying)
     if value then
         if not alert.IsPlaying then
             alert:Play()
