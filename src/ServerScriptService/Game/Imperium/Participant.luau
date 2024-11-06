@@ -608,6 +608,10 @@ local function GiveJailCards(participant: Types.Participant, amount: number): ()
 end
 
 local function TransferJailCards(participant: Types.Participant, to: Types.AssetOwner, amount: number): ()
+    if amount <= 0 then
+        return
+    end
+    
     assert(participant.JailCards >= amount, "Not enough jail cards")
     participant.JailCards -= amount
     participant.Player:SetAttribute("GetOutOfJailFreeCards", participant.JailCards)
