@@ -17,7 +17,7 @@ local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
-local MIN_STUDIO_PLAYERS = 1
+local MIN_STUDIO_PLAYERS = 2
 local MIN_PLAYERS_OR_EXIT = 1
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?

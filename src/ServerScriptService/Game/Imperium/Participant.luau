@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local TweenService = game:GetService("TweenService")
 local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
@@ -21,8 +22,8 @@ local MOVEMENT_EPSILON = 2.5
 local JAIL_EPSILON = 1.5
 local CHAR_HEIGHT = 3
 
-local SPACE_AROUND_DISTANCE = 0.5
-local MAX_SPACE_AROUND_ATTEMPTS = 30
+local SPACE_AROUND_DISTANCE = 1.5
+local MAX_SPACE_AROUND_ATTEMPTS = 100
 
 local module = {}
 
@@ -229,14 +230,10 @@ local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
     round:SetFreeParkingMoney(0)
 end
 
-local function findFreePointAroundPosition(participant: Types.Participant, target: Types.Tile): Vector3
-    local isAnySpaceOccupied = false
-
+local function findFreePointAroundPosition(participant: Types.Participant, targetTile: Types.Tile, targetPart: BasePart): Vector3
     local occupiedPositions: {Vector3} = {}
     for _, v in participant.Round.Participants do
-        if v.Position == target.Position and v ~= participant then
-            isAnySpaceOccupied = true
-
+        if v.Position == targetTile.Position and v ~= participant then
             local char = v.Player.Character
             if not char then
                 continue
@@ -250,9 +247,10 @@ local function findFreePointAroundPosition(participant: Types.Participant, targe
         end
     end
 
-    local centre, size = target.Model:GetBoundingBox()
+    local centre = targetPart.CFrame
+    local size = targetPart.Size
 
-    if not isAnySpaceOccupied then
+    if #occupiedPositions == 0 then
         return Vector3.new(centre.X, 0, centre.Z)
     end
 
@@ -260,7 +258,7 @@ local function findFreePointAroundPosition(participant: Types.Participant, targe
 
     local newPosition: Vector3
     for _ = 1, MAX_SPACE_AROUND_ATTEMPTS do
-        newPosition = Vector3.new(random:NextNumber(centre.X - size.X / 2, centre.X + size.X / 2), 0, random:NextNumber(centre.Z - size.Z / 2, centre.Z + size.Z / 2))
+        newPosition = Vector3.new(random:NextNumber(centre.X - size.X / 3, centre.X + size.X / 3), 0, random:NextNumber(centre.Z - size.Z / 3, centre.Z + size.Z / 3))
         for _, v in occupiedPositions do
             if (newPosition - v).Magnitude < SPACE_AROUND_DISTANCE then
                 continue
@@ -305,11 +303,12 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
         end
     end
 
-    local targetPosition = findFreePointAroundPosition(participant, tile) + Vector3.new(0, targetPart.Position.Y + CHAR_HEIGHT + targetPart.Size.Y / 2, 0)
+    local targetPosition = findFreePointAroundPosition(participant, tile, targetPart) + Vector3.new(0, targetPart.Position.Y + CHAR_HEIGHT + targetPart.Size.Y / 2, 0)
 
     repeat
         if (root.Position - targetPosition).Magnitude < epsilon then
             reached = true
+            TweenService:Create(root, TweenInfo.new(0.1), { Position = targetPosition }):Play()
             break
         end
         hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
