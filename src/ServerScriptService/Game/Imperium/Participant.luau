@@ -21,7 +21,7 @@ local MOVEMENT_EPSILON = 2.5
 local JAIL_EPSILON = 1.5
 local CHAR_HEIGHT = 3
 
-local SPACE_AROUND_DISTANCE = 2
+local SPACE_AROUND_DISTANCE = 0.5
 local MAX_SPACE_AROUND_ATTEMPTS = 30
 
 local module = {}
@@ -230,9 +230,13 @@ local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
 end
 
 local function findFreePointAroundPosition(participant: Types.Participant, target: Types.Tile): Vector3
+    local isAnySpaceOccupied = false
+
     local occupiedPositions: {Vector3} = {}
     for _, v in participant.Round.Participants do
         if v.Position == target.Position and v ~= participant then
+            isAnySpaceOccupied = true
+
             local char = v.Player.Character
             if not char then
                 continue
@@ -247,6 +251,10 @@ local function findFreePointAroundPosition(participant: Types.Participant, targe
     end
 
     local centre, size = target.Model:GetBoundingBox()
+
+    if not isAnySpaceOccupied then
+        return Vector3.new(centre.X, 0, centre.Z)
+    end
 
     local random = Random.new()
 
