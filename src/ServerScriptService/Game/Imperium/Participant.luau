@@ -21,6 +21,9 @@ local MOVEMENT_EPSILON = 2.5
 local JAIL_EPSILON = 1.5
 local CHAR_HEIGHT = 3
 
+local SPACE_AROUND_DISTANCE = 2
+local MAX_SPACE_AROUND_ATTEMPTS = 30
+
 local module = {}
 
 local function animateJailBars(round: Types.Round, locked: boolean): ()
@@ -226,6 +229,41 @@ local function TryReceiveFreeParkingMoney(participant: Types.Participant): ()
     round:SetFreeParkingMoney(0)
 end
 
+local function findFreePointAroundPosition(participant: Types.Participant, target: Types.Tile): Vector3
+    local occupiedPositions: {Vector3} = {}
+    for _, v in participant.Round.Participants do
+        if v.Position == target.Position and v ~= participant then
+            local char = v.Player.Character
+            if not char then
+                continue
+            end
+
+            local root = char.PrimaryPart
+            if not root then
+                continue
+            end
+            table.insert(occupiedPositions, Vector3.new(root.Position.X, 0, root.Position.Z))
+        end
+    end
+
+    local centre, size = target.Model:GetBoundingBox()
+
+    local random = Random.new()
+
+    local newPosition: Vector3
+    for _ = 1, MAX_SPACE_AROUND_ATTEMPTS do
+        newPosition = Vector3.new(random:NextNumber(centre.X - size.X / 2, centre.X + size.X / 2), 0, random:NextNumber(centre.Z - size.Z / 2, centre.Z + size.Z / 2))
+        for _, v in occupiedPositions do
+            if (newPosition - v).Magnitude < SPACE_AROUND_DISTANCE then
+                continue
+            end
+        end
+        break
+    end
+
+    return newPosition
+end
+
 local function moveCharacter(participant: Types.Participant, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
     local char = participant.Player.Character
     if not char then
@@ -259,7 +297,7 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
         end
     end
 
-    local targetPosition = targetPart.Position + Vector3.new(0, CHAR_HEIGHT + targetPart.Size.Y / 2, 0)
+    local targetPosition = findFreePointAroundPosition(participant, tile) + Vector3.new(0, targetPart.Position.Y + CHAR_HEIGHT + targetPart.Size.Y / 2, 0)
 
     repeat
         if (root.Position - targetPosition).Magnitude < epsilon then
