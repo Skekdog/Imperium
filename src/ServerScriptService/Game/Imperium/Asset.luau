@@ -413,7 +413,7 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
     end
 
     local rentTable = asset.AssetDescription.Rent
-    local rent = rentTable.Houses[asset.Houses] or rentTable.Hotels[asset.Hotels] or rentTable.Default
+    local rent = rentTable.Hotels[asset.Hotels] or rentTable.Houses[asset.Houses] or rentTable.Default
 
     if asset.Owner ~= "Bank" and asset.Owner:HasMonopoly(asset.AssetDescription.Colour) and not asset:HasAnyDevelopments() then
         rent *= 2
