@@ -90,7 +90,7 @@ local function OfferJailCards(tradeManager: Types.TradeManager, amount: number):
     tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
 end
 
-local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player?): ()
+local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player?, reason: "GoingBankrupt"?): ()
     tradeManager.SentOfferTo = nil
     tradeManager.TradingWith = nil
 
@@ -100,7 +100,7 @@ local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player?): 
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
 
-    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player, wasRejectedBy)
+    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player, wasRejectedBy, reason)
 end
 
 local function finishTradeForParticipant(participant: Types.Participant, to: Types.Participant): ()
@@ -112,7 +112,7 @@ local function finishTradeForParticipant(participant: Types.Participant, to: Typ
     participant:TransferJailCards(to, participant.TradeManager.OfferedJailCards)
 end
 
-local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean): ()
+local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean, reason: "GoingBankrupt"?): ()
     if not isTradeActive(tradeManager) then
         return
     end
@@ -124,8 +124,8 @@ local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean):
         finishTradeForParticipant(tradeManager.TradingWith, tradeManager.Participant)
     end
 
-    Reset(tradeManager.TradingWith.TradeManager, if not accepted then tradeManager.Participant.Player else nil)
-    Reset(tradeManager, if not accepted then tradeManager.Participant.Player else nil)
+    Reset(tradeManager.TradingWith.TradeManager, if not accepted then tradeManager.Participant.Player else nil, reason)
+    Reset(tradeManager, if not accepted then tradeManager.Participant.Player else nil, reason)
 end
 
 local function processUpdatedAcceptance(tradeManager: Types.TradeManager): ()

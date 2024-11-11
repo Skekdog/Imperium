@@ -137,9 +137,9 @@ export type TradeManager = {
     RespondRequest: (TradeManager, accepted: boolean) -> (),
 
     SetProposalAccepted: (TradeManager, accepted: boolean?) -> (),
-    FinishTrade: (TradeManager, accepted: boolean) -> (),
+    FinishTrade: (TradeManager, accepted: boolean, reason: "GoingBankrupt"?) -> (),
 
-    Reset: (TradeManager) -> (),
+    Reset: (TradeManager, wasRejectedBy: Player?, reason: "GoingBankrupt") -> (),
 }
 
 export type Participant = {

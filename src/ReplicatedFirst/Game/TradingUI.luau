@@ -245,10 +245,12 @@ tradeRemotes:WaitForChild("TradeAcceptance").OnClientEvent:Connect(function(plr:
     updatedAcceptance()
 end)
 
-tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function(wasRejected: Player?)
+tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function(reason: Player | "GoingBankrupt"?)
     ui:ToggleVisible(false)
-    if wasRejected and wasRejected ~= Players.LocalPlayer then
+    if typeof(reason) == "Instance" and reason ~= Players.LocalPlayer then
         ScreenMessage("Error", "The other player rejected your trade.")
+    elseif reason == "GoingBankrupt" then
+        ScreenMessage("Error", "Trade cancelled due to ongoing bankruptcy.")
     end
 end)
 

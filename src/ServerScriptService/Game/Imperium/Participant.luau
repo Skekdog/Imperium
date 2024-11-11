@@ -157,6 +157,10 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
         table.insert(players, to.Player)
     end
 
+    if participant.TradeManager.TradingWith then
+        participant.TradeManager:FinishTrade(false)
+    end
+
     local neededMoney = targetAmount - participant.Money
     SendNotification(`[PLAYER] needs another {GetCurrencySymbol()}{neededMoney} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
     
