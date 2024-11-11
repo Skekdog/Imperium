@@ -281,6 +281,9 @@ return function(target: Player): ()
     local theirInventory = inventories[target]
     clearObject(theirItems)
 
+    clearObject(theirOffer)
+    clearObject(yourOffer)
+
     if theirInventory then
         moveButtons(theirInventory, theirItems)
     end
