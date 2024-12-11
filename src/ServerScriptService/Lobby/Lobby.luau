@@ -8,7 +8,7 @@ local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local serverClient = ReplicatedStorage.Lobby.ServerClient
 
 local MAX_PLAYERS = 8
-local MIN_PLAYERS = 1
+local MIN_PLAYERS = 2
 
 local lobbies: {[number]: LobbyTypes.Lobby?} = {}
 
