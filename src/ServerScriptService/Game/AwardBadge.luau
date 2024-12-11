@@ -1,8 +1,8 @@
 local BadgeService = game:GetService("BadgeService")
 
-export type BadgeName = "Monopoly" | "Imperium" | "Bankrupt!"
+export type BadgeName = --[["Monopoly"]] | "Imperium" | "Bankrupt!"
 local badges: {[string]: number} = {
-    ["Monopoly"] = 3372918368199180,
+    --["Monopoly"] = 3372918368199180,
     ["Imperium"] = 2989328846691150,
     ["Bankrupt!"] = 2022094759463020,
 }

@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local AwardBadge = require(script.Parent.Parent.AwardBadge)
+-- local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local PlaySoundAtPart = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.PlaySoundAtPart)
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
@@ -65,24 +65,24 @@ local function TransferTo(asset: Types.Asset, to: Types.AssetOwner): ()
         table.insert(to.Assets, asset)
         updateAssetsInParticipantColourGroup(to, colour, round)
 
-        task.defer(function() -- Defer so that if TransferTo() is called in a loop we don't award the badge erroneously
-            local shouldAward = true
-            for _, tile in round.Board.Tiles do
-                local new = tile.Asset
-                if not new then
-                    continue
-                end
+        -- task.defer(function() -- Defer so that if TransferTo() is called in a loop we don't award the badge erroneously
+        --     local shouldAward = true
+        --     for _, tile in round.Board.Tiles do
+        --         local new = tile.Asset
+        --         if not new then
+        --             continue
+        --         end
 
-                if new.Owner ~= to then
-                    shouldAward = false
-                    break
-                end
-            end
+        --         if new.Owner ~= to then
+        --             shouldAward = false
+        --             break
+        --         end
+        --     end
 
-            if shouldAward then
-                AwardBadge(to.Player, "Monopoly")
-            end
-        end)
+        --     if shouldAward then
+        --         AwardBadge(to.Player, "Monopoly")
+        --     end
+        -- end)
     end
 
     local board = round.Board
