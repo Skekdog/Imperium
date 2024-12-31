@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
+local GetCharacter = require(script.Parent.GetCharacter)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local LerpModelCFrame = require(script.Parent.LerpModelCFrame)
 local ControlManager = require(script.Parent.Parent.Shared.ControlManager)
@@ -69,12 +70,14 @@ gameServerClient.BeginTurn.OnClientEvent:Connect(function(name: string)
 
     local isLocalPlayer = plr == localPlayer
 
-    if plr and plr:IsA("Player") then
-        for _, v in Players:GetPlayers() do -- Inside the if block because we don't want to unhighlight everyone when beginTurn is fired with empty string
-            highlightCharacter(v.Character, v == plr and v ~= localPlayer)
+    if plr then
+        assert(plr:IsA("Player") or plr:IsA("Configuration"))
+        for _, v in Players:GetChildren() do -- Inside the if block because we don't want to unhighlight everyone when beginTurn is fired with empty string
+            assert(v:IsA("Player") or v:IsA("Configuration"))
+            highlightCharacter(GetCharacter(v), v == plr and v ~= localPlayer)
         end
 
-        local char = plr.Character
+        local char = GetCharacter(plr)
         if char then
             workspace.CurrentCamera.CameraSubject = char:FindFirstChildOfClass("Humanoid")
         end
