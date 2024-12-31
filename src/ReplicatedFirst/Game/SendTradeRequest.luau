@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(script.Parent.ClientTypes)
 local ScreenMessage = require(script.Parent.Parent.Shared.ScreenMessage)
 
-return function(plr: Player): ()
+return function(plr: Player | Configuration): ()
     local response: ClientTypes.TradeRequestInvokeResult = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("RequestTrade"):InvokeServer(plr)
     if response == "Cooldown" then
         ScreenMessage("Error", "Please wait before sending another trade request to this player.")

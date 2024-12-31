@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.GetPlayerName)
+local GetUserId = require(script.Parent.GetUserId)
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -19,7 +20,7 @@ local function findPlr(plrName: string)
 	return players[plrName]
 end
 
-function updatePlr(plr: Player, clone: PlayerElement?)
+function updatePlr(plr: Player | Configuration, clone: PlayerElement?)
 	if not clone then
 		return
 	end
@@ -39,14 +40,14 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	movePlr(plr, status :: any)
 end
 
-local function createPlr(plr: Player)
+local function createPlr(plr: Player | Configuration)
 	local clone = ui.PlayerFrame:Clone()
 	players[plr.Name] = clone
 
 	clone.Username.Text = GetPlayerName(plr, "Both")
 
 	pcall(function()
-		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+		clone.Avatar.Image = Players:GetUserThumbnailAsync(GetUserId(plr), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
 	end)
 
 	clone.Visible = true
@@ -104,7 +105,7 @@ local function getStatus(order: number): Status
 	error("Failed to get status for order: "..order)
 end
 
-function movePlr(plr: Player, status: Status)
+function movePlr(plr: Player | Configuration, status: Status)
 	local clone = findPlr(plr.Name) or createPlr(plr)
 	local oldOrder = clone.LayoutOrder
 	clone.LayoutOrder = layoutOrders[status] + 1
@@ -130,12 +131,14 @@ end
 Players.PlayerRemoving:Connect(removePlr)
 Players.PlayerAdded:Connect(createPlr)
 
-for _, v in Players:GetPlayers() do
+for _, v in Players:GetChildren() do
+	assert(v:IsA("Player") or v:IsA("Configuration"))
 	createPlr(v)
 end
 
 Players.LocalPlayer:GetAttributeChangedSignal("Status"):Connect(function()
-	for _, v in Players:GetPlayers() do
+	for _, v in Players:GetChildren() do
+		assert(v:IsA("Player") or v:IsA("Configuration"))
 		updatePlr(v)
 	end
 end)
