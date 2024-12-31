@@ -15,7 +15,7 @@ local module = {}
 local function SetNextParticipant(round: Types.Round): Types.Participant
     local lastIndex: number? = 0
     if round.CurrentParticipant then
-        if #Players:GetPlayers() < 1 or #round.Participants < 1 then
+        if #Players:GetChildren() < 1 or #round.Participants < 1 then
             WaitForever()
         end
         lastIndex = table.find(round.Participants, round.CurrentParticipant)
@@ -186,7 +186,8 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.SetFreeParkingMoney = SetFreeParkingMoney
     round.GetFreeParkingMoney = GetFreeParkingMoney
 
-    for _, player in Players:GetPlayers() do
+    for _, player in Players:GetChildren() do
+        assert(player:IsA("Player") or player:IsA("Configuration"), "Player is not a player")
         table.insert(round.Participants, Participant.new(player, round))
     end
 

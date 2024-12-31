@@ -792,7 +792,7 @@ local function CanPlayMove(participant: Types.Participant, move: "Dice" | "JailC
     error("Invalid move")
 end
 
-function module.new(player: Player, round: Types.Round): Types.Participant
+function module.new(player: Player | Configuration, round: Types.Round): Types.Participant
     local participant = {}
 
     participant.Player = player
