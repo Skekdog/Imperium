@@ -7,7 +7,11 @@ local badges: {[string]: number} = {
     ["Bankrupt!"] = 2022094759463020,
 }
 
-return function(plr: Player, name: BadgeName): ()
+return function(plr: Player | Configuration, name: BadgeName): ()
+    if plr:IsA("Configuration") then
+        return
+    end
+    
     local success, result
     local tries = 0
 

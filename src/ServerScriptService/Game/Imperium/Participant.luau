@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
+local FireRemote = require(script.Parent.FireRemote)
 local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
@@ -67,14 +68,14 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
         return asset:StartAuction(participant.Round)
     end
 
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"):FireClient(participant.Player, asset.AssetDescription)
+    FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"), participant, asset.AssetDescription)
 
     local startTime = GetTime()
     local response: boolean?
 
     local con: RBXScriptConnection
     con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("RespondPropertyPurchase").OnServerEvent:Once(function(plr, accepted: unknown, propertyName: unknown)
-        if plr ~= participant.Player then
+        if plr ~= (participant.Player :: Player) then
             return
         end
 
@@ -108,7 +109,7 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
 
         participant:PurchaseProperty(asset)
     else
-        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"):FireClient(participant.Player, nil)
+        FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"), participant, nil)
         asset:StartAuction(participant.Round)
     end
 
@@ -144,7 +145,7 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
     participant:TransferMoneyTo(to, participant.Money, true)
     participant:TransferJailCards(to, participant.JailCards)
 
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"):FireClient(participant.Player)
+    FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"), participant)
     participant:RemoveParticipant()
 
     AwardBadge(participant.Player, "Bankrupt!")
@@ -238,7 +239,7 @@ local function findFreePointAroundPosition(participant: Types.Participant, targe
     local occupiedPositions: {Vector3} = {}
     for _, v in participant.Round.Participants do
         if v.Position == targetTile.Position and v ~= participant then
-            local char = v.Player.Character
+            local char = v.Character
             if not char then
                 continue
             end
@@ -275,7 +276,7 @@ local function findFreePointAroundPosition(participant: Types.Participant, targe
 end
 
 local function moveCharacter(participant: Types.Participant, tile: Types.Tile, direct: boolean?, elapsedTime: number?, isJailed: boolean?): ()
-    local char = participant.Player.Character
+    local char = participant.Character
     if not char then
         return
     end
@@ -717,7 +718,7 @@ local function GetTheDub(participant: Types.Participant): ()
 
     if profile then
         plr:SetAttribute("Wins", profile.Wins + 1)
-        ProfileManager.UpdateProfile(participant.Player, "Wins", profile.Wins + 1)
+        ProfileManager.UpdateProfile(participant.Player :: Player, "Wins", profile.Wins + 1)
     end
 
     task.wait(15)
@@ -756,8 +757,7 @@ local function RemoveParticipant(participant: Types.Participant): ()
     participant.Player:SetAttribute("Status", "Spectating")
     participant.Player:SetAttribute("IsJailed", false)
 
-    local plr = participant.Player
-    local char = plr.Character
+    local char = participant.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
         if hum then

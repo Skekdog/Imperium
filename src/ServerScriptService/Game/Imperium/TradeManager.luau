@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FireRemote = require(script.Parent.FireRemote)
 local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
@@ -52,8 +53,8 @@ local function OfferAsset(tradeManager: Types.TradeManager, assetName: string): 
         Name = assetName,
         Mode = if indexToRemove then "Remove" else "Add",
     }
-    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, offer)
-    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
+    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.Participant, tradeManager.Participant.Player, offer)
+    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.TradingWith, tradeManager.Participant.Player, offer)
 end
 
 local function OfferMoney(tradeManager: Types.TradeManager, amount: number): ()
@@ -69,8 +70,8 @@ local function OfferMoney(tradeManager: Types.TradeManager, amount: number): ()
         Kind = "Money",
         Amount = tradeManager.OfferedMoney,
     }
-    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, offer)
-    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
+    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.Participant, tradeManager.Participant.Player, offer)
+    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.TradingWith, tradeManager.Participant.Player, offer)
 end
 
 local function OfferJailCards(tradeManager: Types.TradeManager, amount: number): ()
@@ -86,11 +87,11 @@ local function OfferJailCards(tradeManager: Types.TradeManager, amount: number):
         Kind = "JailCards",
         Amount = tradeManager.OfferedJailCards,
     }
-    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, offer)
-    tradeRemotes:WaitForChild("UpdateOffer"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, offer)
+    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.Participant, tradeManager.Participant.Player, offer)
+    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.TradingWith, tradeManager.Participant.Player, offer)
 end
 
-local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player?, reason: "GoingBankrupt"?): ()
+local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player | Configuration?, reason: "GoingBankrupt"?): ()
     tradeManager.SentOfferTo = nil
     tradeManager.TradingWith = nil
 
@@ -100,7 +101,7 @@ local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player?, r
     tradeManager.OfferedMoney = 0
     tradeManager.OfferedJailCards = 0
 
-    tradeRemotes:WaitForChild("TradeEnded"):FireClient(tradeManager.Participant.Player, wasRejectedBy, reason)
+    FireRemote(tradeRemotes:WaitForChild("TradeEnded"), tradeManager.Participant, wasRejectedBy, reason)
 end
 
 local function finishTradeForParticipant(participant: Types.Participant, to: Types.Participant): ()
@@ -139,8 +140,8 @@ local function processUpdatedAcceptance(tradeManager: Types.TradeManager): ()
         return FinishTrade(tradeManager, true)
     end
 
-    tradeRemotes:WaitForChild("TradeAcceptance"):FireClient(tradeManager.Participant.Player, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
-    tradeRemotes:WaitForChild("TradeAcceptance"):FireClient(tradeManager.TradingWith.Player, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
+    FireRemote(tradeRemotes:WaitForChild("TradeAcceptance"), tradeManager.Participant, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
+    FireRemote(tradeRemotes:WaitForChild("TradeAcceptance"), tradeManager.TradingWith, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
 end
 
 local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: boolean?): ()
@@ -180,7 +181,7 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
 
     tradeManager.SentOfferTo = to
     to.TradeManager.SentOfferTo = tradeManager.Participant
-    tradeRemotes:WaitForChild("ReceiveTradeRequest"):FireClient(to.Player, tradeManager.Participant.Player)
+    FireRemote(tradeRemotes:WaitForChild("ReceiveTradeRequest"), to, tradeManager.Participant.Player)
 
     tradeManager.LastTradeRequestTimes[to] = GetTime()
 
@@ -210,7 +211,7 @@ local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Part
 end
 
 local function processRequestResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
-    tradeRemotes:WaitForChild("RespondedTradeRequest"):FireClient(with.Player, tradeManager.Participant.Player, accepted)
+    FireRemote(tradeRemotes:WaitForChild("RespondedTradeRequest"), with, tradeManager.Participant.Player, accepted)
 
     tradeManager.TradingWith = if accepted then with else nil
     tradeManager.SentOfferTo = nil

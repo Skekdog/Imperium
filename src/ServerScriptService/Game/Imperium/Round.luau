@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Board = require(script.Parent.Board)
+local FireRemote = require(script.Parent.FireRemote)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local WaitForever = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.WaitForever)
 local SetTimeMilestone = require(script.Parent.Parent.SetTimeMilestone)
@@ -61,21 +62,21 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     end
 
     table.insert(cons, gameClientServer:WaitForChild("RollDice").OnServerEvent:Connect(function(plr)
-        if nextParticipant:CanPlayMove("Dice") and plr == nextParticipant.Player then
+        if nextParticipant:CanPlayMove("Dice") and plr == (nextParticipant.Player :: Player) then
             clearCons()
             playedMove = "Dice"
         end
     end))
 
     table.insert(cons, gameClientServer:WaitForChild("UseGetOutOfJailFreeCard").OnServerEvent:Connect(function(plr)
-        if nextParticipant:CanPlayMove("JailCard") and plr == nextParticipant.Player then
+        if nextParticipant:CanPlayMove("JailCard") and plr == (nextParticipant.Player :: Player) then
             clearCons()
             playedMove = "JailCard"
         end
     end))
 
     table.insert(cons, gameClientServer:WaitForChild("PayFine").OnServerEvent:Connect(function(plr)
-        if nextParticipant:CanPlayMove("Fine") and plr == nextParticipant.Player then
+        if nextParticipant:CanPlayMove("Fine") and plr == (nextParticipant.Player :: Player) then
             clearCons()
             playedMove = "Fine"
         end
@@ -94,7 +95,7 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     end
     assert(playedMove)
 
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireClient(nextParticipant.Player, "")
+    FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"), nextParticipant, "")
     if playedMove == "Dice" then
         nextParticipant:TryPlayMove()
     elseif playedMove == "JailCard" then

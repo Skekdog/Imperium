@@ -143,7 +143,9 @@ export type TradeManager = {
 }
 
 export type Participant = {
-    Player: Player,
+    Player: Player | Configuration,
+    Character: Model?,
+    
     Round: Round,
     Board: Board,
     IsInGame: boolean,

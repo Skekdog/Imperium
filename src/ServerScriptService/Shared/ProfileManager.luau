@@ -45,7 +45,11 @@ function module.ReleaseProfile(plr: Player): ()
 	end
 end
 
-function module.GetProfile(plr: Player): PlayerData?
+function module.GetProfile(plr: Player | Configuration): PlayerData?
+	if plr:IsA("Configuration") then
+		return
+	end
+	
 	if not profiles[plr] then
 		return warn(plr.Name.." profile not found!")
 	end

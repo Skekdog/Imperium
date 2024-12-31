@@ -2,8 +2,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
 type SoundName = "Click" | "Siren" | "DiceRoll" | "MoneyGained" | "LockingUp" | "DrawCard" | "TurnBeginAlert" | "BankruptcyAlert"
-return function(soundName: SoundName, to: Player?): Sound?
+return function(soundName: SoundName, to: Player | Configuration?): Sound?
     if to then
+        if to:IsA("Configuration") then
+            return
+        end
         return ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("PlaySound"):FireClient(to, soundName)
     end
 

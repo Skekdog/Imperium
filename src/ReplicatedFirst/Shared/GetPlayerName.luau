@@ -1,5 +1,5 @@
 -- descriptor string is of format "DisplayName (@Name)"
-return function(descriptor: Player | string, mode: "Username" | "Display Name" | "Both"?): string
+return function(descriptor: Configuration | Player | string, mode: "Username" | "Display Name" | "Both"?): string
     if typeof(descriptor) == "string" then
         if mode == "Username" then
             return descriptor:split(" ")[2]:sub(3, -2)
@@ -11,5 +11,5 @@ return function(descriptor: Player | string, mode: "Username" | "Display Name" |
             return descriptor
         end
     end
-    return `{descriptor.DisplayName} (@{descriptor.Name})`
+    return if descriptor:IsA("Configuration") then descriptor.Name else `{descriptor.DisplayName} (@{descriptor.Name})`
 end
