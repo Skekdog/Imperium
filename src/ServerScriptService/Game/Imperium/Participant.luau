@@ -799,6 +799,13 @@ function module.new(player: Player | Configuration, round: Types.Round): Types.P
     participant.Round = round
     participant.Board = round.Board
 
+    if player:IsA("Player") then
+        player:GetPropertyChangedSignal("Character"):Connect(function()
+            participant.Character = player.Character
+        end)
+        participant.Character = player.Character
+    end
+
     participant.JailCards = round.BoardConfiguration.StartingJailCards
     participant.Money = round.GameConfiguration.StartingMoney
     participant.Assets = {}
