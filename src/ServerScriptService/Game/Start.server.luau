@@ -1,10 +1,10 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
-local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local DisableCharacterCollision = require(ServerScriptService.Game.Imperium.DisableCharacterCollision)
 local Tile = require(script.Parent.Imperium.Tile)
 local Types = require(script.Parent.Imperium.Types)
 local ClientTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
@@ -76,25 +76,9 @@ for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))
 end
 
-PhysicsService:RegisterCollisionGroup("Characters")
-PhysicsService:RegisterCollisionGroup("Dice")
-PhysicsService:CollisionGroupSetCollidable("Characters", "Characters", false)
-PhysicsService:CollisionGroupSetCollidable("Dice", "Characters", false)
-local function disableCollision(part: Instance): ()
-    if part:IsA("BasePart") then
-        part.CollisionGroup = "Characters"
-    end
-end
-
 Players.PlayerAdded:Connect(function(plr)
     plr:SetAttribute("Status", "Spectating")
-    plr.CharacterAdded:Connect(function(char)
-        for _, v in char:GetDescendants() do
-            disableCollision(v)
-        end
-
-        char.DescendantAdded:Connect(disableCollision)
-    end)
+    plr.CharacterAdded:Connect(DisableCharacterCollision)
     plr:LoadCharacter()
 end)
 

@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local StarterPlayer = game:GetService("StarterPlayer")
+local DisableCharacterCollision = require(script.Parent.DisableCharacterCollision)
 local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
@@ -46,6 +47,8 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
 
     assert(char.PrimaryPart):SetNetworkOwner(nil)
 
+    DisableCharacterCollision(char)
+
     char.Destroying:Connect(function()
         spawnCharacter(participant, char)
     end)
@@ -60,6 +63,7 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
     local player = Instance.new("Configuration")
     player.Name = `🤖 {character.Name}` --note: don't use normal whitespace here because that messes with name formatting
     player:SetAttribute("UserId", character.UserId)
+    player:SetAttribute("Status", "Spectating")
     player.Parent = Players
 
     local participant = Participant.new(player, round)
