@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
@@ -33,8 +34,17 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
     char = char:Clone()
     participant.Character = char
 
+    local hum = char:WaitForChild("Humanoid")
+    assert(hum:IsA("Humanoid"), "Humanoid is not a humanoid")
+
+    hum.WalkSpeed = StarterPlayer.CharacterWalkSpeed
+    hum.JumpPower = StarterPlayer.CharacterJumpPower
+    hum.JumpHeight = StarterPlayer.CharacterJumpHeight
+
     char.Name = participant.Player.Name
     char.Parent = workspace
+
+    assert(char.PrimaryPart):SetNetworkOwner(nil)
 
     char.Destroying:Connect(function()
         spawnCharacter(participant, char)
