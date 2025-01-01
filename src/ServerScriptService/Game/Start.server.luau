@@ -42,14 +42,12 @@ info.Players = info.Players or (if RunService:IsStudio() then MIN_STUDIO_PLAYERS
 if not info.BotPlayers then
     info.BotPlayers = {}
     if RunService:IsStudio() then
-        local i = 0
-        for k, v in BotCharacters do
+        for i, v in BotCharacters do
             if i >= STUDIO_BOT_PLAYERS then
                 break
             end
 
-            table.insert(assert(info.BotPlayers), k)
-            i += 1
+            table.insert(assert(info.BotPlayers), v)
         end
     end
 end

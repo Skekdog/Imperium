@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.GetPlayerName)
-local GetUserId = require(script.Parent.GetUserId)
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
@@ -46,9 +45,11 @@ local function createPlr(plr: Player | Configuration)
 
 	clone.Username.Text = GetPlayerName(plr, "Both")
 
-	pcall(function()
-		clone.Avatar.Image = Players:GetUserThumbnailAsync(GetUserId(plr), Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
-	end)
+	if plr:IsA("Player") then
+		pcall(function()
+			clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+		end)
+	end
 
 	clone.Visible = true
 	clone.Name = "Player-"..plr.Name
