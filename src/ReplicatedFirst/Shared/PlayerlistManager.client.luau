@@ -115,7 +115,7 @@ function movePlr(plr: Player | Configuration, status: Status)
 	recalculateCount(status)
 end
 
-local function removePlr(plr: Player)
+local function removePlr(plr: Player | Configuration)
 	local f = findPlr(plr.Name)
 	players[plr.Name] = nil
 	if f then
@@ -128,8 +128,16 @@ if false then -- This looks stupid but that's because it is. This doesn't do any
 	(movePlr :: any)()
 end
 
-Players.PlayerRemoving:Connect(removePlr)
-Players.PlayerAdded:Connect(createPlr)
+Players.ChildRemoved:Connect(function(child)
+	if child:IsA("Player") or child:IsA("Configuration") then
+		removePlr(child)
+	end
+end)
+Players.ChildAdded:Connect(function(child)
+	if child:IsA("Player") or child:IsA("Configuration") then
+		createPlr(child)
+	end
+end)
 
 for _, v in Players:GetChildren() do
 	assert(v:IsA("Player") or v:IsA("Configuration"))
