@@ -210,6 +210,20 @@ export type Participant = {
     RemoveParticipant: (Participant) -> (),
 }
 
+export type BotPlayer = {
+    Participant: Participant,
+    Player: Configuration,
+    Model: Model,
+
+    EvaluateAsset: (BotPlayer, Asset) -> number,
+    EvaluateSkipJail: (BotPlayer) -> boolean,
+
+    DecideMove: (BotPlayer) -> "Dice" | "JailCard" | "Fine",
+    TryBuildDevelopments: (BotPlayer) -> (),
+    TryUnmortgageAssets: (BotPlayer) -> (),
+    TryAvoidBankruptcy: (BotPlayer) -> (),
+}
+
 export type Board = {
     Tiles: {Tile},
 
