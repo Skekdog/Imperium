@@ -13,7 +13,20 @@ end
 
 local function EvaluateSkipJail(bot: Types.BotPlayer): boolean
     assert(bot.Participant.JailedOn ~= 0, "Participant is not jailed")
-    return false
+    
+    local numAllAssets = 0
+    local numOwnedAssets = 0
+    for _, v in bot.Participant.Round.Board.Tiles do
+        if v.Asset then
+            numAllAssets += 1
+            if v.Asset.Owner ~= "Bank" then
+                numOwnedAssets += 1
+            end
+        end
+    end
+
+    local percentOwned = numOwnedAssets / numAllAssets
+    return percentOwned < 0.8
 end
 
 local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeManager): boolean
