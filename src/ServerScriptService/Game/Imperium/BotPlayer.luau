@@ -116,11 +116,14 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
     hum.JumpPower = StarterPlayer.CharacterJumpPower
     hum.JumpHeight = StarterPlayer.CharacterJumpHeight
 
-    local oldAnimateScript = char:FindFirstChild("Animate")
-    if oldAnimateScript then
-        oldAnimateScript:Destroy()
+    local animate: Script
+    if hum.RigType == Enum.HumanoidRigType.R15 then
+        animate = script.Parent.Util.BotAnimateR15:Clone()
+    elseif hum.RigType == Enum.HumanoidRigType.R6 then
+        animate = script.Parent.Util.BotAnimateR6:Clone()
+    else
+        error(`Unsupported rig type: {hum.RigType}`)
     end
-    local animate = script.Parent.Util.BotAnimate:Clone()
     animate.Enabled = true
     animate.Parent = char :: any
 
