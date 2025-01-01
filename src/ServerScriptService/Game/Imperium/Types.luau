@@ -218,8 +218,11 @@ export type BotPlayer = {
 
     EvaluateAsset: (BotPlayer, Asset) -> number,
     EvaluateSkipJail: (BotPlayer) -> boolean,
+    EvaluateTrade: (BotPlayer, TradeManager) -> boolean,
 
     DecideMove: (BotPlayer) -> "Dice" | "JailCard" | "Fine",
+    DecidePurchase: (BotPlayer, Asset) -> boolean,
+
     TryBuildDevelopments: (BotPlayer) -> (),
     TryUnmortgageAssets: (BotPlayer) -> (),
     TryAvoidBankruptcy: (BotPlayer) -> (),

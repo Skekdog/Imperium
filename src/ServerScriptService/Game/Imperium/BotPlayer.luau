@@ -15,8 +15,16 @@ local function EvaluateSkipJail(bot: Types.BotPlayer): boolean
     return false
 end
 
+local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeManager): boolean
+    return false
+end
+
 local function DecideMove(bot: Types.BotPlayer): "Dice" | "JailCard" | "Fine"
     return "Dice"
+end
+
+local function DecidePurchase(bot: Types.BotPlayer, asset: Types.Asset): boolean
+    return true
 end
 
 local function TryBuildDevelopments(bot: Types.BotPlayer): ()
@@ -85,7 +93,11 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
 
         EvaluateAsset = EvaluateAsset,
         EvaluateSkipJail = EvaluateSkipJail,
+        EvaluateTrade = EvaluateTrade,
+
         DecideMove = DecideMove,
+        DecidePurchase = DecidePurchase,
+
         TryBuildDevelopments = TryBuildDevelopments,
         TryUnmortgageAssets = TryUnmortgageAssets,
         TryAvoidBankruptcy = TryAvoidBankruptcy,
