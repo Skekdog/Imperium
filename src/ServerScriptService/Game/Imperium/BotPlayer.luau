@@ -12,6 +12,7 @@ local function EvaluateAsset(bot: Types.BotPlayer, asset: Types.Asset): number
 end
 
 local function EvaluateSkipJail(bot: Types.BotPlayer): boolean
+    assert(bot.Participant.JailedOn ~= 0, "Participant is not jailed")
     return false
 end
 
@@ -20,6 +21,13 @@ local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeMana
 end
 
 local function DecideMove(bot: Types.BotPlayer): "Dice" | "JailCard" | "Fine"
+    if bot.Participant.JailedOn ~= 0 and bot:EvaluateSkipJail() then
+        if bot.Participant.JailCards > 0 then
+            return "JailCard"
+        elseif bot.Participant:CanAfford(bot.Participant.Round.BoardConfiguration.JailFine) then
+            return "Fine"
+        end
+    end
     return "Dice"
 end
 
