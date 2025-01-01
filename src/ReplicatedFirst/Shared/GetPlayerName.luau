@@ -2,7 +2,13 @@
 return function(descriptor: Configuration | Player | string, mode: "Username" | "Display Name" | "Both"?): string
     if typeof(descriptor) == "string" then
         if mode == "Username" then
-            return descriptor:split(" ")[2]:sub(3, -2)
+            local split = descriptor:split(" ")
+            if #split == 2 then
+                return split[2]:sub(3, -2)
+            else -- then this is a bot
+                return descriptor
+            end
+            
         elseif mode == "Display Name" then
             return descriptor:split(" ")[1]
         elseif mode == "Both" then
