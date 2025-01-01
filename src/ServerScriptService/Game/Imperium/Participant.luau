@@ -717,6 +717,10 @@ local function GetTheDub(participant: Types.Participant): ()
     local plr = participant.Player
     local profile = ProfileManager.GetProfile(plr)
 
+    if participant.Round.GameConfiguration.HumanPlayerCount == 1 and #participant.Round.GameConfiguration.BotPlayers >= 3 then
+        AwardBadge(plr, "Artificial, but not Intelligent")
+    end
+
     AwardBadge(plr, "Imperium")
 
     if profile then

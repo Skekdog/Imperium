@@ -38,6 +38,7 @@ export type GameConfiguration = {
     StartingMoney: number,
     FreeParkingBonusEnabled: boolean,
     BotPlayers: {string},
+    HumanPlayerCount: number,
 }
 
 export type AssetDescription = {

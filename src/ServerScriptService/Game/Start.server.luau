@@ -117,6 +117,7 @@ local round = Round.new(board, tiles, {
     StartingMoney = info.StartingMoney,
     FreeParkingBonusEnabled = if info.FreeParkingBonusEnabled == "Enabled" then true else false,
     BotPlayers = info.BotPlayers,
+    HumanPlayerCount = info.Players
 })
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)
