@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local ServerStorage = game:GetService("ServerStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
 local DisableCharacterCollision = require(script.Parent.Util.DisableCharacterCollision)
 local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
@@ -150,7 +150,7 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
     local index = assert(table.find(BotCharacters, name), `Missing bot {name}`)
     table.remove(BotCharacters, index)
 
-    local char = assert(ServerStorage.Shared.BotModels:FindFirstChild(name), `Missing bot model {name}`):Clone()
+    local char = assert(ReplicatedStorage.Shared.BotModels:FindFirstChild(name), `Missing bot model {name}`):Clone()
     assert(char:IsA("Model"), "Bot model is not a model")
 
     local player = Instance.new("Configuration")

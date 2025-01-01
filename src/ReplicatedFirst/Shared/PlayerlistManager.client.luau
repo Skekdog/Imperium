@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetAvatarHeadshot = require(script.Parent.GetAvatarHeadshot)
 local GetPlayerName = require(script.Parent.GetPlayerName)
 local IsLobby = require(script.Parent.IsLobby)
 local AwaitReplicatedAttribute = require(script.Parent.Parent.Shared.AwaitReplicatedAttribute)
@@ -45,11 +46,25 @@ local function createPlr(plr: Player | Configuration)
 
 	clone.Username.Text = GetPlayerName(plr, "Both")
 
-	if plr:IsA("Player") then
-		pcall(function()
-			clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
-		end)
+	local headshotObject = GetAvatarHeadshot(plr) :: ImageLabel -- this is a lie, but the typechecker does not like roblox class unions
+	headshotObject.BackgroundTransparency = 1
+	headshotObject.Size = UDim2.new(0, 128, 1, 0)
+
+	do
+		local uiCorner = Instance.new("UICorner")
+		uiCorner.CornerRadius = UDim.new(0, 8)
+		
+		local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
+		uiAspectRatio.AspectRatio = 1
+		uiAspectRatio.DominantAxis = Enum.DominantAxis.Width
+		uiAspectRatio.AspectType = Enum.AspectType.FitWithinMaxSize
+		
+		uiCorner.Parent = headshotObject
+		uiAspectRatio.Parent = headshotObject
 	end
+
+	headshotObject.Name = "Avatar"
+	headshotObject.Parent = clone
 
 	clone.Visible = true
 	clone.Name = "Player-"..plr.Name
