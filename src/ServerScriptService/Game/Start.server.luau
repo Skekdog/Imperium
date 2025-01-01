@@ -43,7 +43,7 @@ if not info.BotPlayers then
     info.BotPlayers = {}
     if RunService:IsStudio() then
         for i, v in BotCharacters do
-            if i >= STUDIO_BOT_PLAYERS then
+            if (i - 1) >= STUDIO_BOT_PLAYERS then -- I don't like 1-indexing
                 break
             end
 
