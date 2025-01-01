@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local FireRemote = require(script.Parent.FireRemote)
+local FireRemote = require(script.Parent.Util.FireRemote)
 local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)

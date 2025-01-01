@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local StarterPlayer = game:GetService("StarterPlayer")
-local DisableCharacterCollision = require(script.Parent.DisableCharacterCollision)
+local DisableCharacterCollision = require(script.Parent.Util.DisableCharacterCollision)
 local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
@@ -46,7 +46,7 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
     if oldAnimateScript then
         oldAnimateScript:Destroy()
     end
-    local animate = script.Parent.BotAnimate:Clone()
+    local animate = script.Parent.Util.BotAnimate:Clone()
     animate.Enabled = true
     animate.Parent = char :: any
 
