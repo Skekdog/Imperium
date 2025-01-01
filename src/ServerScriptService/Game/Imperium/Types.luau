@@ -225,7 +225,7 @@ export type BotPlayer = {
 
     TryBuildDevelopments: (BotPlayer) -> (),
     TryUnmortgageAssets: (BotPlayer) -> (),
-    TryAvoidBankruptcy: (BotPlayer) -> (),
+    TryAvoidBankruptcy: (BotPlayer, requiredMoney: number) -> (),
 }
 
 export type Board = {

@@ -7,6 +7,18 @@ local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
 local module = {}
 
+local function sortAssetPriceAscending(tbl: {[number]: Types.Asset}): ()
+    table.sort(tbl, function(a, b)
+        return a.AssetDescription.Price < b.AssetDescription.Price
+    end)
+end
+
+local function sortAssetPriceDescending(tbl: {[number]: Types.Asset}): ()
+    table.sort(tbl, function(a, b)
+        return a.AssetDescription.Price > b.AssetDescription.Price
+    end)
+end
+
 local function EvaluateAsset(bot: Types.BotPlayer, asset: Types.Asset): number
     return 0
 end
@@ -49,14 +61,46 @@ local function DecidePurchase(bot: Types.BotPlayer, asset: Types.Asset): boolean
 end
 
 local function TryBuildDevelopments(bot: Types.BotPlayer): ()
+    -- We want to build on higher value properties first, because that (usually) brings more rent
+    sortAssetPriceDescending(bot.Participant.Assets)
+
+    for _, v in bot.Participant.Assets do
+        v:TryDevelopProperty("House")
+        v:TryDevelopProperty("Hotel")
+    end
+
     return
 end
 
 local function TryUnmortgageAssets(bot: Types.BotPlayer): ()
+    -- We want to unmortgage higher value properties first
+    sortAssetPriceDescending(bot.Participant.Assets)
+
+    for _, v in bot.Participant.Assets do
+        v:TryUnMortgage()
+    end
+
     return
 end
 
-local function TryAvoidBankruptcy(bot: Types.BotPlayer): ()
+local function TryAvoidBankruptcy(bot: Types.BotPlayer, requiredMoney: number): ()
+    -- We want to sell off lower value properties first
+    sortAssetPriceAscending(bot.Participant.Assets)
+
+    for _, v in bot.Participant.Assets do
+        v:TrySellAllDevelopments()
+        if bot.Participant.Money >= requiredMoney then
+            return
+        end
+    end
+
+    for _, v in bot.Participant.Assets do
+        v:TryMortgage()
+        if bot.Participant.Money >= requiredMoney then
+            return
+        end
+    end
+
     return
 end
 
