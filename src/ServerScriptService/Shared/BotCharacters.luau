@@ -13,4 +13,6 @@ local characters = {
     "Bob",
 }
 
+Random.new():Shuffle(characters)
+
 return characters
