@@ -68,52 +68,55 @@ local function PromptPurchaseProperty(participant: Types.Participant, asset: Typ
         return asset:StartAuction(participant.Round)
     end
 
-    FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"), participant, asset.AssetDescription)
-
-    local startTime = GetTime()
     local response: boolean?
+    local botPlayer = participant.Round:GetBotPlayer(participant)
 
-    local con: RBXScriptConnection
-    con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("RespondPropertyPurchase").OnServerEvent:Once(function(plr, accepted: unknown, propertyName: unknown)
-        if plr ~= (participant.Player :: Player) then
-            return
+    if botPlayer then
+        response = botPlayer:DecidePurchase(asset)
+    else
+        FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"), participant, asset.AssetDescription)
+
+        local startTime = GetTime()
+        local con: RBXScriptConnection
+        con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("RespondPropertyPurchase").OnServerEvent:Once(function(plr, accepted: unknown, propertyName: unknown)
+            if plr ~= (participant.Player :: Player) then
+                return
+            end
+
+            if not participant:CanAfford(asset.AssetDescription.Price) then
+                response = false -- If they do something async and they can no longer afford we want to start an auction
+                return
+            end
+
+            if typeof(accepted) ~= "boolean" or typeof(propertyName) ~= "string" then
+                return
+            end
+        
+            local tile = participant.Board:TryFindTileByName(propertyName)
+            if not tile or tile.Asset ~= asset then
+                return
+            end
+
+            response = accepted
+        end)
+
+        local duration = participant.Round.GameConfiguration.PlayerTurnTime
+        SetTimeMilestone(duration)
+        while response == nil and GetTime() - startTime < duration and not participant.HasDisconnected do
+            task.wait()
         end
 
-        if not participant:CanAfford(asset.AssetDescription.Price) then
-            response = false -- If they do something async and they can no longer afford we want to start an auction
-            return
-        end
-
-        if typeof(accepted) ~= "boolean" or typeof(propertyName) ~= "string" then
-            return
-        end
-    
-        local tile = participant.Board:TryFindTileByName(propertyName)
-        if not tile or tile.Asset ~= asset then
-            return
-        end
-
-        response = accepted
-    end)
-
-    local duration = participant.Round.GameConfiguration.PlayerTurnTime
-    SetTimeMilestone(duration)
-    while response == nil and GetTime() - startTime < duration and not participant.HasDisconnected do
-        task.wait()
+        con:Disconnect()
     end
 
     if response == true then
-        if asset.Owner ~= "Bank" then
-            return con:Disconnect()
+        if asset.Owner == "Bank" then
+            participant:PurchaseProperty(asset)
         end
-
-        participant:PurchaseProperty(asset)
     else
         FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("PromptPropertyPurchase"), participant, nil)
         asset:StartAuction(participant.Round)
     end
-
-    con:Disconnect()
 end
 
 local function GiveMoney(participant: Types.Participant, amount: number): ()
