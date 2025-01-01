@@ -56,7 +56,6 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
 
     local botPlayer = round:GetBotPlayer(nextParticipant)
     if botPlayer then
-        task.wait(1) -- purely aesthetic reasons
         playedMove = botPlayer:DecideMove()
     else
         local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
