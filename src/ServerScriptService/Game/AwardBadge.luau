@@ -5,6 +5,7 @@ local badges: {[string]: number} = {
     --["Monopoly"] = 3372918368199180,
     ["Imperium"] = 2989328846691150,
     ["Bankrupt!"] = 2022094759463020,
+    ["Artificial, but not Intelligent"] = 3444594326569967,
 }
 
 return function(plr: Player | Configuration, name: BadgeName): ()
