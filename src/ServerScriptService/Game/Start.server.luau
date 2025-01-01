@@ -76,11 +76,16 @@ for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))
 end
 
-Players.PlayerAdded:Connect(function(plr)
+local function onPlayerAdded(plr: Player)
     plr:SetAttribute("Status", "Spectating")
     plr.CharacterAdded:Connect(DisableCharacterCollision)
     plr:LoadCharacter()
-end)
+end
+
+for _, v in Players:GetPlayers() do
+    onPlayerAdded(v)
+end
+Players.PlayerAdded:Connect(onPlayerAdded)
 
 local players = #Players:GetChildren()
 
