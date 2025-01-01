@@ -43,6 +43,16 @@ local function TryAvoidBankruptcy(bot: Types.BotPlayer): ()
     return
 end
 
+local function spawnCharacter(participant: Types.Participant, char: Model): ()
+    char = char:Clone()
+    participant.Character = char
+    char.Parent = workspace
+
+    char.Destroying:Connect(function()
+        spawnCharacter(participant, char)
+    end)
+end
+
 function module.new(round: Types.Round): Types.BotPlayer
     assert(#characters > 0, "No characters available")
     local characterIndex = math.random(1, #characters)
@@ -57,6 +67,8 @@ function module.new(round: Types.Round): Types.BotPlayer
     player.Parent = Players
 
     local participant = Participant.new(player, round)
+
+    spawnCharacter(participant, char)
 
     return {
         Participant = participant,
