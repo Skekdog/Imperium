@@ -42,6 +42,14 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
     hum.JumpPower = StarterPlayer.CharacterJumpPower
     hum.JumpHeight = StarterPlayer.CharacterJumpHeight
 
+    local oldAnimateScript = char:FindFirstChild("Animate")
+    if oldAnimateScript then
+        oldAnimateScript:Destroy()
+    end
+    local animate = script.Parent.BotAnimate:Clone()
+    animate.Enabled = true
+    animate.Parent = char :: any
+
     char.Name = participant.Player.Name
     char.Parent = workspace
 
