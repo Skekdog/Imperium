@@ -105,9 +105,16 @@ local function TryAvoidBankruptcy(bot: Types.BotPlayer, requiredMoney: number): 
     return
 end
 
+local function randomNegativeHalf(value: number): number
+    return math.random(-value / 2, value / 2)
+end
+
 local function spawnCharacter(participant: Types.Participant, char: Model): ()
     char = char:Clone()
     participant.Character = char
+
+    local spawn = assert(workspace:FindFirstChildWhichIsA("SpawnLocation", true), "Missing spawn location")
+    char:PivotTo(spawn.CFrame + Vector3.new(randomNegativeHalf(spawn.Size.X), spawn.Size.Y + 2, randomNegativeHalf(spawn.Size.Z)))
 
     local hum = char:WaitForChild("Humanoid")
     assert(hum:IsA("Humanoid"), "Humanoid is not a humanoid")
