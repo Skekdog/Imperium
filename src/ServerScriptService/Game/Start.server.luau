@@ -13,12 +13,14 @@ local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTi
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Round = require(ServerScriptService.Game.Imperium.Round)
+local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
-local MIN_STUDIO_PLAYERS = 2
-local MIN_PLAYERS_OR_EXIT = 2
+local MIN_STUDIO_PLAYERS = 1
+local STUDIO_BOT_PLAYERS = 1
+local MIN_PLAYERS_OR_EXIT = 1
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
@@ -36,6 +38,21 @@ info.Map = info.Map or GameConfiguration.Map.Default :: string
 info.Board = info.Board or GameConfiguration.Board.Default :: string
 info.FreeParkingBonusEnabled = info.FreeParkingBonusEnabled or GameConfiguration.FreeParkingBonusEnabled.Default :: string
 info.Players = info.Players or (if RunService:IsStudio() then MIN_STUDIO_PLAYERS else 8)
+
+if not info.BotPlayers then
+    info.BotPlayers = {}
+    if RunService:IsStudio() then
+        local i = 0
+        for k, v in BotCharacters do
+            if i >= STUDIO_BOT_PLAYERS then
+                break
+            end
+
+            table.insert(assert(info.BotPlayers), k)
+            i += 1
+        end
+    end
+end
 
 local map = ServerStorage.Game.Maps:FindFirstChild(info.Map)
 assert(map, `Map {info.Map} not found`)
@@ -112,6 +129,7 @@ local round = Round.new(board, tiles, {
     BankruptcyTime = info.BankruptcyTime,
     StartingMoney = info.StartingMoney,
     FreeParkingBonusEnabled = if info.FreeParkingBonusEnabled == "Enabled" then true else false,
+    BotPlayers = info.BotPlayers,
 })
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)

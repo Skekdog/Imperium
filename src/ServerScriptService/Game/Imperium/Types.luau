@@ -37,6 +37,7 @@ export type GameConfiguration = {
     BankruptcyTime: number,
     StartingMoney: number,
     FreeParkingBonusEnabled: boolean,
+    BotPlayers: {string},
 }
 
 export type AssetDescription = {

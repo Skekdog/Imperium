@@ -1,23 +1,9 @@
 local Players = game:GetService("Players")
+local ServerScriptService = game:GetService("ServerScriptService")
+local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
 local module = {}
-
-type BotCharacter = {
-    Name: string,
-    UserId: number,
-}
-
-local characters: {BotCharacter} = {
-    {
-        Name = "Scelly_Dog",
-        UserId = 965735486,
-    },
-    {
-        Name = "Roblox",
-        UserId = 1,
-    }
-}
 
 local function EvaluateAsset(bot: Types.BotPlayer, asset: Types.Asset): number
     return 0
@@ -46,6 +32,8 @@ end
 local function spawnCharacter(participant: Types.Participant, char: Model): ()
     char = char:Clone()
     participant.Character = char
+
+    char.Name = participant.Player.Name
     char.Parent = workspace
 
     char.Destroying:Connect(function()
@@ -53,16 +41,14 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
     end)
 end
 
-function module.new(round: Types.Round): Types.BotPlayer
-    assert(#characters > 0, "No characters available")
-    local characterIndex = math.random(1, #characters)
-    local character = characters[characterIndex]
-    table.remove(characters, characterIndex)
+function module.new(round: Types.Round, name: string): Types.BotPlayer
+    local character = assert(BotCharacters[name], `Bot character {name} does not exist`)
+    BotCharacters[name] = nil
 
     local char = Players:CreateHumanoidModelFromUserId(character.UserId)
 
     local player = Instance.new("Configuration")
-    player.Name = `🤖 {character.Name}`
+    player.Name = `🤖 {character.Name}` --note: don't use normal whitespace here because that messes with name formatting
     player:SetAttribute("UserId", character.UserId)
     player.Parent = Players
 

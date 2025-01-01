@@ -8,6 +8,7 @@ local gameInfoStore = MemoryStoreService:GetHashMap("GameInfo")
 
 export type GameInfo = {
     Players: number,
+    BotPlayers: {string},
 } & GameConfiguration.SerialisedSettings
 
 return function(players: {Player}, place: "Game" | "Lobby", gameInfo: GameInfo?, callback: ((success: boolean, TeleportAsyncResult) -> ())?): ()

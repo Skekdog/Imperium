@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Board = require(script.Parent.Board)
+local BotPlayer = require(script.Parent.BotPlayer)
 local FireRemote = require(script.Parent.FireRemote)
 local GetTime = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTime)
 local WaitForever = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.WaitForever)
@@ -186,9 +187,12 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.SetFreeParkingMoney = SetFreeParkingMoney
     round.GetFreeParkingMoney = GetFreeParkingMoney
 
-    for _, player in Players:GetChildren() do
-        assert(player:IsA("Player") or player:IsA("Configuration"), "Player is not a player")
+    for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))
+    end
+
+    for _, v in gameConfiguration.BotPlayers do
+        table.insert(round.Participants, BotPlayer.new(round, v).Participant)
     end
 
     Random.new():Shuffle(round.Participants)
