@@ -249,6 +249,9 @@ export type Round = {
     Participants: {Participant},
     CurrentParticipant: Participant?,
 
+    BotPlayers: {[Participant]: BotPlayer?},
+    GetBotPlayer: (Round, participant: Participant) -> BotPlayer?,
+
     StartRound: (Round) -> (),
     TryGetParticipant: (Round, player: Player) -> Participant?,
     StartNextParticipantTurn: (Round, participant: Participant?) -> (),

@@ -52,49 +52,56 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"):FireAllClients(nextParticipant.Player.Name)
 
-    local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
-
     local playedMove: "Dice" | "JailCard" | "Fine" | "Skip"?
-    local cons: {RBXScriptConnection} = {}
-    local function clearCons(): ()
-        for _, v in cons do
-            v:Disconnect()
+
+    local botPlayer = round:GetBotPlayer(nextParticipant)
+    if botPlayer then
+        task.wait(1) -- purely aesthetic reasons
+        playedMove = botPlayer:DecideMove()
+    else
+        local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
+
+        local cons: {RBXScriptConnection} = {}
+        local function clearCons(): ()
+            for _, v in cons do
+                v:Disconnect()
+            end
         end
+
+        table.insert(cons, gameClientServer:WaitForChild("RollDice").OnServerEvent:Connect(function(plr)
+            if nextParticipant:CanPlayMove("Dice") and plr == (nextParticipant.Player :: Player) then
+                clearCons()
+                playedMove = "Dice"
+            end
+        end))
+
+        table.insert(cons, gameClientServer:WaitForChild("UseGetOutOfJailFreeCard").OnServerEvent:Connect(function(plr)
+            if nextParticipant:CanPlayMove("JailCard") and plr == (nextParticipant.Player :: Player) then
+                clearCons()
+                playedMove = "JailCard"
+            end
+        end))
+
+        table.insert(cons, gameClientServer:WaitForChild("PayFine").OnServerEvent:Connect(function(plr)
+            if nextParticipant:CanPlayMove("Fine") and plr == (nextParticipant.Player :: Player) then
+                clearCons()
+                playedMove = "Fine"
+            end
+        end))
+
+        local start = GetTime()
+
+        while not playedMove and GetTime() < start + round.GameConfiguration.PlayerTurnTime and not nextParticipant.HasDisconnected do
+            task.wait()
+        end
+
+        clearCons()
+
+        if not playedMove then
+            playedMove = if nextParticipant.HasDisconnected then "Skip" else "Dice"
+        end
+        assert(playedMove)
     end
-
-    table.insert(cons, gameClientServer:WaitForChild("RollDice").OnServerEvent:Connect(function(plr)
-        if nextParticipant:CanPlayMove("Dice") and plr == (nextParticipant.Player :: Player) then
-            clearCons()
-            playedMove = "Dice"
-        end
-    end))
-
-    table.insert(cons, gameClientServer:WaitForChild("UseGetOutOfJailFreeCard").OnServerEvent:Connect(function(plr)
-        if nextParticipant:CanPlayMove("JailCard") and plr == (nextParticipant.Player :: Player) then
-            clearCons()
-            playedMove = "JailCard"
-        end
-    end))
-
-    table.insert(cons, gameClientServer:WaitForChild("PayFine").OnServerEvent:Connect(function(plr)
-        if nextParticipant:CanPlayMove("Fine") and plr == (nextParticipant.Player :: Player) then
-            clearCons()
-            playedMove = "Fine"
-        end
-    end))
-
-    local start = GetTime()
-
-    while not playedMove and GetTime() < start + round.GameConfiguration.PlayerTurnTime and not nextParticipant.HasDisconnected do
-        task.wait()
-    end
-
-    clearCons()
-
-    if not playedMove then
-        playedMove = if nextParticipant.HasDisconnected then "Skip" else "Dice"
-    end
-    assert(playedMove)
 
     FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("BeginTurn"), nextParticipant, "")
     if playedMove == "Dice" then
@@ -164,12 +171,18 @@ local function GetFreeParkingMoney(round: Types.Round): number
     return round._freeParkingMoney
 end
 
+local function GetBotPlayer(round: Types.Round, participant: Types.Participant): Types.BotPlayer?
+    return round.BotPlayers[participant]
+end
+
 function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.Tile}, gameConfiguration: Types.GameConfiguration): Types.Round
     local round = {}
 
     round.Board = Board.new(tiles)
     round.BoardConfiguration = boardConfiguration
     round.GameConfiguration = gameConfiguration
+
+    round.BotPlayers = {}
 
     round._freeParkingMoney = 0
     round.Started = false
@@ -187,12 +200,16 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.SetFreeParkingMoney = SetFreeParkingMoney
     round.GetFreeParkingMoney = GetFreeParkingMoney
 
+    round.GetBotPlayer = GetBotPlayer
+
     for _, player in Players:GetPlayers() do
         table.insert(round.Participants, Participant.new(player, round))
     end
 
     for _, v in gameConfiguration.BotPlayers do
-        table.insert(round.Participants, BotPlayer.new(round, v).Participant)
+        local botPlayer = BotPlayer.new(round, v)
+        table.insert(round.Participants, botPlayer.Participant)
+        round.BotPlayers[botPlayer.Participant] = botPlayer
     end
 
     Random.new():Shuffle(round.Participants)
