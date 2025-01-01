@@ -87,7 +87,7 @@ local players = #Players:GetChildren()
 SetWaitingText("Waiting for players...", math.huge)
 while players < 1 do
     task.wait()
-    players = #Players:GetChildren()
+    players = #Players:GetPlayers()
 end
 
 local startWait = GetTime()
@@ -97,7 +97,7 @@ SetWaitingText("Waiting for players...", MAX_PLAYER_LOAD_WAIT_TIME)
 -- Note: we can't use Players.PlayerAdded because then we don't check for max time
 while (players < info.Players) and (GetTime() - startWait < MAX_PLAYER_LOAD_WAIT_TIME) do
     task.wait()
-    players = math.max(players, #Players:GetChildren()) -- If a player disconnects after joining we don't want to stall the game
+    players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
 end
 
 if players < MIN_PLAYERS_OR_EXIT then
