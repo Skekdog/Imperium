@@ -17,14 +17,15 @@ local function setPlayerText(): ()
         return
     end
 
+    local turnLabel = object.Frame.Turn
+
     local player = Players:FindFirstChild(name)
-    if not player or not player:IsA("Player") then
-        object.Frame.Turn.Text = "Unknown Player's Turn"
+    if not player or (not player:IsA("Player") and not player:IsA("Configuration")) then
+        turnLabel:SetAttribute("Format", "Unknown Player's Turn")
         return
     end
 
-    local turnLabel = object.Frame.Turn
-    turnLabel:SetAttribute("Player_1", GetPlayerName(player))
+    turnLabel:SetAttribute("Player_1", GetPlayerName(player :: Player | Configuration))
     turnLabel:SetAttribute("Format", "[PLAYER]'s Turn")
     turnLabel:AddTag("DynamicNames")
 end
