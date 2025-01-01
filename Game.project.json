@@ -32,6 +32,11 @@
                 }
             }
         },
+        "Players": {
+            "$properties": {
+                "CharacterAutoLoads": false
+            }
+        },
         "ServerStorage": {
             "Shared": {"$path": "Assets/Shared"},
             "Game": {"$path": "Assets/Game"}
