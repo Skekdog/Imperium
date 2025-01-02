@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
+local IsBotSimulationEnabled = require(ServerScriptService.Game.Imperium.Util.IsBotSimulationEnabled)
 local FireRemote = require(script.Parent.Util.FireRemote)
 local AwardBadge = require(script.Parent.Parent.AwardBadge)
 local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
@@ -38,20 +40,22 @@ local function animateJailBars(round: Types.Round, locked: boolean): ()
 end
 
 local function SendToJail(participant: Types.Participant): ()
-    local sound = PlaySound("Siren")
-    if sound then
-        task.delay(sound.TimeLength, PlaySound, "Siren" :: "Siren")
+    if not IsBotSimulationEnabled() then
+        local sound = PlaySound("Siren")
+        if sound then
+            task.delay(sound.TimeLength, PlaySound, "Siren" :: "Siren")
+        end
+
+        participant.DoublesStreak = 0
+        participant.JailedOn = participant.Round.Turn
+        participant.Player:SetAttribute("IsJailed", true)
+
+        animateJailBars(participant.Round, false)
+        PlaySound("LockingUp")
     end
 
-    participant.DoublesStreak = 0
-    participant.JailedOn = participant.Round.Turn
-    participant.Player:SetAttribute("IsJailed", true)
-
-    animateJailBars(participant.Round, false)
     participant:MoveToTileByName("Jail", true)
     animateJailBars(participant.Round, true)
-
-    PlaySound("LockingUp")
 end
 
 local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
@@ -319,6 +323,7 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
             TweenService:Create(root, TweenInfo.new(0.1), { Position = targetPosition }):Play()
             break
         end
+
         hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
         task.wait() -- We don't need to wait really because MoveTo is blocking, but why not
     until (GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION) or participant.HasDisconnected
@@ -329,31 +334,33 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
 end
 
 local function DrawCard(participant: Types.Participant, card: Types.CardDescription, cardType: Types.CardType): ()
-    if participant.HasDisconnected then
-        return
+    if not IsBotSimulationEnabled() then
+        if participant.HasDisconnected then
+            return
+        end
+
+        local position = participant.Board.Tiles[participant.Position].Model:GetPivot()
+
+        local model = (ServerStorage.Game:FindFirstChild(cardType .. " Card") :: Types.CardModel):Clone()
+        model.Size = Vector3.new()
+        model:PivotTo(position + Vector3.new(0, 10, 0))
+
+        model.Gui.Description.Text = card.Title
+
+        local gui2 = model.Gui:Clone()
+        gui2.Face = Enum.NormalId.Back
+        gui2.Parent = model
+
+        model.Parent = workspace:FindFirstChild("Cards") or Instance.new("Folder", workspace) :: any
+        model.Parent.Name = "Cards"
+
+        PlaySound("DrawCard")
+        SendNotification(`[PLAYER] drew a {cardType} card: {card.Title}`, {participant.Player})
+        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateCard"):FireAllClients(model)
+
+        task.wait(6)
+        model:Destroy()
     end
-
-    local position = participant.Board.Tiles[participant.Position].Model:GetPivot()
-
-    local model = (ServerStorage.Game:FindFirstChild(cardType .. " Card") :: Types.CardModel):Clone()
-    model.Size = Vector3.new()
-    model:PivotTo(position + Vector3.new(0, 10, 0))
-
-    model.Gui.Description.Text = card.Title
-
-    local gui2 = model.Gui:Clone()
-    gui2.Face = Enum.NormalId.Back
-    gui2.Parent = model
-
-    model.Parent = workspace:FindFirstChild("Cards") or Instance.new("Folder", workspace) :: any
-    model.Parent.Name = "Cards"
-
-    PlaySound("DrawCard")
-    SendNotification(`[PLAYER] drew a {cardType} card: {card.Title}`, {participant.Player})
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateCard"):FireAllClients(model)
-
-    task.wait(6)
-    model:Destroy()
     
     if not participant.HasDisconnected then
         card.Effect(participant)
@@ -378,43 +385,62 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
     local isJailed = participant.JailedOn ~= 0
 
-    if not moveDirectly then
-        local startTime = GetTime()
-        local numTiles = #participant.Board.Tiles
+    if IsBotSimulationEnabled() then
+        local targetPart = tile.Model.PrimaryPart
+        assert(targetPart, "Tile has no primary part")
 
-        local targetRow = TileMath.GetRowFromPosition(position, numTiles)
-
-        local currentPosition = participant.PreviousPosition
-        local currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
-
-        local rowDiff: number?
-        if moveDirectly or (currentPosition < position and targetRow == currentRow) then
-            rowDiff = 0
-        elseif targetRow == currentRow then
-            rowDiff = 4
-        elseif targetRow < currentRow then
-            rowDiff = 4 - math.abs(targetRow - currentRow)
-        elseif targetRow > currentRow then
-            rowDiff = math.abs(targetRow - currentRow)
-        end
-
-        assert(rowDiff, "Failed to calculate row difference")
-
-        for i = 1, rowDiff do
-            if participant.HasDisconnected then
-                return
+        local isJail = tile.Model.Name == "Jail"
+        if isJail then
+            if isJailed then
+                targetPart = (tile.Model :: Types.JailTile).Cell
+            else
+                targetPart = (tile.Model :: Types.JailTile).JustVisiting
             end
-            local nextCorner = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, numTiles), numTiles)
-
-            currentPosition = nextCorner
-            currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
-
-            local nextTile = participant.Board.Tiles[currentPosition]
-            moveCharacter(participant, nextTile, false, GetTime() - startTime, isJailed)
         end
-        moveCharacter(participant, tile, nil, nil, isJailed)
+
+        local char = participant.Character
+        if char then
+            char:PivotTo(CFrame.new(findFreePointAroundPosition(participant, tile, targetPart) + Vector3.new(0, targetPart.Position.Y + CHAR_HEIGHT + targetPart.Size.Y / 2, 0)))
+        end
     else
-        moveCharacter(participant, tile, moveDirectly, nil, isJailed)
+        if not moveDirectly then
+            local startTime = GetTime()
+            local numTiles = #participant.Board.Tiles
+
+            local targetRow = TileMath.GetRowFromPosition(position, numTiles)
+
+            local currentPosition = participant.PreviousPosition
+            local currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
+
+            local rowDiff: number?
+            if moveDirectly or (currentPosition < position and targetRow == currentRow) then
+                rowDiff = 0
+            elseif targetRow == currentRow then
+                rowDiff = 4
+            elseif targetRow < currentRow then
+                rowDiff = 4 - math.abs(targetRow - currentRow)
+            elseif targetRow > currentRow then
+                rowDiff = math.abs(targetRow - currentRow)
+            end
+
+            assert(rowDiff, "Failed to calculate row difference")
+
+            for i = 1, rowDiff do
+                if participant.HasDisconnected then
+                    return
+                end
+                local nextCorner = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, numTiles), numTiles)
+
+                currentPosition = nextCorner
+                currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
+
+                local nextTile = participant.Board.Tiles[currentPosition]
+                moveCharacter(participant, nextTile, false, GetTime() - startTime, isJailed)
+            end
+            moveCharacter(participant, tile, nil, nil, isJailed)
+        else
+            moveCharacter(participant, tile, moveDirectly, nil, isJailed)
+        end
     end
 
     local asset = tile.Asset
@@ -515,42 +541,50 @@ local diceMap = {
 }
 
 local function RollDice(participant: Types.Participant): Types.DiceRollResult
-    PlaySound("DiceRoll")
-    ServerStorage.Game.Dice.CollisionGroup = "Dice"
-    local dice1 = ServerStorage.Game.Dice:Clone()
-    local dice2 = ServerStorage.Game.Dice:Clone()
+    local roll1: number
+    local roll2: number
 
-    local diceFolder = workspace:FindFirstChild("Dice") or Instance.new("Folder", workspace) :: any
-    diceFolder.Name = "Dice"
-    diceFolder:ClearAllChildren()
+    if IsBotSimulationEnabled() then
+        roll1 = math.random(1, 6)
+        roll2 = math.random(1, 6)
+    else
+        PlaySound("DiceRoll")
+        ServerStorage.Game.Dice.CollisionGroup = "Dice"
+        local dice1 = ServerStorage.Game.Dice:Clone()
+        local dice2 = ServerStorage.Game.Dice:Clone()
 
-    local num = 0
-    local function throwDice(dice: typeof(dice1))
-        num += 1
-        dice.CFrame = CFrame.new(num * 7.5, 100, num * 7.5)
+        local diceFolder = workspace:FindFirstChild("Dice") or Instance.new("Folder", workspace) :: any
+        diceFolder.Name = "Dice"
+        diceFolder:ClearAllChildren()
 
-        dice.Parent = diceFolder
-        dice.Parent.Name = "Dice"
+        local num = 0
+        local function throwDice(dice: typeof(dice1))
+            num += 1
+            dice.CFrame = CFrame.new(num * 7.5, 100, num * 7.5)
 
-        dice:ApplyAngularImpulse(Vector3.new(genRandom(), genRandom(), genRandom()))
+            dice.Parent = diceFolder
+            dice.Parent.Name = "Dice"
+
+            dice:ApplyAngularImpulse(Vector3.new(genRandom(), genRandom(), genRandom()))
+        end
+
+        throwDice(dice1)
+        throwDice(dice2)
+        
+        task.wait(0.5)
+        while (dice1.AssemblyLinearVelocity.Magnitude > 0.1 and dice1.Parent) or (dice2.Parent and dice2.AssemblyLinearVelocity.Magnitude > 0.1) do
+            task.wait()
+        end
+        task.wait(0.5)
+
+        roll1 = diceMap[findSide(dice1)]
+        roll2 = diceMap[findSide(dice2)]
+
+        task.delay(2, function()
+            dice1:Destroy()
+            dice2:Destroy()
+        end)
     end
-
-    throwDice(dice1)
-    throwDice(dice2)
-    
-    task.wait(0.5)
-    while (dice1.AssemblyLinearVelocity.Magnitude > 0.1 and dice1.Parent) or (dice2.Parent and dice2.AssemblyLinearVelocity.Magnitude > 0.1) do
-        task.wait()
-    end
-    task.wait(0.5)
-
-    local roll1 = diceMap[findSide(dice1)]
-    local roll2 = diceMap[findSide(dice2)]
-
-    task.delay(2, function()
-        dice1:Destroy()
-        dice2:Destroy()
-    end)
 
     local result = roll1 + roll2
     local isDoubles = roll1 == roll2

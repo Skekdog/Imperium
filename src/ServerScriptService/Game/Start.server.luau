@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local IsBotSimulationEnabled = require(ServerScriptService.Game.Imperium.Util.IsBotSimulationEnabled)
 local DisableCharacterCollision = require(ServerScriptService.Game.Imperium.Util.DisableCharacterCollision)
 local Tile = require(script.Parent.Imperium.Tile)
 local Types = require(script.Parent.Imperium.Types)
@@ -18,9 +19,10 @@ local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
 local INTERMISSION_DURATION = 5
-local MIN_STUDIO_PLAYERS = 1
-local STUDIO_BOT_PLAYERS = 1
 local MIN_PLAYERS_OR_EXIT = 1
+
+local STUDIO_MIN_PLAYERS = if IsBotSimulationEnabled() then 1 else 1
+local STUDIO_BOT_PLAYERS = 3
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
@@ -37,7 +39,7 @@ info.StartingMoney = info.StartingMoney or GameConfiguration.StartingMoney.Defau
 info.Map = info.Map or GameConfiguration.Map.Default :: string
 info.Board = info.Board or GameConfiguration.Board.Default :: string
 info.FreeParkingBonusEnabled = info.FreeParkingBonusEnabled or GameConfiguration.FreeParkingBonusEnabled.Default :: string
-info.Players = info.Players or (if RunService:IsStudio() then MIN_STUDIO_PLAYERS else 8)
+info.Players = info.Players or (if RunService:IsStudio() then STUDIO_MIN_PLAYERS else 8)
 
 if not info.BotPlayers then
     info.BotPlayers = {}
@@ -87,10 +89,12 @@ Players.PlayerAdded:Connect(onPlayerAdded)
 
 local players = #Players:GetChildren()
 
-SetWaitingText("Waiting for players...", math.huge)
-while players < 1 do
-    task.wait()
-    players = #Players:GetPlayers()
+if not IsBotSimulationEnabled() then
+    SetWaitingText("Waiting for players...", math.huge)
+    while players < 1 do
+        task.wait()
+        players = #Players:GetPlayers()
+    end
 end
 
 local startWait = GetTime()
@@ -103,11 +107,13 @@ while (players < info.Players) and (GetTime() - startWait < MAX_PLAYER_LOAD_WAIT
     players = math.max(players, #Players:GetPlayers()) -- If a player disconnects after joining we don't want to stall the game
 end
 
-if players < MIN_PLAYERS_OR_EXIT then
-    for _, v in Players:GetPlayers() do -- note: we do not want to kick bots.
-        v:Kick("Not enough players to start the game.")
+if not IsBotSimulationEnabled() then
+    if players < MIN_PLAYERS_OR_EXIT then
+        for _, v in Players:GetPlayers() do -- note: we do not want to kick bots.
+            v:Kick("Not enough players to start the game.")
+        end
+        return
     end
-    return
 end
 
 local round = Round.new(board, tiles, {
