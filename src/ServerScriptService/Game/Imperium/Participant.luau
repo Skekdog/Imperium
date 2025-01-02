@@ -40,15 +40,15 @@ local function animateJailBars(round: Types.Round, locked: boolean): ()
 end
 
 local function SendToJail(participant: Types.Participant): ()
+    participant.DoublesStreak = 0
+    participant.JailedOn = participant.Round.Turn
+    participant.Player:SetAttribute("IsJailed", true)
+    
     if not IsBotSimulationEnabled() then
         local sound = PlaySound("Siren")
         if sound then
             task.delay(sound.TimeLength, PlaySound, "Siren" :: "Siren")
         end
-
-        participant.DoublesStreak = 0
-        participant.JailedOn = participant.Round.Turn
-        participant.Player:SetAttribute("IsJailed", true)
 
         animateJailBars(participant.Round, false)
         PlaySound("LockingUp")
