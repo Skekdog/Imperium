@@ -51,7 +51,7 @@ local function Start(lobby: LobbyTypes.Lobby): ()
     end
 
     local info = {
-        Players = #lobby.Players,
+        Players = #playerPlayers,
         BotPlayers = botPlayers,
     } :: Teleport.GameInfo
     for i, v in lobby.Settings do
