@@ -56,7 +56,7 @@ clientServer.CreateLobby.OnServerEvent:Connect(function(plr, password: unknown)
 end)
 
 clientServer.KickPlayer.OnServerEvent:Connect(function(plr, target: unknown)
-    if typeof(target) ~= "Instance" or not target:IsA("Player") then
+    if typeof(target) ~= "string" then
         return
     end
 
@@ -73,7 +73,7 @@ clientServer.KickPlayer.OnServerEvent:Connect(function(plr, target: unknown)
         return
     end
 
-    lobby:Kick(target.Name)
+    lobby:Kick(target)
 end)
 
 clientServer.StartLobby.OnServerEvent:Connect(function(plr)

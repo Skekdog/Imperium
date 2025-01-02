@@ -135,8 +135,8 @@ local function TryAddBotPlayer(lobby: LobbyTypes.Lobby): "Success" | string
     end
 
     for _, v in BotCharacters do
-        if not table.find(lobby.Players, v) then
-            table.insert(lobby.Players, v)
+        if not table.find(lobby.Players, "_" .. v) then
+            table.insert(lobby.Players, "_" .. v)
             serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, "_" .. v)
             return "Success"
         end
@@ -146,6 +146,7 @@ local function TryAddBotPlayer(lobby: LobbyTypes.Lobby): "Success" | string
 end
 
 local function RemovePlayer(lobby: LobbyTypes.Lobby, plr: string): ()
+    print(lobby.Players)
     local index = table.find(lobby.Players, plr)
     if index then
         table.remove(lobby.Players, index)
