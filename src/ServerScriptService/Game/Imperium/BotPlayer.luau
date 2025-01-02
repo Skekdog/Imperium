@@ -71,13 +71,32 @@ local function TryBuildDevelopments(bot: Types.BotPlayer): ()
     -- We want to build on higher value properties first, because that (usually) brings more rent
     sortAssetPriceDescending(bot.Participant.Assets)
 
-    for _, v in bot.Participant.Assets do
-        if bot.Participant.Money < bot.MinimumMoneyForDeveloping then
-            break
-        end
+    local monopolisedAssets: {[string]: {Types.Asset}} = {}
+    for _, asset in bot.Participant.Assets do
+        local colour = asset.AssetDescription.Colour
+        if bot.Participant:HasMonopoly(colour) then
+            if not monopolisedAssets[colour] then
+                monopolisedAssets[colour] = {}
+            end
 
-        v:TryDevelopProperty("House")
-        v:TryDevelopProperty("Hotel")
+            table.insert(monopolisedAssets[colour], asset)
+        end
+    end
+
+    for _, assets in monopolisedAssets do
+        for _, asset in assets do
+            if bot.Participant.Money < bot.MinimumMoneyForDeveloping then
+                break
+            end
+
+            while asset.Houses < 4 and bot.Participant.Money >= bot.MinimumMoneyForDeveloping do
+                asset:TryDevelopProperty("House")
+            end
+
+            while asset.Hotels < 1 and bot.Participant.Money >= bot.MinimumMoneyForDeveloping do
+                asset:TryDevelopProperty("Hotel")
+            end
+        end
     end
 
     return
