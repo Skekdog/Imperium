@@ -2,15 +2,16 @@ local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
 export type Lobby = {
     Owner: Player,
     Password: string,
-    Players: {Player},
+    Players: {string},
     Settings: GameConfiguration.SerialisedSettings,
 
-    Kick: (Lobby, plr: Player) -> (),
+    Kick: (Lobby, plr: string) -> (),
     Start: (Lobby) -> (),
     Disband: (Lobby, notification: string?) -> (),
 
+    TryAddBotPlayer: (Lobby) -> "Success" | string,
     AddPlayer: (Lobby, plr: Player) -> (),
-    RemovePlayer: (Lobby, plr: Player) -> (),
+    RemovePlayer: (Lobby, plr: string) -> (),
 
     TryJoin: (Lobby, plr: Player, password: unknown) -> "Success" | string,
 
@@ -22,10 +23,10 @@ export type Lobby = {
 
 export type ClientLobby = {
     Owner: Player,
-    Players: {Player},
+    Players: {string},
     Settings: GameConfiguration.SerialisedSettings,
     Private: boolean,
     Password: string?,
 }
 
-return {}
+return nil

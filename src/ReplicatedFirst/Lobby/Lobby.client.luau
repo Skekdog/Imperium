@@ -1,7 +1,9 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local GetAvatarHeadshot = require(ReplicatedFirst.Shared.GetAvatarHeadshot)
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
@@ -88,26 +90,29 @@ local function setCurrentLobby(id: number?): ()
     end
 end
 
-local function getThumbnail(plr: Player): string
-    return (Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100))
-end
+local function addPlayer(slot: LobbySlot, player: string): ()
+    local plr: Player? = Players:FindFirstChild(player) :: Player?
+    if plr then
+        assert(plr:IsA("Player"), "Invalid player")
+    end
 
-local function addPlayer(slot: LobbySlot, plr: Player): ()
-    local thumbnail = getThumbnail(plr)
     local playerFrame = slot.Players.PlayerTemplate:Clone()
 
-    playerFrame.Name = tostring(plr.UserId)
+    playerFrame.Name = "_" .. player
     playerFrame.Visible = true
+
+    local thumbnail = GetAvatarHeadshot(plr or player) :: ImageLabel -- another lie, because typechecker doesn't like unions of roblox classes
+    thumbnail.Parent = playerFrame
     playerFrame.Frame.Avatar.Image = thumbnail
 
     local usernameLabel = playerFrame.Frame.Username
-    usernameLabel:SetAttribute("Player_1", GetPlayerName(plr))
+    usernameLabel:SetAttribute("Player_1", GetPlayerName(plr or player))
     usernameLabel:SetAttribute("Format", "[PLAYER]")
     usernameLabel:AddTag("DynamicNames")
     
     playerFrame.Parent = slot.Players
 
-    slot.Capacity.Text = `{#slot.Players:GetChildren() - 3} / {tostring(MAX_PLAYERS)}`
+    slot.Capacity.Text = `{#slot.Players:GetChildren() - 4} / {tostring(MAX_PLAYERS)}`
 
     if slot.Parent == (hostView :: any) then
         local button: typeof(hostView.LobbyOverview.Players.PlayerTemplate) = playerFrame :: any
@@ -125,8 +130,8 @@ local function addPlayer(slot: LobbySlot, plr: Player): ()
     end
 end
 
-local function removePlayer(slot: LobbySlot, plr: Player): ()
-    local image = slot.Players:FindFirstChild(tostring(plr.UserId))
+local function removePlayer(slot: LobbySlot, plr: string): ()
+    local image = slot.Players:FindFirstChild("_" .. plr)
     if image then
         image:Destroy()
     end
@@ -271,14 +276,14 @@ local function removeLobbySlot(userId: number): ()
     lobbies[userId] = nil
 end
 
-local function addPlayerToLobby(lobbyId: number, plr: Player): ()
+local function addPlayerToLobby(lobbyId: number, plr: string): ()
     local lobby = lobbies[lobbyId]
     if lobby then
         addPlayer(lobby, plr)
     end
 end
 
-local function removePlayerFromLobby(lobbyId: number, plr: Player): ()
+local function removePlayerFromLobby(lobbyId: number, plr: string): ()
     if lobbyId == currentLobby then
         setCurrentLobby(nil)
     end
