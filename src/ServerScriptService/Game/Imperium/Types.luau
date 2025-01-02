@@ -217,7 +217,12 @@ export type BotPlayer = {
     Player: Configuration,
     Model: Model,
 
-    EvaluateAsset: (BotPlayer, Asset) -> number,
+    MinimumMoneyForDeveloping: number,
+    MinimumMoneyForUnmortgaging: number,
+
+    EvaluateAssetForSale: (BotPlayer, Asset, to: Participant) -> number,
+    EvaluateAssetForPurchase: (BotPlayer, Asset, from: AssetOwner) -> number,
+
     EvaluateSkipJail: (BotPlayer) -> boolean,
     EvaluateTrade: (BotPlayer, TradeManager) -> boolean,
 
@@ -226,6 +231,7 @@ export type BotPlayer = {
 
     TryBuildDevelopments: (BotPlayer) -> (),
     TryUnmortgageAssets: (BotPlayer) -> (),
+
     TryAvoidBankruptcy: (BotPlayer, requiredMoney: number) -> (),
 }
 

@@ -22,7 +22,11 @@ local function sortAssetPriceDescending(tbl: {[number]: Types.Asset}): ()
     end)
 end
 
-local function EvaluateAsset(bot: Types.BotPlayer, asset: Types.Asset): number
+local function EvaluateAssetForSale(bot: Types.BotPlayer, asset: Types.Asset, to: Types.Participant): number
+    return 0
+end
+
+local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset, from: Types.AssetOwner): number
     return 0
 end
 
@@ -68,6 +72,10 @@ local function TryBuildDevelopments(bot: Types.BotPlayer): ()
     sortAssetPriceDescending(bot.Participant.Assets)
 
     for _, v in bot.Participant.Assets do
+        if bot.Participant.Money < bot.MinimumMoneyForDeveloping then
+            break
+        end
+
         v:TryDevelopProperty("House")
         v:TryDevelopProperty("Hotel")
     end
@@ -80,6 +88,9 @@ local function TryUnmortgageAssets(bot: Types.BotPlayer): ()
     sortAssetPriceDescending(bot.Participant.Assets)
 
     for _, v in bot.Participant.Assets do
+        if bot.Participant.Money < bot.MinimumMoneyForUnmortgaging then
+            break
+        end
         v:TryUnMortgage()
     end
 
@@ -169,9 +180,14 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
         Player = player,
         Model = char,
 
-        EvaluateAsset = EvaluateAsset,
-        EvaluateSkipJail = EvaluateSkipJail,
+        MinimumMoneyForDeveloping = 200,
+        MinimumMoneyForUnmortgaging = 250,
+
+        EvaluateAssetForSale = EvaluateAssetForSale,
+        EvaluateAssetForPurchase = EvaluateAssetForPurchase,
         EvaluateTrade = EvaluateTrade,
+
+        EvaluateSkipJail = EvaluateSkipJail,
 
         DecideMove = DecideMove,
         DecidePurchase = DecidePurchase,
