@@ -220,6 +220,8 @@ export type BotPlayer = {
     MinimumMoneyForDeveloping: number,
     MinimumMoneyForUnmortgaging: number,
 
+    FinishTurn: (BotPlayer) -> (),
+
     EvaluateAssetForSale: (BotPlayer, Asset, to: Participant) -> number,
     EvaluateAssetForPurchase: (BotPlayer, Asset, from: AssetOwner) -> number,
 

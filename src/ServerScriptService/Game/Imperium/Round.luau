@@ -56,8 +56,6 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
 
     local botPlayer = round:GetBotPlayer(nextParticipant)
     if botPlayer then
-        botPlayer:TryBuildDevelopments()
-        botPlayer:TryUnmortgageAssets()
         playedMove = botPlayer:DecideMove()
     else
         local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
@@ -112,8 +110,14 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     elseif playedMove == "Fine" then
         nextParticipant:TryPayFine()
     elseif playedMove == "Skip" then
-        StartNextParticipantTurn(round)
+        return StartNextParticipantTurn(round)
     end
+
+    if botPlayer then
+        botPlayer:FinishTurn()
+    end
+
+    task.defer(round.StartNextParticipantTurn, round)
 end
 
 local function TryGetParticipant(round: Types.Round, player: Player): Types.Participant?

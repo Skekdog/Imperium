@@ -691,7 +691,6 @@ local function TryPlayMove(participant: Types.Participant): ()
     play()
 
     participant.IsMoving = false
-    participant.Round:StartNextParticipantTurn()
 end
 
 local function GiveJailCards(participant: Types.Participant, amount: number): ()

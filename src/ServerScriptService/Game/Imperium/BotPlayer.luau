@@ -153,6 +153,11 @@ local function TryAvoidBankruptcy(bot: Types.BotPlayer, requiredMoney: number): 
     return
 end
 
+local function FinishTurn(bot: Types.BotPlayer): ()
+    bot:TryUnmortgageAssets()
+    bot:TryBuildDevelopments()
+end
+
 local function randomNegativeHalf(value: number): number
     return math.random(-value / 2, value / 2)
 end
@@ -217,6 +222,8 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
 
         MinimumMoneyForDeveloping = 400,
         MinimumMoneyForUnmortgaging = 450,
+
+        FinishTurn = FinishTurn,
 
         EvaluateAssetForSale = EvaluateAssetForSale,
         EvaluateAssetForPurchase = EvaluateAssetForPurchase,
