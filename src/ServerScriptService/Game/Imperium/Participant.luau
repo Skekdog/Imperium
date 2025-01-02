@@ -179,7 +179,7 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
 
     ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", neededMoney)
     local start = GetTime()
-    local maxTime = start + participant.Round.GameConfiguration.BankruptcyTime
+    local maxTime = start + if botPlayer then 5 else participant.Round.GameConfiguration.BankruptcyTime
     SetTimeMilestone(participant.Round.GameConfiguration.BankruptcyTime)
     while GetTime() < maxTime and participant.Money < targetAmount and not participant.HasDisconnected do
         task.wait()
