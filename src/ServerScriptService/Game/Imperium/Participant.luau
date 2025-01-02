@@ -43,7 +43,7 @@ local function SendToJail(participant: Types.Participant): ()
     participant.DoublesStreak = 0
     participant.JailedOn = participant.Round.Turn
     participant.Player:SetAttribute("IsJailed", true)
-    
+
     if not IsBotSimulationEnabled() then
         local sound = PlaySound("Siren")
         if sound then
@@ -339,6 +339,7 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
 end
 
 local function DrawCard(participant: Types.Participant, card: Types.CardDescription, cardType: Types.CardType): ()
+    SendNotification(`[PLAYER] drew a {cardType} card: {card.Title}`, {participant.Player})
     if not IsBotSimulationEnabled() then
         if participant.HasDisconnected then
             return
@@ -360,7 +361,6 @@ local function DrawCard(participant: Types.Participant, card: Types.CardDescript
         model.Parent.Name = "Cards"
 
         PlaySound("DrawCard")
-        SendNotification(`[PLAYER] drew a {cardType} card: {card.Title}`, {participant.Player})
         ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("AnimateCard"):FireAllClients(model)
 
         task.wait(6)
