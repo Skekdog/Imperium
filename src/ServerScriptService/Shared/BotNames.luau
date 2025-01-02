@@ -1,4 +1,4 @@
-local characters = {
+local names = {
     "Phoebe",
     "Al",
     "Prince",
@@ -13,6 +13,6 @@ local characters = {
     "Bob",
 }
 
-Random.new():Shuffle(characters)
+Random.new():Shuffle(names)
 
-return characters
+return names

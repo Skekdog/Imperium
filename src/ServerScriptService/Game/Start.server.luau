@@ -13,7 +13,7 @@ local GetTime = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GetTi
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Round = require(ServerScriptService.Game.Imperium.Round)
-local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
+local BotCharacters = require(ServerScriptService.Shared.BotNames)
 local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
