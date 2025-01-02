@@ -89,11 +89,11 @@ local function TryBuildDevelopments(bot: Types.BotPlayer): ()
                 break
             end
 
-            while asset.Houses < 4 and bot.Participant.Money >= bot.MinimumMoneyForDeveloping do
+            while bot.Participant.Money >= bot.MinimumMoneyForDeveloping and asset:CanMakeDevelopment("House") do
                 asset:TryDevelopProperty("House")
             end
 
-            while asset.Hotels < 1 and bot.Participant.Money >= bot.MinimumMoneyForDeveloping do
+            while bot.Participant.Money >= bot.MinimumMoneyForDeveloping and asset:CanMakeDevelopment("Hotel") do
                 asset:TryDevelopProperty("Hotel")
             end
         end
