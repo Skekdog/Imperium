@@ -33,8 +33,9 @@ end
 local function Start(lobby: LobbyTypes.Lobby): ()
     local playerPlayers: {Player} = {}
     for _, v in lobby.Players do
-        if typeof(v) == "Instance" then
-            table.insert(playerPlayers, v)
+        local plr = Players:FindFirstChild(v)
+        if plr and plr:IsA("Player") then
+            table.insert(playerPlayers, plr)
         end
     end
 
@@ -44,8 +45,8 @@ local function Start(lobby: LobbyTypes.Lobby): ()
 
     local botPlayers: {string} = {}
     for _, v in lobby.Players do
-        if typeof(v) == "string" then
-            table.insert(botPlayers, v:split("_")[2])
+        if v:sub(1, 1) == "_" then
+            table.insert(botPlayers, v:sub(2, -1))
         end
     end
 
@@ -155,8 +156,9 @@ local function RemovePlayer(lobby: LobbyTypes.Lobby, plr: string): ()
     if plr == lobby.Owner.Name then
         local playerPlayers: {Player} = {}
         for _, v in lobby.Players do
-            if typeof(v) == "Instance" then
-                table.insert(playerPlayers, v)
+            local player = Players:FindFirstChild(v)
+            if player and player:IsA("Player") then
+                table.insert(playerPlayers, player)
             end
         end
 
