@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local LobbyTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Lobby.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
@@ -18,35 +20,52 @@ local function IsTeleporting(plr: Player): boolean
     return not not table.find(teleportingPlayers, plr)
 end
 
-local function Kick(lobby: LobbyTypes.Lobby, plr: Player): ()
-    if plr ~= lobby.Owner then
-        SendNotification("You have been kicked from [PLAYER]'s lobby.", {lobby.Owner}, {plr})
+local function Kick(lobby: LobbyTypes.Lobby, plr: string): ()
+    if plr ~= lobby.Owner.Name then
+        local player = Players:FindFirstChild(plr)
+        if player and player:IsA("Player") then
+            SendNotification("You have been kicked from [PLAYER]'s lobby.", {lobby.Owner}, {player})
+        end
     end
     lobby:RemovePlayer(plr)
 end
 
 local function Start(lobby: LobbyTypes.Lobby): ()
+    local playerPlayers: {Player} = {}
+    for _, v in lobby.Players do
+        if typeof(v) == "Instance" then
+            table.insert(playerPlayers, v)
+        end
+    end
+
     if #lobby.Players < MIN_PLAYERS then
-        return SendNotification("Not enough players to start the game.", nil, lobby.Players)
+        return SendNotification("Not enough players to start the game.", nil, playerPlayers)
+    end
+
+    local botPlayers: {string} = {}
+    for _, v in lobby.Players do
+        if typeof(v) == "string" then
+            table.insert(botPlayers, v:split("_")[2])
+        end
     end
 
     local info = {
         Players = #lobby.Players,
+        BotPlayers = botPlayers,
     } :: Teleport.GameInfo
     for i, v in lobby.Settings do
         info[i] = v
     end
 
-    local allPlayers = lobby.Players
-    for _, plr in allPlayers do
+    for _, plr in playerPlayers do
         serverClient.ToggleUI:FireClient(plr, false)
         table.insert(teleportingPlayers, plr)
     end
 
-    SendNotification("[PLAYER] has started the game. Please wait.", {lobby.Owner}, lobby.Players)
-    Teleport(lobby.Players, "Game", info, function(success)
+    SendNotification("[PLAYER] has started the game. Please wait.", {lobby.Owner}, playerPlayers)
+    Teleport(playerPlayers, "Game", info, function(success)
         if not success then
-            for _, v in allPlayers do
+            for _, v in playerPlayers do
                 local index = table.find(teleportingPlayers, v)
                 if index then
                     serverClient.ToggleUI:FireClient(v, true)
@@ -70,12 +89,12 @@ local function Disband(lobby: LobbyTypes.Lobby): ()
 end
 
 local function AddPlayer(lobby: LobbyTypes.Lobby, plr: Player): ()
-    local index = table.find(lobby.Players, plr)
+    local index = table.find(lobby.Players, plr.Name)
     if index or #lobby.Players >= MAX_PLAYERS then
         return
     end
 
-    table.insert(lobby.Players, plr)
+    table.insert(lobby.Players, plr.Name)
 
     serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, plr)
 end
@@ -97,7 +116,7 @@ local function TryJoin(lobby: LobbyTypes.Lobby, plr: Player, password: unknown):
         return "the password is incorrect"
     end
 
-    if table.find(lobby.Players, plr) then
+    if table.find(lobby.Players, plr.Name) then
         return "you are already in this lobby"
     end
 
@@ -110,14 +129,36 @@ local function TryJoin(lobby: LobbyTypes.Lobby, plr: Player, password: unknown):
     return "Success"
 end
 
-local function RemovePlayer(lobby: LobbyTypes.Lobby, plr: Player): ()
+local function TryAddBotPlayer(lobby: LobbyTypes.Lobby): "Success" | string
+    if #lobby.Players >= MAX_PLAYERS then
+        return "this lobby is full"
+    end
+
+    for _, v in BotCharacters do
+        if not table.find(lobby.Players, v) then
+            table.insert(lobby.Players, v)
+            return "Success"
+        end
+    end
+    
+    return "there are no more available bots"
+end
+
+local function RemovePlayer(lobby: LobbyTypes.Lobby, plr: string): ()
     local index = table.find(lobby.Players, plr)
     if index then
         table.remove(lobby.Players, index)
     end
 
-    if plr == lobby.Owner then
-        SendNotification("[PLAYER] has disbanded their lobby.", {lobby.Owner}, lobby.Players)
+    if plr == lobby.Owner.Name then
+        local playerPlayers: {Player} = {}
+        for _, v in lobby.Players do
+            if typeof(v) == "Instance" then
+                table.insert(playerPlayers, v)
+            end
+        end
+
+        SendNotification("[PLAYER] has disbanded their lobby.", {lobby.Owner}, playerPlayers)
         lobby:Disband()
     end
 
@@ -179,7 +220,7 @@ function module.new(host: Player, password: string): LobbyTypes.Lobby
 
     lobby.Owner = host
     lobby.Password = password
-    lobby.Players = {host}
+    lobby.Players = {host.Name}
     lobby.Settings = {} :: GameConfiguration.SerialisedSettings
 
     for _, v in GameConfiguration do
@@ -195,12 +236,13 @@ function module.new(host: Player, password: string): LobbyTypes.Lobby
     lobby.GetAllSettings = GetAllSettings
     lobby.TryJoin = TryJoin
     lobby.GetClientLobby = GetClientLobby
+    lobby.TryAddBotPlayer = TryAddBotPlayer
 
     for _, v in lobbies do
         assert(v)
 
-        if table.find(v.Players, host) then
-            v:RemovePlayer(host)
+        if table.find(v.Players, host.Name) then
+            v:RemovePlayer(host.Name)
         end
     end
 
