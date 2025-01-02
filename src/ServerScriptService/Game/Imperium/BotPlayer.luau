@@ -22,6 +22,18 @@ local function sortAssetPriceDescending(tbl: {[number]: Types.Asset}): ()
     end)
 end
 
+local function groupAssetsByColour(assets: {Types.Asset}): {[string]: {Types.Asset}}
+    local groupedAssets: {[string]: {Types.Asset}} = {}
+    for _, asset in assets do
+        local colour = asset.AssetDescription.Colour
+        if not groupedAssets[colour] then
+            groupedAssets[colour] = {}
+        end
+        table.insert(groupedAssets[colour], asset)
+    end
+    return groupedAssets
+end
+
 local function EvaluateAssetForSale(bot: Types.BotPlayer, asset: Types.Asset, to: Types.Participant): number
     return 0
 end
@@ -71,32 +83,24 @@ local function TryBuildDevelopments(bot: Types.BotPlayer): ()
     -- We want to build on higher value properties first, because that (usually) brings more rent
     sortAssetPriceDescending(bot.Participant.Assets)
 
-    local monopolisedAssets: {[string]: {Types.Asset}} = {}
-    for _, asset in bot.Participant.Assets do
-        local colour = asset.AssetDescription.Colour
-        if bot.Participant:HasMonopoly(colour) then
-            if not monopolisedAssets[colour] then
-                monopolisedAssets[colour] = {}
-            end
+    local groupedAssets = groupAssetsByColour(bot.Participant.Assets)
+    for _, assets in groupedAssets do
+        local cantDevelopAgain = false
+        repeat
+            for _, asset in assets do
+                if bot.Participant.Money < bot.MinimumMoneyForDeveloping then
+                    cantDevelopAgain = true
+                    break
+                end
 
-            table.insert(monopolisedAssets[colour], asset)
-        end
-    end
-
-    for _, assets in monopolisedAssets do
-        for _, asset in assets do
-            if bot.Participant.Money < bot.MinimumMoneyForDeveloping then
-                break
-            end
-
-            while bot.Participant.Money >= bot.MinimumMoneyForDeveloping and asset:CanMakeDevelopment("House") do
                 asset:TryDevelopProperty("House")
-            end
-
-            while bot.Participant.Money >= bot.MinimumMoneyForDeveloping and asset:CanMakeDevelopment("Hotel") do
                 asset:TryDevelopProperty("Hotel")
+
+                if not asset:CanMakeDevelopment("House") then -- don't need to check for hotel here because we would have already made it
+                    cantDevelopAgain = true
+                end
             end
-        end
+        until cantDevelopAgain
     end
 
     return
@@ -120,18 +124,30 @@ local function TryAvoidBankruptcy(bot: Types.BotPlayer, requiredMoney: number): 
     -- We want to sell off lower value properties first
     sortAssetPriceAscending(bot.Participant.Assets)
 
-    for _, v in bot.Participant.Assets do
-        v:TrySellAllDevelopments()
-        if bot.Participant.Money >= requiredMoney then
-            return
-        end
-    end
-
+    -- Mortgage stuff first because it's cheaper to do that
     for _, v in bot.Participant.Assets do
         v:TryMortgage()
         if bot.Participant.Money >= requiredMoney then
             return
         end
+    end
+
+    local groupedAssets = groupAssetsByColour(bot.Participant.Assets)
+
+    for _, assets in groupedAssets do
+        local cantSellAgain = false
+        repeat
+            for _, asset in assets do
+                asset:TrySellDevelopment()
+                if bot.Participant.Money >= requiredMoney then
+                    return
+                end
+
+                if not asset:HasAnyDevelopments() then
+                    cantSellAgain = true
+                end
+            end
+        until cantSellAgain
     end
 
     return
@@ -199,8 +215,8 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
         Player = player,
         Model = char,
 
-        MinimumMoneyForDeveloping = 200,
-        MinimumMoneyForUnmortgaging = 250,
+        MinimumMoneyForDeveloping = 400,
+        MinimumMoneyForUnmortgaging = 450,
 
         EvaluateAssetForSale = EvaluateAssetForSale,
         EvaluateAssetForPurchase = EvaluateAssetForPurchase,

@@ -171,7 +171,12 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
 
     local neededMoney = targetAmount - participant.Money
     SendNotification(`[PLAYER] needs another {GetCurrencySymbol()}{neededMoney} to pay {if to == "Bank" then "the bank" else "[PLAYER]"}, or else they go bankrupt.`, players)
-    
+
+    local botPlayer = participant.Round:GetBotPlayer(participant)
+    if botPlayer then
+        task.delay(3, botPlayer.TryAvoidBankruptcy, botPlayer, targetAmount) -- We delay to give the humans some time to process what's happening
+    end
+
     ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", neededMoney)
     local start = GetTime()
     local maxTime = start + participant.Round.GameConfiguration.BankruptcyTime

@@ -13,6 +13,6 @@ local names = {
     "Bob",
 }
 
-Random.new():Shuffle(names)
+Random.new(workspace:GetServerTimeNow()):Shuffle(names)
 
 return names
