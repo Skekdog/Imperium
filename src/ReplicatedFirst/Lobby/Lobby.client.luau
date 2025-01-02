@@ -152,7 +152,7 @@ local function removePlayer(slot: LobbySlot, plr: string): ()
         image:Destroy()
     end
 
-    slot.Capacity.Text = `{#slot.Players:GetChildren() - 3} / {tostring(MAX_PLAYERS)}`
+    slot.Capacity.Text = `{#slot.Players:GetChildren() - 4} / {tostring(MAX_PLAYERS)}`
 end
 
 local function setHostSettingsView(setting: string, value: string | number): ()
@@ -275,7 +275,7 @@ local function removeLobbySlot(userId: number): ()
         switchView("Browser")
         local overview: LobbyOverview = hostView.LobbyOverview
         for _, v in overview.Players:GetChildren() do
-            if v.Name ~= "PlayerTemplate" and v:IsA("TextButton") then
+            if v.Name ~= "PlayerTemplate" and v.Name ~= "AddBotButton" and v:IsA("TextButton") then
                 v:Destroy()
             end
         end
@@ -342,6 +342,14 @@ end)
 hostView.Start.Activated:Connect(function()
     PlayClickSound()
     clientServer.StartLobby:FireServer()
+end)
+
+hostView.LobbyOverview.Players.AddBotButton.Activated:Connect(function()
+    PlayClickSound()
+    local response = clientServer.AddBotPlayer:InvokeServer()
+    if response ~= "Success" then
+        Notification(`Failed to add bot player because {response}.`)
+    end
 end)
 
 local settingsOverview = hostView.Settings

@@ -17,6 +17,15 @@ clientServer.JoinLobby.OnServerInvoke = function(plr, userId: unknown, password:
     return lobby:TryJoin(plr, password)
 end
 
+clientServer.AddBotPlayer.OnServerInvoke = function(plr): "Success" | string
+    local lobby = Lobby.GetLobby(plr.UserId)
+    if not lobby then
+        return "this lobby was not found"
+    end
+
+    return lobby:TryAddBotPlayer()
+end
+
 clientServer.LeaveLobby.OnServerEvent:Connect(function(plr, userId: unknown)
     if typeof(userId) ~= "number" then
         return
@@ -31,7 +40,7 @@ clientServer.LeaveLobby.OnServerEvent:Connect(function(plr, userId: unknown)
         return
     end
 
-    lobby:RemovePlayer(plr)
+    lobby:RemovePlayer(plr.Name)
 end)
 
 clientServer.CreateLobby.OnServerEvent:Connect(function(plr, password: unknown)
@@ -64,7 +73,7 @@ clientServer.KickPlayer.OnServerEvent:Connect(function(plr, target: unknown)
         return
     end
 
-    lobby:Kick(target)
+    lobby:Kick(target.Name)
 end)
 
 clientServer.StartLobby.OnServerEvent:Connect(function(plr)
@@ -115,7 +124,7 @@ Players.PlayerRemoving:Connect(function(plr)
         lobby:Disband()
     else
         for _, v in Lobby.GetAllLobbies() do
-            v:RemovePlayer(plr)
+            v:RemovePlayer(plr.Name)
         end
     end
 end)   

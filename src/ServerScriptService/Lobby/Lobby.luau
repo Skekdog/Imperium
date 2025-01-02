@@ -137,6 +137,7 @@ local function TryAddBotPlayer(lobby: LobbyTypes.Lobby): "Success" | string
     for _, v in BotCharacters do
         if not table.find(lobby.Players, v) then
             table.insert(lobby.Players, v)
+            serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, "_" .. v)
             return "Success"
         end
     end
