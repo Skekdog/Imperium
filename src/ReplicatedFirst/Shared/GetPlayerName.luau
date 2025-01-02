@@ -17,5 +17,6 @@ return function(descriptor: Configuration | Player | string, mode: "Username" | 
             return descriptor
         end
     end
+    
     return if descriptor:IsA("Configuration") then descriptor.Name else `{descriptor.DisplayName} (@{descriptor.Name})`
 end

@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local BotNameFormatting = require(ReplicatedFirst.Shared.BotNameFormatting)
 local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local LobbyTypes = require(script.Parent.Parent.Parent.ReplicatedFirst.Lobby.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
@@ -45,8 +47,8 @@ local function Start(lobby: LobbyTypes.Lobby): ()
 
     local botPlayers: {string} = {}
     for _, v in lobby.Players do
-        if v:sub(1, 1) == "_" then
-            table.insert(botPlayers, v:sub(2, -1))
+        if BotNameFormatting.IsFormattedBotName(v) then
+            table.insert(botPlayers, BotNameFormatting.Unformat(v))
         end
     end
 
@@ -136,9 +138,9 @@ local function TryAddBotPlayer(lobby: LobbyTypes.Lobby): "Success" | string
     end
 
     for _, v in BotCharacters do
-        if not table.find(lobby.Players, "_" .. v) then
-            table.insert(lobby.Players, "_" .. v)
-            serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, "_" .. v)
+        if not table.find(lobby.Players, BotNameFormatting.Format(v)) then
+            table.insert(lobby.Players, BotNameFormatting.Format(v))
+            serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, BotNameFormatting.Format(v))
             return "Success"
         end
     end

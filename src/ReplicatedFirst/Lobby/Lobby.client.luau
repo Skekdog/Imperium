@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local BotNameFormatting = require(ReplicatedFirst.Shared.BotNameFormatting)
 local GetAvatarHeadshot = require(ReplicatedFirst.Shared.GetAvatarHeadshot)
 local LobbyTypes = require(script.Parent.LobbyTypes)
 local GameConfiguration = require(script.Parent.Parent.Shared.GameConfiguration)
@@ -122,7 +123,7 @@ local function addPlayer(slot: LobbySlot, player: string): ()
     headshot.Parent = playerFrame.Frame
 
     local usernameLabel = playerFrame.Frame.Username
-    usernameLabel:SetAttribute("Player_1", if player:sub(1, 1) == "_" then "🤖 " .. player:sub(2, -1) else GetPlayerName(plr or player))
+    usernameLabel:SetAttribute("Player_1", if BotNameFormatting.IsFormattedBotName(player) then player else GetPlayerName(plr or player))
     usernameLabel:SetAttribute("Format", "[PLAYER]")
     usernameLabel:AddTag("DynamicNames")
     

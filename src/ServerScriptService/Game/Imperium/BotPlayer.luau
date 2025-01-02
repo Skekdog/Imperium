@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local StarterPlayer = game:GetService("StarterPlayer")
+local BotNameFormatting = require(ReplicatedFirst.Shared.BotNameFormatting)
 local DisableCharacterCollision = require(script.Parent.Util.DisableCharacterCollision)
 local BotCharacters = require(ServerScriptService.Shared.BotCharacters)
 local Participant = require(script.Parent.Participant)
@@ -154,7 +156,7 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
     assert(char:IsA("Model"), "Bot model is not a model")
 
     local player = Instance.new("Configuration")
-    player.Name = `🤖 {name}` --note: don't use normal whitespace here because that messes with name formatting
+    player.Name = BotNameFormatting.Format(name)
     player:SetAttribute("Status", "Spectating")
     player.Parent = Players
 

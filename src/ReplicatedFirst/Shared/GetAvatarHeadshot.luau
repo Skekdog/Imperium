@@ -1,14 +1,17 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BotNameFormatting = require(script.Parent.BotNameFormatting)
 
 local function GetAvatarHeadshot(player: Player | Configuration | string): ImageLabel | ViewportFrame
     if typeof(player) == "string" then
-        assert(player:sub(1, 1) == "_", "string is not a bot string")
+        assert(BotNameFormatting.IsFormattedBotName(player), "Player is not a bot")
     end
 
     if typeof(player) == "string" or player:IsA("Configuration") then
         local frame = Instance.new("ViewportFrame")
-        local model = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("BotModels"):WaitForChild(if typeof(player) == "string" then player:sub(2, -1) else player.Name:split(" ")[2]):Clone()
+
+        local name = BotNameFormatting.Unformat(if typeof(player) == "string" then player else player.Name)
+        local model = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("BotModels"):WaitForChild(name):Clone()
 
         assert(model:IsA("Model"), "Bot model is not a model")
         local head = model:FindFirstChild("Head")
