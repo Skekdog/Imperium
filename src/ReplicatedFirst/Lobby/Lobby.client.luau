@@ -101,9 +101,25 @@ local function addPlayer(slot: LobbySlot, player: string): ()
     playerFrame.Name = "_" .. player
     playerFrame.Visible = true
 
-    local thumbnail = GetAvatarHeadshot(plr or player) :: ImageLabel -- another lie, because typechecker doesn't like unions of roblox classes
-    thumbnail.Parent = playerFrame
-    playerFrame.Frame.Avatar.Image = thumbnail
+    local headshot = GetAvatarHeadshot(plr or player) :: ImageLabel -- another lie, because typechecker doesn't like unions of roblox classes
+    headshot.BackgroundTransparency = 1
+    headshot.Size = UDim2.fromScale(0.1, 1)
+    headshot.LayoutOrder = -1
+
+    do
+        local aspectRatio = Instance.new("UIAspectRatioConstraint")
+        aspectRatio.AspectRatio = 1
+        aspectRatio.DominantAxis = Enum.DominantAxis.Height
+        aspectRatio.AspectType = Enum.AspectType.ScaleWithParentSize
+        aspectRatio.Parent = headshot
+
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(1, 0)
+        uiCorner.Parent = headshot
+    end
+
+    headshot.Name = "Avatar"
+    headshot.Parent = playerFrame.Frame
 
     local usernameLabel = playerFrame.Frame.Username
     usernameLabel:SetAttribute("Player_1", GetPlayerName(plr or player))
