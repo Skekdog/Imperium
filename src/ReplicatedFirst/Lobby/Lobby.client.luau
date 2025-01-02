@@ -122,7 +122,7 @@ local function addPlayer(slot: LobbySlot, player: string): ()
     headshot.Parent = playerFrame.Frame
 
     local usernameLabel = playerFrame.Frame.Username
-    usernameLabel:SetAttribute("Player_1", GetPlayerName(plr or player))
+    usernameLabel:SetAttribute("Player_1", if player:sub(1, 1) == "_" then "🤖 " .. player:sub(2, -1) else GetPlayerName(plr or player))
     usernameLabel:SetAttribute("Format", "[PLAYER]")
     usernameLabel:AddTag("DynamicNames")
     
@@ -141,7 +141,7 @@ local function addPlayer(slot: LobbySlot, player: string): ()
 
         button.Activated:Connect(function()
             PlayClickSound()
-            clientServer.KickPlayer:FireServer(plr)
+            clientServer.KickPlayer:FireServer(player)
         end)
     end
 end
