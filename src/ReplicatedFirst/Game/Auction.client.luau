@@ -27,7 +27,7 @@ resetAuction()
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 gameServerClient:WaitForChild("StartAuction").OnClientEvent:Connect(resetAuction)
 
-gameServerClient:WaitForChild("UpdateAuction").OnClientEvent:Connect(function(highestBidder: Player, highestBid: number)
+gameServerClient:WaitForChild("UpdateAuction").OnClientEvent:Connect(function(highestBidder: Player | Configuration, highestBid: number)
     local currency = GetCurrencySymbol()
     object.CurrentBid.Text = currency .. highestBid
 
