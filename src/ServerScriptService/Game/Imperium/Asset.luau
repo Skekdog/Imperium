@@ -423,7 +423,6 @@ local function GetRentCost(asset: Types.Asset, participant: Types.Participant): 
 end
 
 local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBankIfNoWinner: boolean?): ()
-    print("starting auction server")
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("StartAuction"):FireAllClients(asset.AssetDescription)
 
     local auctionDuration = round.GameConfiguration.AuctionTime
@@ -474,8 +473,7 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
     while GetTime() < endTime do
         task.wait()
     end
-    
-    print("stopping auction server")
+
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("StartAuction"):FireAllClients(nil)
     con:Disconnect()
 
