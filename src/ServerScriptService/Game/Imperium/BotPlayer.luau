@@ -105,6 +105,7 @@ local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset
     local multiplier = baseAssetMultiplier(bot, asset)
 
     if from ~= "Bank" then
+        multiplier += 0.1 -- depriving people of things is good
         local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
         local countOwnedByFrom = getOwnedAssetsInSet(set, from)
         local countTotal = #set
