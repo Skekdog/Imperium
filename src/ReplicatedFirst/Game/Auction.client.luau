@@ -13,7 +13,7 @@ local object = auctionPropertyUI.Object
 local function resetAuction(description: {Name: string}?): ()
     local currency = GetCurrencySymbol()
     object.CurrentBid.Text = `{currency}0`
-    object.CurrentWinner.Text = ""
+    object.CurrentWinner:SetAttribute("Format", "")
     
     if not description or IsSpectating() then
         return auctionPropertyUI:ToggleVisible(false)
