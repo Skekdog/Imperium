@@ -190,7 +190,7 @@ local function DecideMove(bot: Types.BotPlayer): "Dice" | "JailCard" | "Fine"
 end
 
 local function DecidePurchase(bot: Types.BotPlayer, asset: Types.Asset): boolean
-    return true
+    return bot:EvaluateAssetForPurchase(asset, "Bank") / asset.AssetDescription.Price > 0.75
 end
 
 local function TryBuildDevelopments(bot: Types.BotPlayer): ()
