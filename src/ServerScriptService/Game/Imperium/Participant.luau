@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local TweenService = game:GetService("TweenService")
 local IsBotSimulationEnabled = require(ServerScriptService.Game.Imperium.Util.IsBotSimulationEnabled)
 local FireRemote = require(script.Parent.Util.FireRemote)
 local AwardBadge = require(script.Parent.Parent.AwardBadge)
@@ -23,7 +22,7 @@ local MAX_MOVE_DURATION = 15
 local MAX_DIRECT_MOVE_DURATION = 8
 local MOVEMENT_EPSILON = 2.5
 local JAIL_EPSILON = 1.5
-local CHAR_HEIGHT = 3
+local CHAR_HEIGHT = 4.5
 
 local SPACE_AROUND_DISTANCE = 1.5
 local MAX_SPACE_AROUND_ATTEMPTS = 100
@@ -302,11 +301,6 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
         return
     end
 
-    local root = hum.RootPart
-    if not root then
-        return
-    end
-
     local targetPart = tile.Model.PrimaryPart
     assert(targetPart, "Tile has no primary part")
 
@@ -331,9 +325,8 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
     end
 
     repeat
-        if (root.Position - targetPosition).Magnitude < epsilon then
+        if (char:GetPivot().Position - targetPosition).Magnitude < epsilon then
             reached = true
-            TweenService:Create(root, TweenInfo.new(0.1), { Position = targetPosition }):Play()
             break
         end
 
@@ -342,7 +335,7 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
     until (GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION) or participant.HasDisconnected
     
     if not reached then
-        root.Position = targetPosition
+        char:PivotTo(CFrame.new(targetPosition))
     end
 end
 
