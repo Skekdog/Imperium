@@ -153,9 +153,10 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
     participant:TransferJailCards(to, participant.JailCards)
 
     FireRemote(ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("GoBankrupt"), participant)
-    participant:RemoveParticipant()
 
     AwardBadge(participant.Player, "Bankrupt!")
+
+    participant:RemoveParticipant(true)
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
@@ -606,7 +607,7 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
     return diceRollResult
 end
 
-local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
+local function LeaveJail(participant: Types.Participant): ()
     participant.JailedOn = 0
     participant.Player:SetAttribute("IsJailed", false)
 
@@ -620,10 +621,6 @@ local function LeaveJail(participant: Types.Participant, skipTurn: boolean?): ()
     end
 
     moveCharacter(participant, participant.Board:FindTileByName("Jail"), true, nil, false)
-
-    if not skipTurn then
-        participant:TryPlayMove()
-    end
 end
 
 local function TryPlayMove(participant: Types.Participant): ()
@@ -646,7 +643,7 @@ local function TryPlayMove(participant: Types.Participant): ()
             local jailLength = boardConfig.JailLength
             if participant.Round.Turn - participant.JailedOn >= jailLength then
                 SendNotification(`[PLAYER] is leaving jail after waiting {jailLength} turns.`, {participant.Player})
-                LeaveJail(participant, true)
+                LeaveJail(participant)
                 return play()
             else
                 local result = RollDice(participant)
@@ -658,7 +655,7 @@ local function TryPlayMove(participant: Types.Participant): ()
                 if result.IsDoubles then
                     participant.DoublesStreak += 1
                     SendNotification("After rolling doubles, [PLAYER] is leaving jail.", {participant.Player})
-                    LeaveJail(participant, true)
+                    LeaveJail(participant)
                     return play()
                 end
                 return
@@ -734,7 +731,7 @@ local function TryUseJailCard(participant: Types.Participant): ()
     participant:TransferJailCards("Bank", 1)
 
     SendNotification(`[PLAYER] used a Get Out of Jail Free card.`, {participant.Player})
-    LeaveJail(participant)
+    participant:TryPlayMove()
 end
 
 local function TryPayFine(participant: Types.Participant): ()
@@ -745,7 +742,7 @@ local function TryPayFine(participant: Types.Participant): ()
     participant:TransferMoneyTo("FreeParking", participant.Round.BoardConfiguration.JailFine, true)
 
     SendNotification(`[PLAYER] paid a fine of {GetCurrencySymbol()}{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
-    LeaveJail(participant)
+    participant:TryPlayMove()
 end
 
 local function GetTheDub(participant: Types.Participant): ()
@@ -786,7 +783,7 @@ local function CanAfford(participant: Types.Participant, amount: number): boolea
     return participant.Money >= amount
 end
 
-local function RemoveParticipant(participant: Types.Participant): ()
+local function RemoveParticipant(participant: Types.Participant, doNotStartNextTurn: boolean?): ()
     local round = participant.Round
 
     local nextParticipant: Types.Participant?
@@ -796,6 +793,7 @@ local function RemoveParticipant(participant: Types.Participant): ()
 
     local index = table.find(round.Participants, participant)
     assert(index, `Invalid index for participant {participant.Player.Name}`)
+    print("Removing participant", participant.Player.Name)
     table.remove(round.Participants, index)
     
     participant.IsInGame = false
@@ -821,7 +819,7 @@ local function RemoveParticipant(participant: Types.Participant): ()
         asset:StartAuction(round, true)
     end
 
-    if nextParticipant and #round.Participants > 1 then
+    if nextParticipant and #round.Participants > 1 and not doNotStartNextTurn then
         round:StartNextParticipantTurn(nextParticipant)
     end
 end

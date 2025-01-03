@@ -182,7 +182,7 @@ export type Participant = {
     MoveBy: (Participant, amount: number, moveDirectly: boolean?) -> (),
 
     SendToJail: (Participant) -> (),
-    LeaveJail: (Participant, skipTurn: boolean?) -> (),
+    LeaveJail: (Participant) -> (),
 
     FindClosestForwardPositionByColour: (Participant, colour: string) -> number?,
 
@@ -209,7 +209,7 @@ export type Participant = {
 
     TryReceiveFreeParkingMoney: (Participant) -> (),
 
-    RemoveParticipant: (Participant) -> (),
+    RemoveParticipant: (Participant, doNotStartNextTurn: boolean?) -> (),
 }
 
 export type BotPlayer = {

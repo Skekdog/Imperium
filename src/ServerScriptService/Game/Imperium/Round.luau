@@ -43,7 +43,7 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     local nextParticipant = participant or SetNextParticipant(round)
 
     if nextParticipant.HasDisconnected then
-        return nextParticipant:RemoveParticipant()
+        return task.defer(nextParticipant.RemoveParticipant, nextParticipant, true)
     end
 
     ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
