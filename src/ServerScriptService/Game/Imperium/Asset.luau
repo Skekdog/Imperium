@@ -206,7 +206,7 @@ function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel",
     assert(asset.Owner ~= "Bank", "The bank cannot buy developments")
     local tile = asset.Owner.Round.Board:FindTileByName(asset.AssetDescription.Name)
 
-    local model = (if development == "House" then ServerStorage.Game.House:Clone() else ServerStorage.Game.Hotel:Clone()) :: Model
+    local model = (if development == "House" then ServerStorage.Game.House:Clone() else ServerStorage.Game.Hotel:Clone()) :: MeshPart
 
     local attachmentName = development .. tostring(index)
     local attachment = (tile :: any).Model.Base:FindFirstChild(attachmentName) :: Attachment or error(`Failed to find Attachment {attachmentName}`)
@@ -219,7 +219,7 @@ function addDevelopmentModel(asset: Types.Asset, development: "House" | "Hotel",
 
     local targetCFrame = attachment.WorldCFrame
 
-    local heightOffset = Vector3.new(0, model:GetExtentsSize().Y, 0)
+    local heightOffset = Vector3.new(0, model.Size.Y, 0)
     local adjustedCFrame = targetCFrame + (heightOffset / 2)
 
     model:PivotTo(targetCFrame - heightOffset)
