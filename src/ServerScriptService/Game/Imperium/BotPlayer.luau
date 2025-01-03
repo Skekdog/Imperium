@@ -76,7 +76,7 @@ local function baseAssetMultiplier(bot: Types.BotPlayer, asset: Types.Asset): nu
     local totalCount = #set
 
     if ownedCount >= totalCount - 1 then
-        multiplier += if canBeDeveloped then 4 else 1.5
+        multiplier += if canBeDeveloped then 3 else 1.5
     else
         local ownedPercent = ownedCount / totalCount
         multiplier += ownedPercent * if canBeDeveloped then 2 else 1.2
