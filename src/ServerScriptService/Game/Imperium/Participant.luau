@@ -741,6 +741,7 @@ local function TryUseJailCard(participant: Types.Participant): ()
     participant:TransferJailCards("Bank", 1)
 
     SendNotification(`[PLAYER] used a Get Out of Jail Free card.`, {participant.Player})
+    participant:LeaveJail()
     participant:TryPlayMove()
 end
 
@@ -752,6 +753,7 @@ local function TryPayFine(participant: Types.Participant): ()
     participant:TransferMoneyTo("FreeParking", participant.Round.BoardConfiguration.JailFine, true)
 
     SendNotification(`[PLAYER] paid a fine of {GetCurrencySymbol()}{participant.Round.BoardConfiguration.JailFine} to leave jail.`, {participant.Player})
+    participant:LeaveJail()
     participant:TryPlayMove()
 end
 
