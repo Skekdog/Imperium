@@ -124,7 +124,7 @@ local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset
     -- If we have more money we are happy to spend a little more. If not we should be a little stingy.
     local relativePrice = bot.Participant.Money / asset.AssetDescription.Price
     if relativePrice < 2 then
-        multiplier -= 1 / relativePrice / 5
+        multiplier -= 1 / relativePrice / 3
     else
         multiplier += relativePrice / 10
     end
