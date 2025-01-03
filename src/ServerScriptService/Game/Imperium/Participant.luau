@@ -538,11 +538,11 @@ local function genRandom(): number
 end
 
 local diceMap = {
-    FrontSurface = 2,
+    FrontSurface = 5,
     TopSurface = 1,
-    LeftSurface = 3,
-    RightSurface = 4,
-    BackSurface = 5,
+    LeftSurface = 4,
+    RightSurface = 3,
+    BackSurface = 2,
     BottomSurface = 6
 }
 
