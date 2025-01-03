@@ -51,11 +51,14 @@ local function SendToJail(participant: Types.Participant): ()
         end
 
         animateJailBars(participant.Round, false)
-        PlaySound("LockingUp")
     end
 
     participant:MoveToTileByName("Jail", true)
     animateJailBars(participant.Round, true)
+
+    if not IsBotSimulationEnabled() then
+        PlaySound("LockingUp")
+    end
 end
 
 local function PurchaseProperty(participant: Types.Participant, asset: Types.Asset): ()
