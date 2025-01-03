@@ -200,10 +200,10 @@ updateMoney()
 
 gameServerClient:WaitForChild("AnimateCard").OnClientEvent:Connect(AnimateDrawCard)
 
-gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(function(bars: Model, targetCFrame: CFrame)
+gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(function(bars: MeshPart, targetCFrame: CFrame)
     LerpModelCFrame(bars, targetCFrame, 1)
 end)
-gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(function(model: Model, targetCFrame: CFrame)
+gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(function(model: MeshPart, targetCFrame: CFrame)
     LerpModelCFrame(model, targetCFrame, 1)
 end)
 

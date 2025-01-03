@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 -- local AwardBadge = require(script.Parent.Parent.AwardBadge)
+local IsBotSimulationEnabled = require(ServerScriptService.Game.Imperium.Util.IsBotSimulationEnabled)
 local GetCurrencySymbol = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.GetCurrencySymbol)
 local PlaySoundAtPart = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.PlaySoundAtPart)
 local GetPlayerName = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Shared.GetPlayerName)
@@ -179,12 +181,14 @@ function tryRemoveDevelopmentModel(asset: Types.Asset, development: "House" | "H
 
     local name = development .. tostring(index)
 
-    local model = (tile :: any).Model:FindFirstChild(name) :: Model?
+    local model = (tile :: any).Model:FindFirstChild(name) :: Instance?
     if not model then
         return
     end
 
-    local heightOffset = Vector3.new(0, model:GetExtentsSize().Y, 0)
+    assert(model:IsA("MeshPart"), "Development model is not a mesh part")
+
+    local heightOffset = Vector3.new(0, model.Size.Y, 0)
     local targetCFrame = model:GetPivot() - heightOffset
 
     animateDevelopmentRemote:FireAllClients(model, targetCFrame)
@@ -479,35 +483,42 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
         end
     end
 
-    local con: RBXScriptConnection
-    con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("MakeBid").OnServerEvent:Connect(function(plr, property: unknown, amount: unknown)
-        if property ~= asset.AssetDescription.Name then
-            return
-        end
-        
-        if typeof(amount) ~= "number" or amount <= highestBid then
-            return
-        end
+    local con: RBXScriptConnection?
+    if not IsBotSimulationEnabled() then
+        con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("MakeBid").OnServerEvent:Connect(function(plr, property: unknown, amount: unknown)
+            if property ~= asset.AssetDescription.Name then
+                return
+            end
+            
+            if typeof(amount) ~= "number" or amount <= highestBid then
+                return
+            end
 
-        local participant = round:TryGetParticipant(plr)
-        if not participant then
-            return
-        end
+            local participant = round:TryGetParticipant(plr)
+            if not participant then
+                return
+            end
 
-        makeBid(participant, amount)
-    end)
+            makeBid(participant, amount)
+        end)
+    end
 
     local highestBotBid, highestBot = getHighestBotBid(round)
     if highestBot then
         makeBid(highestBot, highestBid + highestBotBid)
     end
 
-    while GetTime() < endTime do
-        task.wait()
+    if not IsBotSimulationEnabled() then
+        while GetTime() < endTime do
+            task.wait()
+        end
     end
 
     ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("StartAuction"):FireAllClients(nil)
-    con:Disconnect()
+
+    if con then
+        con:Disconnect()
+    end
 
     if not highestBidder or not highestBidder.IsInGame then
         if transferToBankIfNoWinner then

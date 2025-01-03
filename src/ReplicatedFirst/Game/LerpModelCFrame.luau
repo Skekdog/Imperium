@@ -1,6 +1,6 @@
 local RunService = game:GetService("RunService")
 
-return function(model: Model, targetCFrame: CFrame, duration: number): ()
+return function(model: PVInstance, targetCFrame: CFrame, duration: number): ()
     local startTime = tick()
     local startCFrame = model:GetPivot()
 
