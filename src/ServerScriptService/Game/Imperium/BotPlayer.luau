@@ -96,6 +96,12 @@ local function EvaluateAssetForSale(bot: Types.BotPlayer, asset: Types.Asset, to
         multiplier += 2 -- this asset is more valuable to them if they get a set for it
     end
 
+    -- If they have more money we can squeeze them more
+    local relativePrice = to.Money / asset.AssetDescription.Price
+    if relativePrice > 1.5 then
+        multiplier += relativePrice / 15
+    end
+
     print(`{bot.Player.Name} evaluates {asset.AssetDescription.Name} for selling {asset.AssetDescription.Price * multiplier} to {to.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
 
     return asset.AssetDescription.Price * multiplier
@@ -113,6 +119,14 @@ local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset
         if countOwnedByFrom == countTotal then
             multiplier += 2 -- if we can deprive them of a set, great!
         end
+    end
+
+    -- If we have more money we are happy to spend a little more. If not we should be a little stingy.
+    local relativePrice = bot.Participant.Money / asset.AssetDescription.Price
+    if relativePrice < 2 then
+        multiplier -= 1 / relativePrice / 5
+    else
+        multiplier += relativePrice / 10
     end
 
     print(`{bot.Player.Name} evaluates {asset.AssetDescription.Name} for purchasing {asset.AssetDescription.Price * multiplier} from {if from == "Bank" then "the Bank" else from.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
