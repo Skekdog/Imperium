@@ -149,7 +149,6 @@ local function TryAddBotPlayer(lobby: LobbyTypes.Lobby): "Success" | string
 end
 
 local function RemovePlayer(lobby: LobbyTypes.Lobby, plr: string): ()
-    print(lobby.Players)
     local index = table.find(lobby.Players, plr)
     if index then
         table.remove(lobby.Players, index)
