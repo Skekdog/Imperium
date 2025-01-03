@@ -34,12 +34,89 @@ local function groupAssetsByColour(assets: {Types.Asset}): {[string]: {Types.Ass
     return groupedAssets
 end
 
+local function getOwnedAssetsInSet(set: {Types.Asset}, participant: Types.Participant): number
+    local count = 0
+
+    for _, asset in set do
+        if asset.Owner == participant then
+            count += 1
+        end
+    end
+
+    return count
+end
+
+local function canAssetBeDeveloped(bot: Types.BotPlayer, asset: Types.Asset): boolean
+    return not not bot.Participant.Round.BoardConfiguration.HousePrices[asset.AssetDescription.Colour]
+end
+
+local function baseAssetMultiplier(bot: Types.BotPlayer, asset: Types.Asset): number
+    local multiplier = 1
+    if asset.IsMortgaged then
+        multiplier -= 0.1
+    end
+
+    local canBeDeveloped = canAssetBeDeveloped(bot, asset)
+
+    if not canBeDeveloped then
+        multiplier -= 0.2 -- Assets we can't build on are less valuable
+    else
+        multiplier += 0.1
+        for i = 1, asset.Houses do
+            multiplier += 0.1
+        end
+
+        for i = 1, asset.Hotels do
+            multiplier += 0.2
+        end
+    end
+
+    local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
+    local ownedCount = getOwnedAssetsInSet(set, bot.Participant)
+    local totalCount = #set
+
+    if ownedCount >= totalCount - 1 then
+        multiplier += if canBeDeveloped then 4 else 1.5
+    else
+        local ownedPercent = ownedCount / totalCount
+        multiplier += ownedPercent * if canBeDeveloped then 2 else 1.2
+    end
+
+    return multiplier
+end
+
 local function EvaluateAssetForSale(bot: Types.BotPlayer, asset: Types.Asset, to: Types.Participant): number
-    return 0
+    local multiplier = baseAssetMultiplier(bot, asset)
+
+    local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
+    local countOwnedByTo = getOwnedAssetsInSet(set, to)
+    local countTotal = #set
+
+    if countOwnedByTo >= countTotal - 1 then
+        multiplier += 2 -- this asset is more valuable to them if they get a set for it
+    end
+
+    print(`{bot.Player.Name} evaluates {asset.AssetDescription.Name} for selling {asset.AssetDescription.Price * multiplier} to {to.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
+
+    return asset.AssetDescription.Price * multiplier
 end
 
 local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset, from: Types.AssetOwner): number
-    return 0
+    local multiplier = baseAssetMultiplier(bot, asset)
+
+    if from ~= "Bank" then
+        local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
+        local countOwnedByFrom = getOwnedAssetsInSet(set, from)
+        local countTotal = #set
+
+        if countOwnedByFrom == countTotal then
+            multiplier += 2 -- if we can deprive them of a set, great!
+        end
+    end
+
+    print(`{bot.Player.Name} evaluates {asset.AssetDescription.Name} for purchasing {asset.AssetDescription.Price * multiplier} from {if from == "Bank" then "the Bank" else from.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
+
+    return asset.AssetDescription.Price * multiplier
 end
 
 local function EvaluateSkipJail(bot: Types.BotPlayer): boolean

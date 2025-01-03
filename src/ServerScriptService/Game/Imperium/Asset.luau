@@ -464,6 +464,13 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
         SetWaitingText("Auction in progress...", auctionDuration)
     end)
 
+    for _, v in round.Participants do
+        local bot = round:GetBotPlayer(v)
+        if bot then
+            bot:EvaluateAssetForPurchase(asset, asset.Owner)
+        end
+    end
+
     while GetTime() < endTime do
         task.wait()
     end
