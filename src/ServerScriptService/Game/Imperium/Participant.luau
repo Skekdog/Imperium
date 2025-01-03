@@ -323,6 +323,10 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
 
     local targetPosition = findFreePointAroundPosition(participant, tile, targetPart) + Vector3.new(0, targetPart.Position.Y + CHAR_HEIGHT + targetPart.Size.Y / 2, 0)
 
+    if IsBotSimulationEnabled() then
+        return char:PivotTo(CFrame.new(targetPosition))
+    end
+
     repeat
         if (root.Position - targetPosition).Magnitude < epsilon then
             reached = true
@@ -611,15 +615,21 @@ local function LeaveJail(participant: Types.Participant): ()
     participant.JailedOn = 0
     participant.Player:SetAttribute("IsJailed", false)
 
-    animateJailBars(participant.Round, false)
-    task.wait(1)
-
+    local keepBarsUp: boolean = false
     for _, v in participant.Round.Participants do
         if v.JailedOn ~= 0 then
-            animateJailBars(participant.Round, true)
+            keepBarsUp = true
+            break
         end
     end
 
+    if not IsBotSimulationEnabled() then
+        animateJailBars(participant.Round, false)
+        task.wait(1)
+    end
+
+    animateJailBars(participant.Round, keepBarsUp)
+    
     moveCharacter(participant, participant.Board:FindTileByName("Jail"), true, nil, false)
 end
 
