@@ -325,14 +325,14 @@ local function moveCharacter(participant: Types.Participant, tile: Types.Tile, d
     end
 
     repeat
-        if (char:GetPivot().Position - targetPosition).Magnitude < epsilon then
+        if (char:GetPivot().Position * Vector3.new(1, 0, 1) - targetPosition * Vector3.new(1, 0, 1)).Magnitude < epsilon then
             reached = true
             break
         end
 
         hum:MoveTo(targetPosition) -- MoveTo timesout after 8 seconds by default - but we want a longer timeout, so we set it every iteration
         task.wait() -- We don't need to wait really because MoveTo is blocking, but why not
-    until (GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION) or participant.HasDisconnected
+    until (GetTime() - startTime > if direct then MAX_DIRECT_MOVE_DURATION else MAX_MOVE_DURATION) or participant.HasDisconnected or reached or not char.Parent
     
     if not reached then
         char:PivotTo(CFrame.new(targetPosition))
