@@ -45,5 +45,15 @@ return function(enabled: boolean): ()
         if Controls.touchJumpController then
             Controls.touchJumpController:Enable(false)
         end
+
+        local char = Players.LocalPlayer.Character
+        if not char then
+            return
+        end
+
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:Move(Vector3.zero)
+        end
     end
 end
