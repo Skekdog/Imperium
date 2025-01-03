@@ -169,7 +169,6 @@ export type Participant = {
     
     JailedOn: number,
     DoublesStreak: number,
-    LastRoll: DiceRollResult,
 
     RollDice: (Participant) -> DiceRollResult,
     CanPlayMove: (Participant, move: "Dice" | "JailCard" | "Fine") -> boolean,

@@ -602,8 +602,6 @@ local function RollDice(participant: Types.Participant): Types.DiceRollResult
         IsDoubles = isDoubles,
     }
 
-    participant.LastRoll = diceRollResult
-
     return diceRollResult
 end
 
@@ -900,10 +898,6 @@ function module.new(player: Player | Configuration, round: Types.Round): Types.P
     participant.RemoveParticipant = RemoveParticipant
 
     participant.CanPlayMove = CanPlayMove
-    participant.LastRoll = {
-        Result = 0,
-        IsDoubles = false,
-    }
 
     participant.IsGoingBankrupt = false
 
