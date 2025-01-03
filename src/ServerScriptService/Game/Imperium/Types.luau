@@ -222,6 +222,8 @@ export type BotPlayer = {
 
     FinishTurn: (BotPlayer) -> (),
 
+    GetAuctionBid: (BotPlayer, Asset, currentBid: number, currentWinner: Participant?) -> number?,
+
     EvaluateAssetForSale: (BotPlayer, Asset, to: Participant) -> number,
     EvaluateAssetForPurchase: (BotPlayer, Asset, from: AssetOwner) -> number,
 

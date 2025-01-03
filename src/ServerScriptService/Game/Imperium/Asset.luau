@@ -433,6 +433,52 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
 
     local endTime = GetTime() + auctionDuration
 
+    local function getHighestBotBid(round: Types.Round): (number, Types.Participant?)
+        local botBids: {[Types.Participant]: number} = {}
+        for _, v in round.Participants do
+            local bot = round:GetBotPlayer(v)
+            if bot and v ~= highestBidder then
+                botBids[v] = bot:GetAuctionBid(asset, highestBid, highestBidder) or 0
+            end
+        end
+
+        local highestBot: Types.Participant?
+        local highestBotBid = 0
+        for bot, v in botBids do
+            if v > highestBotBid then
+                highestBotBid = v
+                highestBot = bot
+            end
+        end
+
+        return highestBotBid, highestBot
+    end
+
+    local function makeBid(participant: Types.Participant, amount: number)
+        if not participant:CanAfford(amount) then
+            return
+        end
+
+        if highestBidder == participant then
+            return
+        end
+
+        assert(participant ~= asset.Owner, `Player {participant.Player.Name} tried to bid on their own property?`)
+
+        highestBidder = participant
+        highestBid = amount
+
+        local highestBotBid, highestBot = getHighestBotBid(round)
+
+        if highestBot then
+            makeBid(highestBot, highestBid + highestBotBid)
+        else
+            ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAuction"):FireAllClients(assert(highestBidder).Player, amount)
+            endTime = GetTime() + auctionDuration
+            SetWaitingText("Auction in progress...", auctionDuration)
+        end
+    end
+
     local con: RBXScriptConnection
     con = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer"):WaitForChild("MakeBid").OnServerEvent:Connect(function(plr, property: unknown, amount: unknown)
         if property ~= asset.AssetDescription.Name then
@@ -444,30 +490,16 @@ local function StartAuction(asset: Types.Asset, round: Types.Round, transferToBa
         end
 
         local participant = round:TryGetParticipant(plr)
-        if not participant or not participant:CanAfford(amount) then
+        if not participant then
             return
         end
 
-        if highestBidder == participant then
-            return
-        end
-
-        assert(participant ~= asset.Owner, `Player {participant.Player.Name} tried to bid on their own property?`)
-
-        ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAuction"):FireAllClients(participant.Player, amount)
-
-        highestBidder = participant
-        highestBid = amount
-
-        endTime = GetTime() + auctionDuration
-        SetWaitingText("Auction in progress...", auctionDuration)
+        makeBid(participant, amount)
     end)
 
-    for _, v in round.Participants do
-        local bot = round:GetBotPlayer(v)
-        if bot then
-            bot:EvaluateAssetForPurchase(asset, asset.Owner)
-        end
+    local highestBotBid, highestBot = getHighestBotBid(round)
+    if highestBot then
+        makeBid(highestBot, highestBid + highestBotBid)
     end
 
     while GetTime() < endTime do

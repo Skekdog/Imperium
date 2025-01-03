@@ -119,6 +119,28 @@ local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset
     return asset.AssetDescription.Price * multiplier
 end
 
+local validBids = {1, 10, 50, 100}
+local function GetAuctionBid(bot: Types.BotPlayer, asset: Types.Asset, currentBid: number, currentWinner: Types.Participant?): number?
+    local valuation = bot:EvaluateAssetForPurchase(asset, currentWinner or "Bank")
+    if valuation < currentBid then
+        return nil -- the price is rice, don't buy
+    end
+
+    local availableMoney = bot.Participant.Money - currentBid
+    if availableMoney <= 0 then
+        return nil
+    end
+
+    local highestBid = 0
+    for _, bid in validBids do
+        if bid <= availableMoney and bid > highestBid and currentBid + bid <= valuation then
+            highestBid = bid
+        end
+    end
+
+    return if highestBid > 0 then highestBid else nil
+end
+
 local function EvaluateSkipJail(bot: Types.BotPlayer): boolean
     assert(bot.Participant.JailedOn ~= 0, "Participant is not jailed")
     
@@ -301,6 +323,8 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
         MinimumMoneyForUnmortgaging = 450,
 
         FinishTurn = FinishTurn,
+
+        GetAuctionBid = GetAuctionBid,
 
         EvaluateAssetForSale = EvaluateAssetForSale,
         EvaluateAssetForPurchase = EvaluateAssetForPurchase,
