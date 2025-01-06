@@ -15,6 +15,7 @@ local SendNotification = require(script.Parent.Parent.Shared.SendNotification)
 local Teleport = require(script.Parent.Parent.Shared.Teleport)
 local Round = require(ServerScriptService.Game.Imperium.Round)
 local BotCharacters = require(ServerScriptService.Shared.BotNames)
+local SendChatMessage = require(ServerScriptService.Shared.SendChatMessage)
 local SetWaitingText = require(script.Parent.SetWaitingText)
 
 local MAX_PLAYER_LOAD_WAIT_TIME = 120
@@ -22,7 +23,7 @@ local INTERMISSION_DURATION = 5
 local MIN_PLAYERS_OR_EXIT = 1
 
 local STUDIO_MIN_PLAYERS = if IsBotSimulationEnabled() then 1 else 1
-local STUDIO_BOT_PLAYERS = 3
+local STUDIO_BOT_PLAYERS = 1
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
@@ -76,17 +77,6 @@ for i, description in board.Tiles do
     table.insert(tiles, Tile.new(board, i, description))
 end
 
-local function onPlayerAdded(plr: Player)
-    plr:SetAttribute("Status", "Spectating")
-    plr.CharacterAdded:Connect(DisableCharacterCollision)
-    plr:LoadCharacter()
-end
-
-for _, v in Players:GetPlayers() do
-    onPlayerAdded(v)
-end
-Players.PlayerAdded:Connect(onPlayerAdded)
-
 local players = #Players:GetChildren()
 
 if not IsBotSimulationEnabled() then
@@ -125,6 +115,79 @@ local round = Round.new(board, tiles, {
     BotPlayers = info.BotPlayers,
     HumanPlayerCount = info.Players
 })
+
+local pauseVotes: {[Player]: boolean} = {}
+
+local function getRequiredVotes(): number
+    local voters = #Players:GetPlayers()
+
+    local votesNeeded: number
+    if voters == 1 then
+        votesNeeded = 1
+    elseif voters == 2 then
+        votesNeeded = 2
+    else
+        votesNeeded = math.ceil(voters / 2)
+    end
+
+    return votesNeeded
+end
+
+local function getCurrentVotes(): number
+    local votes = 0
+    for _, v in pauseVotes do
+        if v then
+            votes += 1
+        end
+    end
+
+    return votes
+end
+
+local function tryPause(): ()
+    local votes = getCurrentVotes()
+
+    if votes >= getRequiredVotes() then
+        round.IsPaused = not round.IsPaused
+        SendChatMessage(if round.IsPaused then "Round paused. This will take effect on the next player's turn." else "Round unpaused.")
+
+        pauseVotes = {}
+        for _, v in Players:GetPlayers() do
+            pauseVotes[v] = false
+        end
+    end
+end
+
+local function onPlayerAdded(plr: Player)
+    plr:SetAttribute("Status", "Spectating")
+    plr.CharacterAdded:Connect(DisableCharacterCollision)
+    plr:LoadCharacter()
+
+    pauseVotes[plr] = false
+
+    plr.Chatted:Connect(function(msg, to)
+        if to then
+            return
+        end
+
+        if msg:lower() == "!pause" then
+            pauseVotes[plr] = not pauseVotes[plr]
+            if pauseVotes[plr] then
+                SendChatMessage(`Voted to {if round.IsPaused then "unpause" else "pause"} the round. {getCurrentVotes()}/{getRequiredVotes()} votes needed.`)
+            else
+                SendChatMessage(`Removed vote to {if round.IsPaused then "unpause" else "pause"} the round. {getCurrentVotes()}/{getRequiredVotes()} votes needed.`)
+            end
+            tryPause()
+        elseif msg:lower() == "!settings" then
+            ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("OpenSettings"):FireClient(plr)
+        end
+    end)
+end
+
+for _, v in Players:GetPlayers() do
+    onPlayerAdded(v)
+end
+Players.PlayerAdded:Connect(onPlayerAdded)
 
 SetWaitingText("Starting soon...", INTERMISSION_DURATION)
 task.wait(INTERMISSION_DURATION)

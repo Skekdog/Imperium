@@ -251,6 +251,8 @@ export type Round = {
     BoardConfiguration: BoardConfiguration,
     GameConfiguration: GameConfiguration,
 
+    IsPaused: boolean,
+
     Board: Board,
     Started: boolean,
     Turn: Turn,

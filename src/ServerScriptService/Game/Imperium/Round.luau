@@ -42,6 +42,16 @@ end
 local function StartNextParticipantTurn(round: Types.Round, participant: Types.Participant?): ()
     local nextParticipant = participant or SetNextParticipant(round)
 
+    if round.IsPaused then
+        ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
+        SetTimeMilestone(nil)
+        ReplicatedStorage:SetAttribute("IsPaused", true)
+        while round.IsPaused do
+            task.wait()
+        end
+        ReplicatedStorage:SetAttribute("IsPaused", false)
+    end
+
     if nextParticipant.HasDisconnected then
         return task.defer(nextParticipant.RemoveParticipant, nextParticipant, true)
     end
@@ -197,6 +207,7 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     
     round.Participants = {}
 
+    round.IsPaused = false
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.TryGetParticipant = TryGetParticipant
     round.StartRound = StartRound

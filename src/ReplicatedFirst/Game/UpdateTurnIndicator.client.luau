@@ -61,6 +61,17 @@ ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(fun
     end
 end)
 
+ReplicatedStorage:GetAttributeChangedSignal("IsPaused"):Connect(function()
+    local isPaused = ReplicatedStorage:GetAttribute("IsPaused") :: boolean
+    UIAnimation.Animate(object.Bankruptcy, TweenInfo.new(0.1), {
+        Position = UDim2.fromScale(0.5, if isPaused then 1 else 0.7)
+    })
+
+    if isPaused then
+        object.Bankruptcy.Text = "PAUSED"
+    end
+end)
+
 task.spawn(function()
     while true do
         task.wait()
