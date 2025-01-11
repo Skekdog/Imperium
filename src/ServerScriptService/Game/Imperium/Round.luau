@@ -228,7 +228,15 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
         round.BotPlayers[botPlayer.Participant] = botPlayer
     end
 
-    Random.new():Shuffle(round.Participants)
+    local participants = round.Participants
+    Random.new():Shuffle(participants)
+    local left = 1
+    for i = 1, #participants do
+        if not round:GetBotPlayer(participants[i]) then
+            participants[left], participants[i] = participants[i], participants[left]
+            left = left + 1
+        end
+    end
 
     ReplicatedStorage:SetAttribute("FineAmount", boardConfiguration.JailFine)
 
