@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIAnimation = require(ReplicatedFirst.Shared.UIAnimation)
 local ClientTypes = require(script.Parent.ClientTypes)
 local CreateAssetButton = require(script.Parent.CreateAssetButton)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
@@ -13,13 +15,13 @@ local inventories: {[Player]: Inventory?} = {}
 local ui = UIManager.WaitForUI("Trading") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Trading)}
 local object = ui.Object
 
-local yourItems = object.YourItems.ScrollingFrame
-local theirItems = object.TheirItems.ScrollingFrame
-local yourOffer = object.YourOffer.ScrollingFrame
-local theirOffer = object.TheirOffer.ScrollingFrame
+local yourItems = object.YourItems.Items
+local theirItems = object.TheirItems.Items
+local yourOffer = object.YourOffer.Items
+local theirOffer = object.TheirOffer.Items
 
-local confirmButton = object.Responses.Confirm
-local rejectButton = object.Responses.Reject
+local confirmButton = object.Choices.Accept
+local rejectButton = object.Choices.Reject
 
 local currentTrader: Player?
 local youAccepted = false
@@ -41,6 +43,15 @@ local function bindToClick(button: TextButton, callback: () -> ())
 
     clickCons[button] = button.Activated:Connect(callback)
 end
+
+local isHidden = false
+object.Hide.Activated:Connect(function()
+    isHidden = not isHidden
+    UIAnimation.Animate(object, TweenInfo.new(0.25), {
+        Position = UDim2.fromScale(if isHidden then 1 else 0.5, 0.5),
+        AnchorPoint = Vector2.new(if isHidden then 0 else 0.5, 0.5),
+    })
+end)
 
 local function offerAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
     local offer: ClientTypes.TradeOfferUpdate = {
@@ -308,9 +319,13 @@ return function(target: Player): ()
 
     updatedAcceptance()
 
-    object.ThemTitle:SetAttribute("Player_1", GetPlayerName(target))
-    object.ThemTitle:SetAttribute("Format", "[PLAYER]")
-    object.ThemTitle:AddTag("DynamicNames")
+    object.TheirItems.Title:SetAttribute("Player_1", GetPlayerName(target))
+    object.TheirItems.Title:SetAttribute("Format", "[PLAYER]")
+    object.TheirItems:AddTag("DynamicNames")
+
+    object.TheirOffer.Title:SetAttribute("Player_1", GetPlayerName(target))
+    object.TheirOffer.Title:SetAttribute("Format", "[PLAYER]")
+    object.TheirOffer:AddTag("DynamicNames")
 
     bindToClick(confirmButton, function()
         tradeRemotes:WaitForChild("TradeAcceptance"):FireServer(not youAccepted)
