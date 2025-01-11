@@ -1,7 +1,8 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
-local SharedData = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.SharedData)
+local GameConfiguration = require(ReplicatedStorage.Shared.GameConfiguration)
+local SharedData = require(ReplicatedStorage.Shared.SharedData)
 local SafeTeleport = require(script.Parent.SafeTeleport)
 
 local gameInfoStore = MemoryStoreService:GetHashMap("GameInfo")

@@ -1,13 +1,13 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local StarterPlayer = game:GetService("StarterPlayer")
-local BotNameFormatting = require(ReplicatedFirst.Shared.BotNameFormatting)
+local BotNameFormatting = require(ReplicatedStorage.Shared.BotNameFormatting)
 local DisableCharacterCollision = require(script.Parent.Util.DisableCharacterCollision)
 local BotCharacters = require(ServerScriptService.Shared.BotNames)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
+
 local module = {}
 
 local function sortAssetPriceAscending(tbl: {[number]: Types.Asset}): ()

@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 
 local ThemesManager = require(script.Parent.ThemesManager)
-local UIManager = require(ReplicatedFirst.Shared.UIManager)
+local UIManager = require(ReplicatedStorage.Shared.UIManager)
 
 local orders = {
 	Special = 4,
@@ -40,7 +40,7 @@ for _, object in UIManager.UnregisteredUIs:GetChildren() do
 	end
 end
 
-local ControlManager = require(ReplicatedFirst.Shared.ControlManager)
+local ControlManager = require(ReplicatedStorage.Shared.ControlManager)
 ControlManager.Register("Close UI", false, function()
 	for _, v in UIManager.GetUIs("Popup") do
 		if v.Visible and not v.NoClose then

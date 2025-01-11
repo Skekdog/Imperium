@@ -2,10 +2,10 @@
 
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CreateSidebarButton = require(script.Parent.CreateSidebarButton)
-local ControlManager = require(ReplicatedFirst.Shared.ControlManager)
+local ControlManager = require(ReplicatedStorage.Shared.ControlManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer

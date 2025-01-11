@@ -1,5 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local ClientTypes = require(script.Parent.Parent.Parent.Parent.ReplicatedFirst.Game.ClientTypes)
+local ClientTypes = require(ReplicatedStorage.Game.ClientTypes)
+
 type Turn = number
 export type AssetOwner = Participant | "Bank"
 export type DiceRollResult = {

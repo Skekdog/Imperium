@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GameConfiguration = require(ReplicatedStorage.Shared.GameConfiguration)
 local Lobby = require(script.Parent.Lobby)
-local GameConfiguration = require(script.Parent.Parent.Parent.ReplicatedFirst.Shared.GameConfiguration)
 
 local clientServer = ReplicatedStorage.Lobby.ClientServer
 clientServer.JoinLobby.OnServerInvoke = function(plr, userId: unknown, password: unknown): "Success" | string

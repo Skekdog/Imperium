@@ -1,12 +1,11 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local UIManager = require(ReplicatedStorage.Shared.UIManager)
 local BankruptcyAlert = require(script.Parent.BankruptcyAlert)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
-local UIManager = require(ReplicatedFirst.Shared.UIManager)
 
 local ui = UIManager.WaitForUI("CurrentTurnIndicator")
 local object = ui.Object :: typeof(UIManager.UnregisteredUIs.CurrentTurnIndicator)

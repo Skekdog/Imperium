@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 return function(name: string, displayName: string, callback: () -> ()): ()
     coroutine.wrap(function()
-        local sb = Players.LocalPlayer.PlayerGui:WaitForChild("Buttons"):WaitForChild("Sidebar") :: typeof(ReplicatedFirst.Shared.UnregisteredUIs.Sidebar)
+        local sb = Players.LocalPlayer.PlayerGui:WaitForChild("Buttons"):WaitForChild("Sidebar") :: typeof(ReplicatedStorage.Shared.UnregisteredUIs.Sidebar)
         local but = sb.Button:Clone()
         but.Name = name
         but.Text = displayName

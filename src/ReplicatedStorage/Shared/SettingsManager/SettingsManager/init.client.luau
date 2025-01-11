@@ -1,4 +1,3 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local CAS = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -32,8 +31,8 @@ end
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 local ScreenMessage = require(script.Parent.Parent.ScreenMessage)
 
-local UIManager = require(ReplicatedFirst.Shared.UIManager)
-local Controls = require(ReplicatedFirst.Shared.ControlManager)
+local UIManager = require(ReplicatedStorage.Shared.UIManager)
+local Controls = require(ReplicatedStorage.Shared.ControlManager)
 
 local pageBase = script.__TabPage
 local tabBase = script.__Tab
