@@ -6,10 +6,6 @@
 
     "tree": {
         "$className": "DataModel",
-        "ReplicatedFirst": {
-            "Shared": {"$path": "src/ReplicatedFirst/Shared"},
-            "Game": {"$path": "src/ReplicatedFirst/Game"}
-        },
         "ServerScriptService": {
             "Shared": {"$path": "src/ServerScriptService/Shared"},
             "Game": {"$path": "src/ServerScriptService/Game"}
