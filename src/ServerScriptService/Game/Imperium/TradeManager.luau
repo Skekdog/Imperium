@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(ReplicatedStorage.Game.ClientTypes)
 local GetTime = require(ReplicatedStorage.Shared.GetTime)
@@ -12,277 +13,239 @@ local TRADE_TIMEOUT = 10
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
-local function isTradeActive(tradeManager: Types.TradeManager): boolean
-    return not not tradeManager.TradingWith
-end
-
-local function OfferAsset(tradeManager: Types.TradeManager, assetName: string): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    assert(tradeManager.TradingWith)
-
-    local asset: Types.Asset?
-    for _, v in tradeManager.Participant.Assets do
-        if v.AssetDescription.Name == assetName then
-            asset = v
-            break
+local function getAssetByName(participant: Types.Participant, name: string): Types.Asset?
+    for _, asset in participant.Assets do
+        if asset.AssetDescription.Name == name then
+            return asset
         end
     end
 
-    if not asset then
-        return
-    end
-
-    local indexToRemove: number?
-    for i, v in tradeManager.OfferedAssets do
-        if v.AssetDescription.Name == assetName then
-            indexToRemove = i
-            break
-        end
-    end
-
-    if indexToRemove then
-        table.remove(tradeManager.OfferedAssets, indexToRemove)
-    else
-        table.insert(tradeManager.OfferedAssets, asset)
-    end
-
-    local offer: ClientTypes.TradeOfferUpdate = {
-        Kind = "Asset",
-        Name = assetName,
-        Mode = if indexToRemove then "Remove" else "Add",
-    }
-    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.Participant, tradeManager.Participant.Player, offer)
-    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.TradingWith, tradeManager.Participant.Player, offer)
+    return nil
 end
 
-local function OfferMoney(tradeManager: Types.TradeManager, amount: number): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    assert(tradeManager.TradingWith)
-
-    amount = math.clamp(amount, 0, tradeManager.Participant.Money)
-    tradeManager.OfferedMoney = amount
-
-    local offer: ClientTypes.TradeOfferUpdate = {
-        Kind = "Money",
-        Amount = tradeManager.OfferedMoney,
-    }
-    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.Participant, tradeManager.Participant.Player, offer)
-    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.TradingWith, tradeManager.Participant.Player, offer)
-end
-
-local function OfferJailCards(tradeManager: Types.TradeManager, amount: number): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    assert(tradeManager.TradingWith)
-
-    amount = math.clamp(amount, 0, tradeManager.Participant.JailCards)
-    tradeManager.OfferedJailCards = amount
-
-    local offer: ClientTypes.TradeOfferUpdate = {
-        Kind = "JailCards",
-        Amount = tradeManager.OfferedJailCards,
-    }
-    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.Participant, tradeManager.Participant.Player, offer)
-    FireRemote(tradeRemotes:WaitForChild("UpdateOffer"), tradeManager.TradingWith, tradeManager.Participant.Player, offer)
-end
-
-local function Reset(tradeManager: Types.TradeManager, wasRejectedBy: Player | Configuration?, reason: "GoingBankrupt"?): ()
-    tradeManager.SentOfferTo = nil
-    tradeManager.TradingWith = nil
-
-    tradeManager.HasAcceptedProposal = false
-
-    tradeManager.OfferedAssets = {}
-    tradeManager.OfferedMoney = 0
-    tradeManager.OfferedJailCards = 0
-
-    FireRemote(tradeRemotes:WaitForChild("TradeEnded"), tradeManager.Participant, wasRejectedBy, reason)
-end
-
-local function finishTradeForParticipant(participant: Types.Participant, to: Types.Participant): ()
-    for _, v in participant.TradeManager.OfferedAssets do
-        v:TransferTo(to)
-    end
-
-    participant:TransferMoneyTo(to, participant.TradeManager.OfferedMoney)
-    participant:TransferJailCards(to, participant.TradeManager.OfferedJailCards)
-end
-
-local function FinishTrade(tradeManager: Types.TradeManager, accepted: boolean, reason: "GoingBankrupt"?): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    assert(tradeManager.TradingWith)
-
-    if accepted then
-        SendNotification("[PLAYER] accepted a trade with [PLAYER].", {tradeManager.Participant.Player, tradeManager.TradingWith.Player})
-        finishTradeForParticipant(tradeManager.Participant, tradeManager.TradingWith)
-        finishTradeForParticipant(tradeManager.TradingWith, tradeManager.Participant)
-    end
-
-    Reset(tradeManager.TradingWith.TradeManager, if not accepted then tradeManager.Participant.Player else nil, reason)
-    Reset(tradeManager, if not accepted then tradeManager.Participant.Player else nil, reason)
-end
-
-local function processUpdatedAcceptance(tradeManager: Types.TradeManager): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-
-    assert(tradeManager.TradingWith)
-
-    if tradeManager.TradingWith.TradeManager.HasAcceptedProposal and tradeManager.HasAcceptedProposal then
-        return FinishTrade(tradeManager, true)
-    end
-
-    FireRemote(tradeRemotes:WaitForChild("TradeAcceptance"), tradeManager.Participant, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
-    FireRemote(tradeRemotes:WaitForChild("TradeAcceptance"), tradeManager.TradingWith, tradeManager.Participant.Player, tradeManager.HasAcceptedProposal)
-end
-
-local function SetProposalAccepted(tradeManager: Types.TradeManager, accepted: boolean?): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    assert(tradeManager.TradingWith)
-
-    if accepted == nil then
-        return FinishTrade(tradeManager, false)
-    end
+local function giveOfferToOtherParticipant(offer: Types.TradeOffer, participant: Types.Participant, to: Types.Participant): ()
+    participant:TransferMoneyTo(to, offer.Money)
+    participant:TransferJailCards(to, offer.JailCards)
     
-    tradeManager.HasAcceptedProposal = accepted
-    processUpdatedAcceptance(tradeManager)
+    for _, asset in offer.Assets do
+        asset:TransferTo(to)
+    end
 end
 
-local onRequestResponded: {(tradeManager: Types.TradeManager, accepted: boolean) -> ()} = {}
+local function doTrade(trade: Types.Trade): ()
+    SendNotification(`[PLAYER] accepted a trade with [PLAYER]`, {trade.Participant1.Player, trade.Participant2.Player})
+    giveOfferToOtherParticipant(trade.Offers[trade.Participant1], trade.Participant1, trade.Participant2)
+    giveOfferToOtherParticipant(trade.Offers[trade.Participant2], trade.Participant2, trade.Participant1)
 
-local function RequestTradeWith(tradeManager: Types.TradeManager, to: Types.Participant): ClientTypes.TradeRequestInvokeResult
-    if isTradeActive(tradeManager) or tradeManager.SentOfferTo then
+    trade.Participant1.TradeManager:ResetBoth("TradeAccepted")
+end
+
+local function tryUpdateMoneyOffer(participant: Types.Participant, currentOffer: Types.TradeOffer, offer: ClientTypes.TradeOfferMoneyUpdate): ClientTypes.TradeOfferUpdateInvokeResult
+    if participant.Money < offer.Amount then
+        return "NotEnoughMoney"
+    end
+    currentOffer.Money = offer.Amount
+    return "Success"
+end
+
+local function tryUpdateJailCardsOffer(participant: Types.Participant, currentOffer: Types.TradeOffer, offer: ClientTypes.TradeOfferJailCardsUpdate): ClientTypes.TradeOfferUpdateInvokeResult
+    if participant.JailCards < offer.Amount then
+        return "NotEnoughJailCards"
+    end
+    currentOffer.JailCards = offer.Amount
+    return "Success"
+end
+
+local function tryUpdateAssetOffer(currentOffer: Types.TradeOffer, offer: ClientTypes.TradeOfferAssetUpdate, participant: Types.Participant): ClientTypes.TradeOfferUpdateInvokeResult
+    local asset = getAssetByName(participant, offer.Name)
+    if not asset then
+        return "UnownedAsset"
+    end
+
+    if offer.Mode == "Add" then
+        if table.find(currentOffer.Assets, asset) then
+            return "AssetAlreadyAdded"
+        end
+
+        table.insert(currentOffer.Assets, asset)
+    elseif offer.Mode == "Remove" then
+        local index = table.find(currentOffer.Assets, asset)
+        if index then
+            table.remove(currentOffer.Assets, index)
+        else
+            return "AssetAlreadyRemoved"
+        end
+    end
+
+    return "Success"
+end
+
+local function getOtherParticipant(tradeManager: Types.TradeManager): Types.Participant
+    assert(tradeManager.Trade, "TradeManager has no trade")
+    return if tradeManager.Trade.Participant1 == tradeManager.Participant then tradeManager.Trade.Participant2 else tradeManager.Trade.Participant1
+end
+
+local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.TradeResetReason): ()
+    assert(tradeManager.Trade, "TradeManager has no trade")
+
+    local otherParticipant = getOtherParticipant(tradeManager)
+
+    tradeManager.Trade = nil
+    otherParticipant.TradeManager.Trade = nil
+
+    FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, reason)
+    FireRemote(tradeRemotes.TradeEnded, otherParticipant, reason)
+end
+
+local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, offer: ClientTypes.TradeOfferUpdate): ClientTypes.TradeOfferUpdateInvokeResult
+    if not tradeManager.Trade then
+        return "Expired"
+    end
+
+    if getOtherParticipant(tradeManager).Player.Name ~= with then
+        return "Expired"
+    end
+
+    local participant = tradeManager.Participant
+
+    local currentOffer = tradeManager.Trade.Offers[participant]
+    local res: ClientTypes.TradeOfferUpdateInvokeResult
+    if offer.Kind == "Money" then
+        res = tryUpdateMoneyOffer(participant, currentOffer, offer)
+    elseif offer.Kind == "JailCards" then
+        res = tryUpdateJailCardsOffer(participant, currentOffer, offer)
+    elseif offer.Kind == "Asset" then
+        res = tryUpdateAssetOffer(currentOffer, offer, participant)
+    else
+        return "OtherError"
+    end
+
+    if res ~= "Success" then
+        return res
+    end
+
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, getOtherParticipant(tradeManager), offer)
+
+    return "Success"
+end
+
+local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, confirmed: boolean): ClientTypes.TradeOfferAcceptInvokeResult
+    if not tradeManager.Trade then
+        return "Expired"
+    end
+
+    if getOtherParticipant(tradeManager).Player.Name ~= with then
+        return "Expired"
+    end
+
+    tradeManager.Trade.Confirmation[tradeManager.Participant] = confirmed
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, getOtherParticipant(tradeManager), confirmed)
+
+    if tradeManager.Trade.Confirmation[tradeManager.Participant] and tradeManager.Trade.Confirmation[getOtherParticipant(tradeManager)] then
+        doTrade(tradeManager.Trade)
+    end
+
+    return "Success"
+end
+
+local function TryRejectOffer(tradeManager: Types.TradeManager, with: string): ClientTypes.TradeOfferRejectInvokeResult
+    if not tradeManager.Trade then
+        return "Success"
+    end
+
+    if getOtherParticipant(tradeManager).Player.Name ~= with then
+        return "Expired"
+    end
+
+    tradeManager:ResetBoth("TradeRejected")
+
+    return "Success"
+end
+
+local function TryRequestTrade(tradeManager: Types.TradeManager, name: string): ClientTypes.TradeRequestInvokeResult
+    if tradeManager.OutgoingTarget then
         return "SelfAlreadyTrading"
     end
 
-    if isTradeActive(to.TradeManager) or to.TradeManager.SentOfferTo then
+    if tradeManager.Trade or tradeManager.OutgoingTarget then
+        return "SelfAlreadyTrading"
+    end
+
+    local otherPlayer = Players:FindFirstChild(name)
+    if not otherPlayer or not otherPlayer:IsA("Player") or not otherPlayer:IsA("Configuration") then
+        return "OtherError"
+    end
+
+    local otherParticipant = tradeManager.Participant.Round:TryGetParticipant(otherPlayer)
+    if not otherParticipant then
+        return "OtherError"
+    end
+
+    if otherParticipant.TradeManager.Trade then
         return "OtherAlreadyTrading"
     end
 
-    if tradeManager.LastTradeRequestTimes[to] and GetTime() - (tradeManager.LastTradeRequestTimes[to] :: number) < TRADE_COOLDOWN then
+    local lastTradeAttempt = tradeManager.LastRequestTimes[otherParticipant]
+    if lastTradeAttempt and GetTime() - lastTradeAttempt < TRADE_COOLDOWN then
         return "Cooldown"
     end
 
-    if to.IsGoingBankrupt or tradeManager.Participant.IsGoingBankrupt then
-        return "Bankrupt"
-    end
+    local response: boolean?
 
-    assert(to ~= tradeManager.Participant, "Can't trade with yourself")
-
-    tradeManager.SentOfferTo = to
-    to.TradeManager.SentOfferTo = tradeManager.Participant
-    FireRemote(tradeRemotes:WaitForChild("ReceiveTradeRequest"), to, tradeManager.Participant.Player)
-
-    tradeManager.LastTradeRequestTimes[to] = GetTime()
-
-    local responded: boolean?
-    local function onResponded(otherTradeManager: Types.TradeManager, accepted: boolean): ()
-        if otherTradeManager == tradeManager then
-            responded = accepted
+    local botPlayer = tradeManager.Participant.Round:GetBotPlayer(tradeManager.Participant)
+    if botPlayer then
+        if botPlayer:EvaluateTrade() then
+            return "BotAcceptedOffer"
         end
+        return "BotDeclinedOffer"
     end
 
-    table.insert(onRequestResponded, onResponded)
+    local con: RBXScriptConnection
+    con = tradeRemotes.RespondTradeRequest.OnServerEvent:Connect(function(plr: Player, accepted: unknown)
+        if plr ~= otherPlayer then
+            return
+        end
 
-    while responded == nil and GetTime() - (tradeManager.LastTradeRequestTimes[to] :: number) < TRADE_TIMEOUT do
+        if typeof(accepted) ~= "boolean" then
+            return
+        end
+
+        response = accepted
+    end)
+
+    FireRemote(tradeRemotes.ReceiveTradeRequest, otherPlayer)
+
+    local startTime = GetTime()
+    while response == nil and startTime + TRADE_TIMEOUT > GetTime() do
         task.wait()
     end
 
-    table.remove(onRequestResponded, table.find(onRequestResponded, onResponded))
+    con:Disconnect()
 
-    if responded == nil then
-        to.TradeManager:RespondRequest(false)
+    if response == nil then
         return "Timeout"
-    elseif responded == false then
+    elseif response == false then
         return "Declined"
     end
 
     return "Success"
 end
 
-local function processRequestResponse(tradeManager: Types.TradeManager, with: Types.Participant, accepted: boolean): ()
-    FireRemote(tradeRemotes:WaitForChild("RespondedTradeRequest"), with, tradeManager.Participant.Player, accepted)
-
-    tradeManager.TradingWith = if accepted then with else nil
-    tradeManager.SentOfferTo = nil
-end
-
-local function RespondRequest(tradeManager: Types.TradeManager, accepted: boolean): ()
-    local sentTo = tradeManager.SentOfferTo
-    if not sentTo then
-        return
-    end
-
-    if (isTradeActive(tradeManager) or isTradeActive(sentTo.TradeManager)) and accepted then
-        return RespondRequest(tradeManager, false)
-    end
-
-    processRequestResponse(sentTo.TradeManager, tradeManager.Participant, accepted)
-    processRequestResponse(tradeManager, sentTo, accepted)
-
-    for _, v in onRequestResponded do
-        v(tradeManager, accepted)
-    end
-end
-
-local function UpdateOffer(tradeManager: Types.TradeManager, offer: ClientTypes.TradeOfferUpdate): ()
-    if not isTradeActive(tradeManager) then
-        return
-    end
-    assert(tradeManager.TradingWith)
-
-    if offer.Kind == "Money" then
-        OfferMoney(tradeManager, offer.Amount)
-    elseif offer.Kind == "Asset" then
-        OfferAsset(tradeManager, offer.Name)
-    elseif offer.Kind == "JailCards" then
-        OfferJailCards(tradeManager, offer.Amount)
-    else
-        error("Invalid trade offer kind")
-    end
-
-    tradeManager:SetProposalAccepted(false)
-    tradeManager.TradingWith.TradeManager:SetProposalAccepted(false)
-end
-
 function module.new(participant: Types.Participant): Types.TradeManager
-    local tradeManager = {}
+    return {
+        Participant = participant,
+        LastRequestTimes = {},
 
-    tradeManager.Participant = participant
+        Trade = nil,
+        
+        ResetBoth = ResetBoth,
 
-    tradeManager.HasAcceptedProposal = false
+        TryRequestTrade = TryRequestTrade,
 
-    tradeManager.OfferedAssets = {}
-    tradeManager.OfferedMoney = 0
-    tradeManager.OfferedJailCards = 0
-
-    tradeManager.UpdateOffer = UpdateOffer
-
-    tradeManager.OfferAsset = OfferAsset
-    tradeManager.OfferMoney = OfferMoney
-    tradeManager.OfferJailCards = OfferJailCards
-
-    tradeManager.SetProposalAccepted = SetProposalAccepted
-    tradeManager.FinishTrade = FinishTrade
-
-    tradeManager.RequestTradeWith = RequestTradeWith
-    tradeManager.RespondRequest = RespondRequest
-
-    tradeManager.LastTradeRequestTimes = {}
-
-    tradeManager.Reset = Reset
-
-    return tradeManager
+        TryUpdateOffer = TryUpdateOffer,
+        TryConfirmOffer = TryConfirmOffer,
+        TryRejectOffer = TryRejectOffer,
+    }
 end
 
 return module

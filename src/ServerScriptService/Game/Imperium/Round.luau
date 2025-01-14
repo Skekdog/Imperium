@@ -130,7 +130,7 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     task.defer(round.StartNextParticipantTurn, round)
 end
 
-local function TryGetParticipant(round: Types.Round, player: Player): Types.Participant?
+local function TryGetParticipant(round: Types.Round, player: Player | Configuration): Types.Participant?
     for _, participant in round.Participants do
         if participant.Player == player then
             return participant

@@ -14,17 +14,17 @@ export type ClientAssetView = {
     SellHouseValue: number?,
 }
 
-type TradeOfferJailCardsUpdate = {
+export type TradeOfferJailCardsUpdate = {
     Kind: "JailCards",
     Amount: number,
 }
 
-type TradeOfferMoneyUpdate = {
+export type TradeOfferMoneyUpdate = {
     Kind: "Money",
     Amount: number,
 }
 
-type TradeOfferAssetUpdate = {
+export type TradeOfferAssetUpdate = {
     Kind: "Asset",
     Name: string,
     Mode: "Add" | "Remove",
@@ -32,6 +32,19 @@ type TradeOfferAssetUpdate = {
 
 export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate | TradeOfferAssetUpdate
 
-export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt"?
+export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyHasOutgoingRequest" | "OtherAlreadyHasIncomingRequest"
+                                    | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt" | "Disconnected"
+                                    | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError"
+
+export type TradeRequestAcceptInvokeResult = "Success" | "Expired" | "OtherError"
+
+export type TradeOfferUpdateInvokeResult = "Success" | "Expired" | "NotEnoughMoney" | "NotEnoughJailCards"
+                                    | "UnownedAsset" | "AssetAlreadyAdded" | "AssetAlreadyRemoved" | "OtherError"
+
+export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError"
+
+export type TradeOfferRejectInvokeResult = "Success" | "Expired" | "OtherError"
+
+export type TradeResetReason = "TradeAccepted" | "TradeRejected" | "GoingBankrupt" | "Disconnected"
 
 return {}

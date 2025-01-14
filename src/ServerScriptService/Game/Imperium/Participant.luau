@@ -168,8 +168,8 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
         table.insert(players, to.Player)
     end
 
-    if participant.TradeManager.TradingWith then
-        participant.TradeManager:FinishTrade(false)
+    if participant.TradeManager.Trade then
+        participant.TradeManager:ResetBoth("GoingBankrupt")
     end
 
     local neededMoney = targetAmount - participant.Money

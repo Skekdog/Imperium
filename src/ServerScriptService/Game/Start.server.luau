@@ -200,11 +200,8 @@ Players.PlayerRemoving:Connect(function(plr)
         SendNotification(`[PLAYER] has left the game. Their assets will be auctioned off when their turn starts.`, {participant.Player})
         participant.HasDisconnected = true
 
-        if participant.TradeManager.TradingWith then
-            participant.TradeManager.OfferedAssets = {}
-            participant.TradeManager.OfferedMoney = 0
-            participant.TradeManager.OfferedJailCards = 0
-            participant.TradeManager:FinishTrade(false)
+        if participant.TradeManager.Trade then
+            participant.TradeManager:ResetBoth("Disconnected")
         end
     end
 end)
@@ -291,58 +288,44 @@ gameClientServer.UnmortgageProperty.OnServerEvent:Connect(function(plr, property
 end)
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
-tradeRemotes:WaitForChild("RequestTrade").OnServerInvoke = function(plr, to: unknown): ClientTypes.TradeRequestInvokeResult
-    if typeof(to) ~= "Instance" or not to:IsA("Player") or to == plr then
-        return
+tradeRemotes:WaitForChild("SendTradeRequest").OnServerInvoke = function(plr, to: unknown): ClientTypes.TradeRequestInvokeResult
+    if typeof(to) ~= "string" then
+        return "OtherError"
     end
 
     local requestingParticipant = round:TryGetParticipant(plr)
     if not requestingParticipant then
-        return
+        return "OtherError"
     end
 
-    local targetParticipant = round:TryGetParticipant(to)
-    if not targetParticipant then
-        return
-    end
-
-    return requestingParticipant.TradeManager:RequestTradeWith(targetParticipant)
+    return requestingParticipant.TradeManager:TryRequestTrade(to)
 end
 
-tradeRemotes:WaitForChild("AnswerTradeRequest").OnServerEvent:Connect(function(plr, target: unknown, accepted: unknown)
-    if typeof(accepted) ~= "boolean" or typeof(target) ~= "Instance" or not target:IsA("Player") then
-        return
+tradeRemotes:WaitForChild("SendTradeAcceptance").OnServerInvoke = function(plr, to: unknown, accepted: unknown): ClientTypes.TradeOfferAcceptInvokeResult
+    if typeof(to) ~= "string" or typeof(accepted) ~= "boolean" then
+        return "OtherError"
     end
 
-    local responder = round:TryGetParticipant(plr)
-    if not responder then
-        return
+    local requestingParticipant = round:TryGetParticipant(plr)
+    if not requestingParticipant then
+        return "OtherError"
     end
 
-    local trader = round:TryGetParticipant(target)
-    if not trader then
-        return
+    return requestingParticipant.TradeManager:TryConfirmOffer(to, accepted)
+end
+
+tradeRemotes:WaitForChild("RejectTradeOffer").OnServerInvoke = function(plr, to: unknown): ClientTypes.TradeOfferRejectInvokeResult
+    if typeof(to) ~= "string" then
+        return "OtherError"
     end
 
-    if trader.TradeManager.SentOfferTo ~= responder then
-        return
+    local requestingParticipant = round:TryGetParticipant(plr)
+    if not requestingParticipant then
+        return "OtherError"
     end
 
-    trader.TradeManager:RespondRequest(accepted)
-end)
-
-tradeRemotes:WaitForChild("TradeAcceptance").OnServerEvent:Connect(function(plr, accepted: unknown)
-    if typeof(accepted) ~= "boolean" and typeof(accepted) ~= "nil" then
-        return
-    end
-
-    local participant = round:TryGetParticipant(plr)
-    if not participant then
-        return
-    end
-
-    participant.TradeManager:SetProposalAccepted(accepted)
-end)
+    return requestingParticipant.TradeManager:TryRejectOffer(to)
+end
 
 local function isTradeOfferUpdate(value: ClientTypes.TradeOfferUpdate): boolean
     if typeof(value) ~= "table" then
@@ -364,17 +347,17 @@ local function isTradeOfferUpdate(value: ClientTypes.TradeOfferUpdate): boolean
     end
 end
 
-tradeRemotes:WaitForChild("UpdateOffer").OnServerEvent:Connect(function(plr, offer: ClientTypes.TradeOfferUpdate)
-    if not isTradeOfferUpdate(offer) then
-        return
+tradeRemotes:WaitForChild("UpdateTradeOffer").OnServerInvoke = function(plr, to: unknown, offer: ClientTypes.TradeOfferUpdate): ClientTypes.TradeOfferUpdateInvokeResult
+    if typeof(to) ~= "string" or not isTradeOfferUpdate(offer) then
+        return "OtherError"
     end
 
     local participant = round:TryGetParticipant(plr)
     if not participant then
-        return
+        return "OtherError"
     end
 
-    participant.TradeManager:UpdateOffer(offer)
-end)
+    return participant.TradeManager:TryUpdateOffer(to, offer)
+end
 
 round:StartRound()

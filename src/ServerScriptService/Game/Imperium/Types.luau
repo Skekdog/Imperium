@@ -117,33 +117,35 @@ export type Tile = {
     Asset: Asset?,
 }
 
+export type TradeOffer = {
+    Assets: {Asset},
+    Money: number,
+    JailCards: number,
+}
+
+export type Trade = {
+    Participant1: Participant,
+    Participant2: Participant,
+
+    Offers: {[Participant]: TradeOffer}, -- username: tradeoffer
+    Confirmation: {[Participant]: boolean}, -- username: has accepted
+}
+
 export type TradeManager = {
     Participant: Participant,
 
-    SentOfferTo: Participant?,
-    TradingWith: Participant?,
-
-    LastTradeRequestTimes: {[Participant]: number?},
-
-    HasAcceptedProposal: boolean,
+    OutgoingTarget: Participant?,
+    LastRequestTimes: {[Participant]: number?},
     
-    OfferedAssets: {Asset},
-    OfferedMoney: number,
-    OfferedJailCards: number,
+    Trade: Trade?,
 
-    UpdateOffer: (TradeManager, ClientTypes.TradeOfferUpdate) -> (),
-    
-    OfferAsset: (TradeManager, assetName: string) -> (),
-    OfferMoney: (TradeManager, amount: number) -> (),
-    OfferJailCards: (TradeManager, amount: number) -> (),
+    ResetBoth: (TradeManager, reason: ClientTypes.TradeResetReason) -> (),
 
-    RequestTradeWith: (TradeManager, with: Participant) -> ClientTypes.TradeRequestInvokeResult,
-    RespondRequest: (TradeManager, accepted: boolean) -> (),
+    TryRequestTrade: (TradeManager, name: string) -> ClientTypes.TradeRequestInvokeResult,
 
-    SetProposalAccepted: (TradeManager, accepted: boolean?) -> (),
-    FinishTrade: (TradeManager, accepted: boolean, reason: "GoingBankrupt"?) -> (),
-
-    Reset: (TradeManager, wasRejectedBy: Player?, reason: "GoingBankrupt") -> (),
+    TryUpdateOffer: (TradeManager, with: string, offer: ClientTypes.TradeOfferUpdate) -> ClientTypes.TradeOfferUpdateInvokeResult,
+    TryConfirmOffer: (TradeManager, with: string, confirmed: boolean) -> ClientTypes.TradeOfferAcceptInvokeResult,
+    TryRejectOffer: (TradeManager, with: string) -> ClientTypes.TradeOfferRejectInvokeResult,
 }
 
 export type Participant = {
@@ -270,7 +272,7 @@ export type Round = {
     GetBotPlayer: (Round, participant: Participant) -> BotPlayer?,
 
     StartRound: (Round) -> (),
-    TryGetParticipant: (Round, player: Player) -> Participant?,
+    TryGetParticipant: (Round, player: Player | Configuration) -> Participant?,
     StartNextParticipantTurn: (Round, participant: Participant?) -> (),
     SetNextParticipant: (Round) -> (),
 }
