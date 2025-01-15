@@ -46,17 +46,17 @@ local function getOwnedAssetsInSet(set: {Types.Asset}, participant: Types.Partic
     return count
 end
 
-local function canAssetBeDeveloped(bot: Types.BotPlayer, asset: Types.Asset): boolean
-    return not not bot.Participant.Round.BoardConfiguration.HousePrices[asset.AssetDescription.Colour]
+local function canAssetBeDeveloped(participant: Types.Participant, asset: Types.Asset): boolean
+    return not not participant.Round.BoardConfiguration.HousePrices[asset.AssetDescription.Colour]
 end
 
-local function baseAssetMultiplier(bot: Types.BotPlayer, asset: Types.Asset): number
+local function baseAssetMultiplier(participant: Types.Participant, asset: Types.Asset): number
     local multiplier = 1
     if asset.IsMortgaged then
         multiplier -= 0.1
     end
 
-    local canBeDeveloped = canAssetBeDeveloped(bot, asset)
+    local canBeDeveloped = canAssetBeDeveloped(participant, asset)
 
     if not canBeDeveloped then
         multiplier -= 0.2 -- Assets we can't build on are less valuable
@@ -71,8 +71,8 @@ local function baseAssetMultiplier(bot: Types.BotPlayer, asset: Types.Asset): nu
         end
     end
 
-    local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
-    local ownedCount = getOwnedAssetsInSet(set, bot.Participant)
+    local set = participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
+    local ownedCount = getOwnedAssetsInSet(set, participant)
     local totalCount = #set
 
     if ownedCount >= totalCount - 1 then
@@ -86,52 +86,11 @@ local function baseAssetMultiplier(bot: Types.BotPlayer, asset: Types.Asset): nu
 end
 
 local function EvaluateAssetForSale(bot: Types.BotPlayer, asset: Types.Asset, to: Types.Participant): number
-    local multiplier = baseAssetMultiplier(bot, asset)
-
-    local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
-    local countOwnedByTo = getOwnedAssetsInSet(set, to)
-    local countTotal = #set
-
-    if countOwnedByTo >= countTotal - 1 then
-        multiplier += 2 -- this asset is more valuable to them if they get a set for it
-    end
-
-    -- If they have more money we can squeeze them more
-    local relativePrice = to.Money / asset.AssetDescription.Price
-    if relativePrice > 1.5 then
-        multiplier += relativePrice / 15
-    end
-
-    print(`{bot.Player.Name} evaluates {asset.AssetDescription.Name} for selling {asset.AssetDescription.Price * multiplier} to {to.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
-
-    return asset.AssetDescription.Price * multiplier
+    return module.GetAssetValueForSaleTo(bot.Participant, asset, to)
 end
 
 local function EvaluateAssetForPurchase(bot: Types.BotPlayer, asset: Types.Asset, from: Types.AssetOwner): number
-    local multiplier = baseAssetMultiplier(bot, asset)
-
-    if from ~= "Bank" then
-        multiplier += 0.1 -- depriving people of things is good
-        local set = bot.Participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
-        local countOwnedByFrom = getOwnedAssetsInSet(set, from)
-        local countTotal = #set
-
-        if countOwnedByFrom == countTotal then
-            multiplier += 2 -- if we can deprive them of a set, great!
-        end
-    end
-
-    -- If we have more money we are happy to spend a little more. If not we should be a little stingy.
-    local relativePrice = bot.Participant.Money / asset.AssetDescription.Price
-    if relativePrice < 2 then
-        multiplier -= 1 / relativePrice / 3
-    else
-        multiplier += relativePrice / 10
-    end
-
-    print(`{bot.Player.Name} evaluates {asset.AssetDescription.Name} for purchasing {asset.AssetDescription.Price * multiplier} from {if from == "Bank" then "the Bank" else from.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
-
-    return asset.AssetDescription.Price * multiplier
+    return module.GetAssetValueForPurchaseFrom(bot.Participant, asset, from)
 end
 
 local validBids = {1, 10, 50, 100}
@@ -311,6 +270,55 @@ local function spawnCharacter(participant: Types.Participant, char: Model): ()
     char.Destroying:Connect(function()
         spawnCharacter(participant, char)
     end)
+end
+
+function module.GetAssetValueForPurchaseFrom(participant: Types.Participant, asset: Types.Asset, from: Types.AssetOwner): number
+    local multiplier = baseAssetMultiplier(participant, asset)
+
+    if from ~= "Bank" then
+        multiplier += 0.1 -- depriving people of things is good
+        local set = participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
+        local countOwnedByFrom = getOwnedAssetsInSet(set, from)
+        local countTotal = #set
+
+        if countOwnedByFrom == countTotal then
+            multiplier += 2 -- if we can deprive them of a set, great!
+        end
+    end
+
+    -- If we have more money we are happy to spend a little more. If not we should be a little stingy.
+    local relativePrice = participant.Money / asset.AssetDescription.Price
+    if relativePrice < 2 then
+        multiplier -= 1 / relativePrice / 3
+    else
+        multiplier += relativePrice / 10
+    end
+
+    print(`{participant.Player.Name} evaluates {asset.AssetDescription.Name} for purchasing {asset.AssetDescription.Price * multiplier} from {if from == "Bank" then "the Bank" else from.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
+
+    return asset.AssetDescription.Price * multiplier
+end
+
+function module.GetAssetValueForSaleTo(participant: Types.Participant, asset: Types.Asset, to: Types.Participant): number
+    local multiplier = baseAssetMultiplier(participant, asset)
+
+    local set = participant.Board:GetAllAssetsInColourGroup(asset.AssetDescription.Colour)
+    local countOwnedByTo = getOwnedAssetsInSet(set, to)
+    local countTotal = #set
+
+    if countOwnedByTo >= countTotal - 1 then
+        multiplier += 2 -- this asset is more valuable to them if they get a set for it
+    end
+
+    -- If they have more money we can squeeze them more
+    local relativePrice = to.Money / asset.AssetDescription.Price
+    if relativePrice > 1.5 then
+        multiplier += relativePrice / 15
+    end
+
+    print(`{participant.Player.Name} evaluates {asset.AssetDescription.Name} for selling {asset.AssetDescription.Price * multiplier} to {to.Player.Name}. Normal price {asset.AssetDescription.Price}.`)
+
+    return asset.AssetDescription.Price * multiplier
 end
 
 function module.new(round: Types.Round, name: string): Types.BotPlayer
