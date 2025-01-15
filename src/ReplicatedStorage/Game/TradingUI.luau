@@ -7,9 +7,12 @@ local UIAnimation = require(ReplicatedStorage.Shared.UIAnimation)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
+local lclPlayer = Players.LocalPlayer
+
 type AssetData = {
     Button: CreateAssetButton.Button,
-    Owner: string
+    Owner: string,
+    Name: string,
 }
 local assets: {[string]: AssetData?} = {}
 
@@ -73,8 +76,50 @@ local function bindToClick(button: TextButton, callback: () -> ())
     clickCons[button] = button.Activated:Connect(callback)
 end
 
+local function offerAsset(assetData: AssetData): ()
+    local offer: ClientTypes.TradeOfferAssetUpdate = {
+        Kind = "Asset",
+        Name = assetData.Name,
+        Mode = "Add",
+    }
+
+    assetData.Button.Parent = if assetData.Owner == lclPlayer.Name then ourOffer :: any else theirOffer :: any
+
+    local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+    if not success then
+        if assetData.Owner == lclPlayer.Name then
+            assetData.Button.Parent = ourItems :: any
+        elseif assetData.Owner == currentTrader then
+            assetData.Button.Parent = theirItems :: any
+        end
+    end
+end
+
+local function retractAsset(assetData: AssetData): ()
+    local offer: ClientTypes.TradeOfferAssetUpdate = {
+        Kind = "Asset",
+        Name = assetData.Name,
+        Mode = "Remove",
+    }
+
+    assetData.Button.Parent = if assetData.Owner == lclPlayer.Name then ourItems :: any else theirItems :: any
+
+    local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+    if not success then
+        if assetData.Owner == lclPlayer.Name then
+            assetData.Button.Parent = ourOffer :: any
+        elseif assetData.Owner == currentTrader then
+            assetData.Button.Parent = theirOffer :: any
+        end
+    end
+end
+
 local function processAssetButtonClick(assetData: AssetData): ()
-    
+    if assetData.Button.Parent == ourItems :: any or assetData.Button.Parent == theirItems :: any then
+        offerAsset(assetData)
+    elseif assetData.Button.Parent == ourOffer :: any or assetData.Button.Parent == theirOffer :: any then
+        retractAsset(assetData)
+    end
 end
 
 serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: string, asset: ClientTypes.ClientAssetView): ()
@@ -94,6 +139,7 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: str
         assets[asset.Name] = {
             Button = button,
             Owner = plr,
+            Name = asset.Name,
         }
 
         bindToClick(button, function()
