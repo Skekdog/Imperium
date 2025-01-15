@@ -8,6 +8,8 @@ local BotCharacters = require(ServerScriptService.Shared.BotNames)
 local Participant = require(script.Parent.Participant)
 local Types = require(script.Parent.Types)
 
+local JAIL_CARD_VALUE_MULTIPLIER = 0.8
+
 local module = {}
 
 local function sortAssetPriceAscending(tbl: {[number]: Types.Asset}): ()
@@ -134,7 +136,23 @@ local function EvaluateSkipJail(bot: Types.BotPlayer): boolean
 end
 
 local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeManager): boolean
-    return false
+    local trade = assert(tradeManager.Trade, "TradeManager has no trade")
+
+    local them = tradeManager:GetOtherParticipant()
+
+    local ourOffer = trade.Offers[bot.Participant]
+    local ourTotalValue = ourOffer.Money + (ourOffer.JailCards * bot.Participant.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
+    for _, v in ourOffer.Assets do
+        ourTotalValue += bot:EvaluateAssetForSale(v, them)
+    end
+
+    local theirOffer = trade.Offers[them]
+    local theirTotalValue = theirOffer.Money + (theirOffer.JailCards * them.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
+    for _, v in theirOffer.Assets do
+        theirTotalValue += EvaluateAssetForSale(bot, v, them)
+    end
+
+    return ourTotalValue > theirTotalValue
 end
 
 local function DecideMove(bot: Types.BotPlayer): "Dice" | "JailCard" | "Fine"
