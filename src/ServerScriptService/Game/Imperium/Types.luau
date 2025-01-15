@@ -139,6 +139,7 @@ export type TradeManager = {
     
     Trade: Trade?,
 
+    GetOtherParticipant: (TradeManager) -> Participant,
     ResetBoth: (TradeManager, reason: ClientTypes.TradeResetReason) -> (),
 
     TryRequestTrade: (TradeManager, name: string) -> ClientTypes.TradeRequestInvokeResult,

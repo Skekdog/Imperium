@@ -80,15 +80,10 @@ local function tryUpdateAssetOffer(currentOffer: Types.TradeOffer, offer: Client
     return "Success"
 end
 
-local function getOtherParticipant(tradeManager: Types.TradeManager): Types.Participant
-    assert(tradeManager.Trade, "TradeManager has no trade")
-    return if tradeManager.Trade.Participant1 == tradeManager.Participant then tradeManager.Trade.Participant2 else tradeManager.Trade.Participant1
-end
-
 local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.TradeResetReason): ()
     assert(tradeManager.Trade, "TradeManager has no trade")
 
-    local otherParticipant = getOtherParticipant(tradeManager)
+    local otherParticipant = tradeManager:GetOtherParticipant()
 
     tradeManager.Trade = nil
     otherParticipant.TradeManager.Trade = nil
@@ -102,7 +97,7 @@ local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, of
         return "Expired"
     end
 
-    if getOtherParticipant(tradeManager).Player.Name ~= with then
+    if tradeManager:GetOtherParticipant().Player.Name ~= with then
         return "Expired"
     end
 
@@ -124,7 +119,7 @@ local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, of
         return res
     end
 
-    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, getOtherParticipant(tradeManager), offer)
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, tradeManager:GetOtherParticipant(), offer)
 
     return "Success"
 end
@@ -134,14 +129,14 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
         return "Expired"
     end
 
-    if getOtherParticipant(tradeManager).Player.Name ~= with then
+    if tradeManager:GetOtherParticipant().Player.Name ~= with then
         return "Expired"
     end
 
     tradeManager.Trade.Confirmation[tradeManager.Participant] = confirmed
-    FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, getOtherParticipant(tradeManager), confirmed)
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), confirmed)
 
-    if tradeManager.Trade.Confirmation[tradeManager.Participant] and tradeManager.Trade.Confirmation[getOtherParticipant(tradeManager)] then
+    if tradeManager.Trade.Confirmation[tradeManager.Participant] and tradeManager.Trade.Confirmation[tradeManager:GetOtherParticipant()] then
         doTrade(tradeManager.Trade)
     end
 
@@ -153,7 +148,7 @@ local function TryRejectOffer(tradeManager: Types.TradeManager, with: string): C
         return "Success"
     end
 
-    if getOtherParticipant(tradeManager).Player.Name ~= with then
+    if tradeManager:GetOtherParticipant().Player.Name ~= with then
         return "Expired"
     end
 
@@ -231,13 +226,20 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string): 
     return "Success"
 end
 
+local function GetOtherParticipant(tradeManager: Types.TradeManager): Types.Participant
+    assert(tradeManager.Trade, "TradeManager has no trade")
+    return if tradeManager.Trade.Participant1 == tradeManager.Participant then tradeManager.Trade.Participant2 else tradeManager.Trade.Participant1
+end
+
 function module.new(participant: Types.Participant): Types.TradeManager
     return {
         Participant = participant,
         LastRequestTimes = {},
 
         Trade = nil,
+        OutgoingTarget = nil,
         
+        GetOtherParticipant = GetOtherParticipant,
         ResetBoth = ResetBoth,
 
         TryRequestTrade = TryRequestTrade,
