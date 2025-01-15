@@ -30,6 +30,19 @@ export type TradeOfferAssetUpdate = {
     Mode: "Add" | "Remove",
 }
 
+export type InitialTradeOffer = {
+    OurOffer: {
+        Money: number,
+        JailCards: number,
+        Assets: {string},
+    },
+    TheirOffer: {
+        Money: number,
+        JailCards: number,
+        Assets: {string},
+    }
+}
+
 export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate | TradeOfferAssetUpdate
 
 export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyHasOutgoingRequest" | "OtherAlreadyHasIncomingRequest"

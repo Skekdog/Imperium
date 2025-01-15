@@ -6,10 +6,15 @@ local ScreenMessage = require(script.Parent.Parent.Shared.ScreenMessage)
 local TradingUI = require(script.Parent.TradingUI)
 
 return function(plr: Player | Configuration): ()
-    local response: ClientTypes.TradeRequestInvokeResult = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("SendTradeRequest"):InvokeServer(plr.Name)
+    local offer = TradingUI.DraftTrade(plr)
+    if not offer then
+        return
+    end
+    
+    local response: ClientTypes.TradeRequestInvokeResult = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("SendTradeRequest"):InvokeServer(plr.Name, offer)
     
     if response == "Success" then
-        return TradingUI(plr)
+        return TradingUI.Trading(plr)
     elseif response == "BotAcceptedOffer" then
         return ScreenMessage("Success", `{GetPlayerName(plr)} accepted your trade offer.`)
     elseif response == "BotDeclinedOffer" then

@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetPlayerName = require(ReplicatedStorage.Shared.GetPlayerName)
 local ScreenMessage = require(ReplicatedStorage.Shared.ScreenMessage)
 local ClientTypes = require(script.Parent.ClientTypes)
 local CreateAssetButton = require(script.Parent.CreateAssetButton)
@@ -285,6 +286,67 @@ end
 
 reset()
 
-return function(): ()
+local module = {}
 
+function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialTradeOffer?
+    reset()
+
+    currentTrader = player.Name
+
+    for _, v in assets do
+        assert(v)
+        if v.Owner == lclPlayer.Name then
+            v.Button.Parent = ourItems :: any
+        elseif v.Owner == player.Name then
+            v.Button.Parent = theirItems :: any
+        end
+    end
+
+    object.Title:SetAttribute("Player_1", GetPlayerName(player))
+    object.Title:SetAttribute("Format", `Drafting Trade with [PLAYER]`)
+    object.Title:AddTag("DynamicNames")
+
+    object.Choices.Reject.Visible = false
+    object.Choices.Accept.Visible = false
+
+    object.Choices.Propose.Visible = true
+    object.Choices.Cancel.Visible = true
+
+    ui:ToggleVisible(true)
+
+    local proposed: boolean?
+    bindToClick(object.Choices.Propose, function()
+        proposed = true
+    end)
+
+    bindToClick(object.Choices.Cancel, function()
+        proposed = false
+    end)
+
+    while proposed == nil do
+        task.wait()
+    end
+
+    if proposed then
+        return {
+            OurOffer = {
+                Money = ourMoneyOffer,
+                JailCards = ourJailCardsOffer,
+                Assets = {}, --todo: this
+            },
+            TheirOffer = {
+                Money = 0, -- todo: also this
+                JailCards = 0,
+                Assets = {},
+            }
+        }
+    end
+
+    return nil
 end
+
+function module.Trading(player: Player | Configuration): ()
+    
+end
+
+return module
