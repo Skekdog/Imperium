@@ -104,6 +104,47 @@ end
 makeMoneyOfferButtons(ourItems.MoneyOffers)
 makeMoneyOfferButtons(theirItems.MoneyOffers)
 
+local jailCardOfferTemplate = ourItems.JailCardOffers.Template
+
+local ourJailCardOfferButtons: {[typeof(jailCardOfferTemplate)]: number} = {}
+local theirJailCardOfferButtons: {[typeof(jailCardOfferTemplate)]: number} = {}
+
+local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) | typeof(theirItems.JailCardOffers)): ()
+    for _, v in {1, -1} do
+        local clone = jailCardOfferTemplate:Clone()
+        clone.Name = tostring(v)
+        clone.Text = `{if v > 0 then "+" else ""}{v} Jail Card`
+        clone.Visible = true
+        clone.Parent = parent :: any
+
+        bindToClick(clone, function()
+            if ourJailCardsOffer + v > getPlayerMoney() then
+                return ScreenMessage("Error", "You don't have enough money.")
+            end
+
+            ourJailCardsOffer += v
+
+            local offer: ClientTypes.TradeOfferJailCardsUpdate = {
+                Kind = "JailCards",
+                Amount = v
+            }
+            
+            local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+            if not success then
+                ourJailCardsOffer -= v
+            end
+        end)
+
+        if parent == ourItems.JailCardOffers then
+            ourJailCardOfferButtons[clone] = v
+        else
+            theirJailCardOfferButtons[clone] = v
+        end
+    end
+end
+makeJailCardOfferButtons(ourItems.JailCardOffers)
+makeJailCardOfferButtons(theirItems.JailCardOffers)
+
 local isHidden = false
 local function setHidden(hidden: boolean): ()
     isHidden = hidden
