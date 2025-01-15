@@ -7,7 +7,11 @@ local UIAnimation = require(ReplicatedStorage.Shared.UIAnimation)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
-local assetButtons: {[string]: CreateAssetButton.Button?} = {}
+type AssetData = {
+    Button: CreateAssetButton.Button,
+    Owner: string
+}
+local assets: {[string]: AssetData?} = {}
 
 local ui = UIManager.WaitForUI("Trading") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Trading)}
 local object = ui.Object
@@ -69,12 +73,41 @@ local function bindToClick(button: TextButton, callback: () -> ())
     clickCons[button] = button.Activated:Connect(callback)
 end
 
+local function processAssetButtonClick(assetData: AssetData): ()
+    
+end
+
+serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: string, asset: ClientTypes.ClientAssetView): ()
+    local assetData = assets[asset.Name]
+    if assetData then
+        assetData.Owner = plr
+        
+        if plr == currentTrader then
+            assetData.Button.Parent = theirItems :: any
+        elseif plr == Players.LocalPlayer.Name then
+            assetData.Button.Parent = ourItems :: any
+        else
+            assetData.Button.Parent = nil :: any
+        end
+    else
+        local button = CreateAssetButton(UDim2.new(1, 0, 0.15, 0), asset)
+        assets[asset.Name] = {
+            Button = button,
+            Owner = plr,
+        }
+
+        bindToClick(button, function()
+            processAssetButtonClick(assert(assets[asset.Name]))
+        end)
+    end
+end)
+
 local moneyOfferTemplate = ourItems.MoneyOffers.Template
 
 local ourMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
 local theirMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
 
-local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | typeof(theirItems.MoneyOffers)): ()
+local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | typeof(theirItems.MoneyOffers), isOwn: boolean): ()
     for _, v in {1, 10, 100, -100, -10, -1} do
         local clone = moneyOfferTemplate:Clone()
         clone.Name = tostring(v)
@@ -83,7 +116,7 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if ourMoneyOffer + v > getPlayerMoney() then
+            if ourMoneyOffer + v > getPlayerMoney(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", "You don't have enough money.")
             end
 
@@ -107,15 +140,15 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
         end
     end
 end
-makeMoneyOfferButtons(ourItems.MoneyOffers)
-makeMoneyOfferButtons(theirItems.MoneyOffers)
+makeMoneyOfferButtons(ourItems.MoneyOffers, true)
+makeMoneyOfferButtons(theirItems.MoneyOffers, false)
 
 local jailCardOfferTemplate = ourItems.JailCardOffers.Template
 
 local ourJailCardOfferButtons: {[typeof(jailCardOfferTemplate)]: number} = {}
 local theirJailCardOfferButtons: {[typeof(jailCardOfferTemplate)]: number} = {}
 
-local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) | typeof(theirItems.JailCardOffers)): ()
+local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) | typeof(theirItems.JailCardOffers), isOwn: boolean): ()
     for _, v in {1, -1} do
         local clone = jailCardOfferTemplate:Clone()
         clone.Name = tostring(v)
@@ -124,7 +157,7 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if ourJailCardsOffer + v > getPlayerJailCards() then
+            if ourJailCardsOffer + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", "You don't have enough jail cards.")
             end
 
@@ -148,8 +181,8 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         end
     end
 end
-makeJailCardOfferButtons(ourItems.JailCardOffers)
-makeJailCardOfferButtons(theirItems.JailCardOffers)
+makeJailCardOfferButtons(ourItems.JailCardOffers, true)
+makeJailCardOfferButtons(theirItems.JailCardOffers, false)
 
 local isHidden = false
 local function setHidden(hidden: boolean): ()
@@ -191,8 +224,8 @@ local function reset(): ()
         assert(v):Disconnect()
     end
 
-    for _, v in assetButtons do
-        assert(v).Parent = nil :: any
+    for _, v in assets do
+        assert(v).Button.Parent = nil :: any
     end
 
     ourMoneyOffer = 0
