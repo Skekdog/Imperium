@@ -1,39 +1,23 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UIAnimation = require(ReplicatedStorage.Shared.UIAnimation)
-local ClientTypes = require(script.Parent.ClientTypes)
 local CreateAssetButton = require(script.Parent.CreateAssetButton)
+local UIAnimation = require(ReplicatedStorage.Shared.UIAnimation)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
-local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
-local ScreenMessage = require(script.Parent.Parent.Shared.ScreenMessage)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
-type Inventory = {[string]: typeof(CreateAssetButton(nil :: any, nil :: any))?}
-local inventories: {[Player]: Inventory?} = {}
+local assetButtons: {[string]: CreateAssetButton.Button?} = {}
 
 local ui = UIManager.WaitForUI("Trading") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Trading)}
 local object = ui.Object
 
-local yourItems = object.YourItems.Items
+local ourItems = object.YourItems.Items
 local theirItems = object.TheirItems.Items
-local yourOffer = object.YourOffer.Items
+local ourOffer = object.YourOffer.Items
 local theirOffer = object.TheirOffer.Items
-
-local confirmButton = object.Choices.Accept
-local rejectButton = object.Choices.Reject
-
-local currentTrader: Player?
-local youAccepted = false
-local theyAccepted = false
-
-local offeredMoney = 0
-local offeredJailCards = 0
 
 local serverClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
 local clickCons: {[TextButton]: RBXScriptConnection?} = {}
-
 local function bindToClick(button: TextButton, callback: () -> ())
     local old = clickCons[button]
     if old then
@@ -43,296 +27,81 @@ local function bindToClick(button: TextButton, callback: () -> ())
     clickCons[button] = button.Activated:Connect(callback)
 end
 
+local moneyOfferTemplate = ourItems.MoneyOffers.Template
+
+local ourMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
+local theirMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
+
+local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | typeof(theirItems.MoneyOffers)): ()
+    for _, v in {1, 10, 100, -100, -10, -1} do
+        local clone = moneyOfferTemplate:Clone()
+        clone.Name = tostring(v)
+        clone.Text = `{if v > 0 then "+" else ""}{GetCurrencySymbol()}{v}`
+        clone.Parent = parent :: any
+
+        if parent == ourItems.MoneyOffers then
+            ourMoneyOfferButtons[clone] = v
+        else
+            theirMoneyOfferButtons[clone] = v
+        end
+    end
+end
+makeMoneyOfferButtons(ourItems.MoneyOffers)
+makeMoneyOfferButtons(theirItems.MoneyOffers)
+
 local isHidden = false
-object.Hide.Activated:Connect(function()
-    isHidden = not isHidden
+local function setHidden(hidden: boolean): ()
+    isHidden = hidden
     UIAnimation.Animate(object, TweenInfo.new(0.25), {
         Position = UDim2.fromScale(if isHidden then 1 else 0.5, 0.5),
         AnchorPoint = Vector2.new(if isHidden then 0 else 0.5, 0.5),
     })
+end
+
+object.Hide.Activated:Connect(function()
+    setHidden(not isHidden)
 end)
 
-local function offerAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
-    local offer: ClientTypes.TradeOfferUpdate = {
-        Kind = "Asset",
-        Name = asset.Name,
-        Mode = "Add",
-    }
-    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(offer)
+local function updateDisplayedMoneyOffer(label: TextLabel, value: number): ()
+    if value == 0 then
+        label.Visible = false
+        return
+    end
+
+    label.Text = `{GetCurrencySymbol()}{value} Cash`
+    label.Visible = true
 end
 
-local function retractAsset(button: CreateAssetButton.Button, asset: ClientTypes.ClientAssetView): ()
-    local offer: ClientTypes.TradeOfferUpdate = {
-        Kind = "Asset",
-        Name = asset.Name,
-        Mode = "Remove",
-    }
-    tradeRemotes:WaitForChild("UpdateOffer"):FireServer(offer)
+local function updateDisplayJailCardsOffer(label: TextLabel, value: number): ()
+    if value == 0 then
+        label.Visible = false
+        return
+    end
+
+    label.Text = `{value} Jail Cards`
+    label.Visible = true
 end
 
-serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Player, asset: ClientTypes.ClientAssetView)
-    local inventory = inventories[plr] or {}
-    inventories[plr] = inventory
-    
-    local button = (inventory[asset.Name] or CreateAssetButton(UDim2.new(1, 0, 0.15, 0), asset)) :: CreateAssetButton.Button
-    inventory[asset.Name] = button
+local function resetUI(): ()
+    setHidden(false)
 
-    if currentTrader == plr then
-        button.Parent = theirItems :: any
+    for _, v in clickCons do
+        assert(v):Disconnect()
     end
 
-    if plr == Players.LocalPlayer and not button.Parent then
-        button.Parent = yourItems :: any
-
-        bindToClick(button, function()
-            if button.Parent == yourItems :: any then
-                offerAsset(button, asset)
-            else
-                retractAsset(button, asset)
-            end
-        end)
-    elseif plr == currentTrader and not button.Parent then
-        button.Parent = theirItems :: any
-    end
-end)
-
-local moneyAmounts = {-100, -10, 10, 100}
-local jailCardAmounts = {-1, 1}
-
-local offerMoneyButtons: {[TextButton]: number} = {}
-local offerJailCardButtons: {[TextButton]: number} = {}
-
-local function updateOfferMoneyButtons(): ()
-    local money = Players.LocalPlayer:GetAttribute("Money") :: number? or 0
-
-    local makeFrameVisible = false
-    for i, v in offerMoneyButtons do
-        if v > 0 then
-            i.Visible = offeredMoney + v <= money
-        else
-            i.Visible = offeredMoney >= math.abs(v)
-        end
-
-        if not makeFrameVisible then
-            makeFrameVisible = i.Visible
-        end
+    for _, v in assetButtons do
+        assert(v).Parent = nil :: any
     end
 
-    yourItems.MoneyOffers.Visible = makeFrameVisible
+    updateDisplayedMoneyOffer(ourOffer.OfferedMoney, 0)
+    updateDisplayedMoneyOffer(theirOffer.OfferedMoney, 0)
+
+    updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, 0)
+    updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, 0)
 end
 
-local function updateOfferJailCardButtons(): ()
-    local jailCards = Players.LocalPlayer:GetAttribute("GetOutOfJailFreeCards") :: number? or 0
+resetUI()
 
-    local makeFrameVisible = false
-    for i, v in offerJailCardButtons do
-        if v > 0 then
-            i.Visible = offeredJailCards + v <= jailCards
-        else
-            i.Visible = offeredJailCards >= math.abs(v)
-        end
+return function(): ()
 
-        if not makeFrameVisible then
-            makeFrameVisible = i.Visible
-        end
-    end
-
-    yourItems.JailCardOffers.Visible = makeFrameVisible
-end
-
-for i, v in moneyAmounts do
-    local button = yourItems.MoneyOffers.Template:Clone()
-
-    button.Visible = true
-    button.LayoutOrder = i
-    button.Text = `{if v < 0 then "-" else "+"}{GetCurrencySymbol()}{math.abs(v)}`
-
-    bindToClick(button, function()
-        offeredMoney += v
-        local offer: ClientTypes.TradeOfferUpdate = {
-            Kind = "Money",
-            Amount = offeredMoney,
-        }
-        tradeRemotes:WaitForChild("UpdateOffer"):FireServer(offer)
-
-        updateOfferMoneyButtons()
-    end)
-
-    button.Parent = yourItems.MoneyOffers
-
-    offerMoneyButtons[button] = v
-end
-yourItems.MoneyOffers.UIGridLayout.CellSize = UDim2.new(1 / #moneyAmounts, -5, 1, 0)
-
-for i, v in jailCardAmounts do
-    local button = yourItems.JailCardOffers.Template:Clone()
-
-    button.Visible = true
-    button.LayoutOrder = i
-    button.Text = `{if v < 0 then "-" else "+"}{v} Jail Card{if v == 1 then "" else "s"}`
-
-    bindToClick(button, function()
-        offeredJailCards += v
-        local offer: ClientTypes.TradeOfferUpdate = {
-            Kind = "JailCards",
-            Amount = offeredJailCards,
-        }
-        tradeRemotes:WaitForChild("UpdateOffer"):FireServer(offer)
-
-        updateOfferJailCardButtons()
-    end)
-
-    button.Parent = yourItems.JailCardOffers
-
-    offerJailCardButtons[button] = v
-end
-yourItems.JailCardOffers.UIGridLayout.CellSize = UDim2.new(1 / #jailCardAmounts, -5, 1, 0)
-
-serverClient:WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: Player, assetName: string)
-    local inventory = inventories[plr]
-    assert(inventory, "No inventory found for player: " .. plr.Name)
-
-    local button = inventory[assetName]
-    inventory[assetName] = nil
-
-    assert(button, "No button found for asset: " .. assetName)
-    button:Destroy()
-end)
-
-tradeRemotes:WaitForChild("UpdateOffer").OnClientEvent:Connect(function(plr: Player, offer: ClientTypes.TradeOfferUpdate)
-    if offer.Kind == "Asset" then
-        local inventory = inventories[plr]
-        assert(inventory, "No inventory found for player: " .. plr.Name)
-
-        local button = inventory[offer.Name]
-        assert(button, "No button found for asset: " .. offer.Name)
-        if offer.Mode == "Add" then
-            button.Parent = if plr == Players.LocalPlayer then yourOffer :: any else theirOffer :: any
-        elseif offer.Mode == "Remove" then
-            button.Parent = if plr == Players.LocalPlayer then yourItems :: any else theirItems :: any
-        end
-    elseif offer.Kind == "Money" then
-        local label = (if plr == Players.LocalPlayer then yourOffer.OfferedMoney else theirOffer.OfferedMoney) :: TextLabel
-        if offer.Amount <= 0 then
-            label.Visible = false
-            return
-        end
-        label.Text = `{GetCurrencySymbol()}{offer.Amount}`
-        label.Visible = true
-    elseif offer.Kind == "JailCards" then
-        local label = (if plr == Players.LocalPlayer then yourOffer.OfferedJailCards else theirOffer.OfferedJailCards) :: TextLabel
-        if offer.Amount <= 0 then
-            label.Visible = false
-            return
-        end
-        label.Text = `{offer.Amount} Jail Card{if offer.Amount == 1 then "" else "s"}`
-        label.Visible = true
-    else
-        error("Unknown offer kind: " .. offer.Kind)
-    end
-end)
-
-local function updatedAcceptance(): ()
-    local num = 0
-    if theyAccepted then
-        num += 1
-    end
-    if youAccepted then
-        num += 1
-        confirmButton.Text = `Unconfirm ({num}/2)`
-    else
-        confirmButton.Text = `Confirm ({num}/2)`
-    end
-end
-
-tradeRemotes:WaitForChild("TradeAcceptance").OnClientEvent:Connect(function(plr: Player, accepted: boolean)
-    if plr == Players.LocalPlayer then
-        youAccepted = accepted
-    elseif plr == currentTrader then
-        theyAccepted = accepted
-    end
-
-    updatedAcceptance()
-end)
-
-tradeRemotes:WaitForChild("TradeEnded").OnClientEvent:Connect(function(reason: Player | "GoingBankrupt"?)
-    ui:ToggleVisible(false)
-    if typeof(reason) == "Instance" and reason ~= Players.LocalPlayer then
-        ScreenMessage("Error", "The other player rejected your trade.")
-    elseif reason == "GoingBankrupt" then
-        ScreenMessage("Error", "Trade cancelled due to ongoing bankruptcy.")
-    end
-end)
-
-local function clearObject(object: ScrollingFrame): ()
-    for _, button in object:GetChildren() do
-        if button:IsA("TextButton") then
-            button.Parent = nil
-        end
-    end
-end
-
-local function moveButtons(from: Inventory, to: ScrollingFrame): ()
-    for _, button in from do
-        assert(button)
-        button.Parent = to :: any
-    end
-end
-
-Players.LocalPlayer:GetAttributeChangedSignal("Money"):Connect(updateOfferMoneyButtons)
-Players.LocalPlayer:GetAttributeChangedSignal("GetOutOfJailFreeCards"):Connect(updateOfferJailCardButtons)
-
-return function(target: Player): ()
-    local yourInventory = inventories[Players.LocalPlayer]
-    clearObject(yourItems)
-
-    if yourInventory then
-        moveButtons(yourInventory, yourItems)
-    end
-
-    local theirInventory = inventories[target]
-    clearObject(theirItems)
-
-    clearObject(theirOffer)
-    clearObject(yourOffer)
-
-    if theirInventory then
-        moveButtons(theirInventory, theirItems)
-    end
-
-    currentTrader = target
-    youAccepted = false
-    theyAccepted = false
-
-    offeredMoney = 0
-    offeredJailCards = 0
-
-    theirOffer.OfferedMoney.Visible = false
-    yourOffer.OfferedMoney.Visible = false
-
-    theirOffer.OfferedJailCards.Visible = false
-    yourOffer.OfferedJailCards.Visible = false
-
-    updateOfferJailCardButtons()
-    updateOfferMoneyButtons()
-
-    updatedAcceptance()
-
-    object.TheirItems.Title:SetAttribute("Player_1", GetPlayerName(target))
-    object.TheirItems.Title:SetAttribute("Format", "[PLAYER]")
-    object.TheirItems:AddTag("DynamicNames")
-
-    object.TheirOffer.Title:SetAttribute("Player_1", GetPlayerName(target))
-    object.TheirOffer.Title:SetAttribute("Format", "[PLAYER]")
-    object.TheirOffer:AddTag("DynamicNames")
-
-    bindToClick(confirmButton, function()
-        tradeRemotes:WaitForChild("TradeAcceptance"):FireServer(not youAccepted)
-    end)
-
-    bindToClick(rejectButton, function()
-        tradeRemotes:WaitForChild("TradeAcceptance"):FireServer(nil)
-    end)
-
-    ui:ToggleVisible(true)
 end
