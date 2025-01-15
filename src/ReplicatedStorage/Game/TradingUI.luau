@@ -40,6 +40,12 @@ local function getPlayerMoney(playerName: string?): number
     return player:GetAttribute("Money") :: number or 0
 end
 
+local function getPlayerJailCards(playerName: string?): number
+    local player = if playerName then Players:FindFirstChild(playerName) else Players.LocalPlayer
+    assert(player and (player:IsA("Player") or player:IsA("Configuration")), "Player not found")
+    return player:GetAttribute("JailCards") :: number or 0
+end
+
 local currentTrader: string?
 
 local ourItems = object.YourItems.Items
@@ -118,8 +124,8 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if ourJailCardsOffer + v > getPlayerMoney() then
-                return ScreenMessage("Error", "You don't have enough money.")
+            if ourJailCardsOffer + v > getPlayerJailCards() then
+                return ScreenMessage("Error", "You don't have enough jail cards.")
             end
 
             ourJailCardsOffer += v
