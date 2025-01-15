@@ -15,7 +15,6 @@ local UIManager = require(script.Parent.Parent.Shared.UIManager)
 local PayFine = require(script.Parent.PayFine)
 local RollDice = require(script.Parent.RollDice)
 local ToggleMovementEnabled = require(script.Parent.ToggleMovementEnabled)
-local TradingUI = require(script.Parent.TradingUI)
 local UseGetOutOfJailFreeCard = require(script.Parent.UseGetOutOfJailFreeCard)
 local ViewDeed = require(script.Parent.ViewDeed)
 
@@ -23,7 +22,6 @@ KeybindHintManager()
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ClientServer")
-local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
 local localPlayer = Players.LocalPlayer
@@ -205,12 +203,6 @@ gameServerClient:WaitForChild("AnimateJailBars").OnClientEvent:Connect(function(
 end)
 gameServerClient:WaitForChild("AnimateDevelopmentModel").OnClientEvent:Connect(function(model: MeshPart, targetCFrame: CFrame)
     LerpModelCFrame(model, targetCFrame, 1)
-end)
-
-tradeRemotes:WaitForChild("RespondedTradeRequest").OnClientEvent:Connect(function(plr: Player, accepted: boolean)
-    if accepted then
-        TradingUI(plr)
-    end
 end)
 
 ReplicatedStorage:WaitForChild("Shared"):WaitForChild("ServerClient"):WaitForChild("SendNotification").OnClientEvent:Connect(Notification)
