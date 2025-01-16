@@ -314,47 +314,69 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
 
     ui:ToggleVisible(true)
 
-    local proposed: boolean?
-    bindToClick(object.Choices.Propose, function()
-        proposed = true
-    end)
+    local success: boolean?
+    repeat
+        success = nil
+        local proposed: boolean?
+        bindToClick(object.Choices.Propose, function()
+            proposed = true
+        end)
 
-    bindToClick(object.Choices.Cancel, function()
-        proposed = false
-    end)
+        bindToClick(object.Choices.Cancel, function()
+            proposed = false
+        end)
 
-    while proposed == nil do
-        task.wait()
-    end
-
-    if proposed then
-        local ourOfferedAssets: {string} = {}
-        for _, v in ourItems:GetChildren() do
-            if assets[v.Name] then
-                table.insert(ourOfferedAssets, v.Name)
-            end
+        while proposed == nil do
+            task.wait()
         end
 
-        local theirOfferedAssets: {string} = {}
-        for _, v in theirItems:GetChildren() do
-            if assets[v.Name] then
-                table.insert(theirOfferedAssets, v.Name)
-            end
-        end
+        assert(currentTrader, "No current trader")
 
-        return {
-            OurOffer = {
-                Money = ourMoneyOffer,
-                JailCards = ourJailCardsOffer,
-                Assets = ourOfferedAssets,
-            },
-            TheirOffer = {
-                Money = 0, -- todo: also this
-                JailCards = 0,
-                Assets = theirOfferedAssets,
+        if proposed then
+            local ourOfferedAssets: {string} = {}
+            for _, v in ourItems:GetChildren() do
+                local asset = assets[v.Name]
+                if asset then
+                    if asset.Owner ~= lclPlayer.Name then
+                        ScreenMessage("Error", `Failed to offer trade as you no longer own {asset.Name}.`)
+                        success = false
+                        break
+                    end
+                    table.insert(ourOfferedAssets, v.Name)
+                end
+            end
+
+            local theirOfferedAssets: {string} = {}
+            for _, v in theirItems:GetChildren() do
+                local asset = assets[v.Name]
+                if asset then
+                    if asset.Owner ~= currentTrader then
+                        ScreenMessage("Error", `Failed to offer trade as {GetPlayerName(currentTrader)} no longer owns {asset.Name}.`)
+                        success = false
+                        break
+                    end
+                    table.insert(theirOfferedAssets, v.Name)
+                end
+            end
+
+            return {
+                OurOffer = {
+                    Money = ourMoneyOffer,
+                    JailCards = ourJailCardsOffer,
+                    Assets = ourOfferedAssets,
+                },
+                TheirOffer = {
+                    Money = 0, -- todo: also this
+                    JailCards = 0,
+                    Assets = theirOfferedAssets,
+                }
             }
-        }
-    end
+        end
+
+        if success == nil then
+            success = true
+        end
+    until success
 
     return nil
 end
