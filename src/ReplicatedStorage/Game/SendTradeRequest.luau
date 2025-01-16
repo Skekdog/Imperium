@@ -10,11 +10,13 @@ return function(plr: Player | Configuration): ()
     if not offer then
         return
     end
+
+    ScreenMessage("Success", "Trade request sent!")
     
     local response: ClientTypes.TradeRequestInvokeResult = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading"):WaitForChild("SendTradeRequest"):InvokeServer(plr.Name, offer)
     
     if response == "Success" then
-        return TradingUI.Trading(plr)
+        return TradingUI.Trading(plr, offer)
     elseif response == "BotAcceptedOffer" then
         return ScreenMessage("Success", `{GetPlayerName(plr)} accepted your trade offer.`)
     elseif response == "BotDeclinedOffer" then

@@ -406,8 +406,42 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
     return nil
 end
 
-function module.Trading(player: Player | Configuration): ()
+function module.Trading(player: Player | Configuration, offer: ClientTypes.InitialTradeOffer): ()
+    reset()
     
+    currentTrader = player.Name
+
+    updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, offer.OurOffer.JailCards)
+    updateDisplayedMoneyOffer(ourOffer.OfferedMoney, offer.OurOffer.Money)
+
+    updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, offer.TheirOffer.JailCards)
+    updateDisplayedMoneyOffer(theirOffer.OfferedMoney, offer.TheirOffer.Money)
+
+    for _, v in offer.OurOffer.Assets do
+        local asset = assets[v]
+        if asset then
+            asset.Button.Parent = ourOffer :: any
+        end
+    end
+
+    for _, v in offer.TheirOffer.Assets do
+        local asset = assets[v]
+        if asset then
+            asset.Button.Parent = theirOffer :: any
+        end
+    end
+
+    object.Choices.Propose.Visible = true
+    object.Choices.Cancel.Visible = true
+
+    object.Choices.Reject.Visible = true
+    object.Choices.Accept.Visible = true
+
+    object.Title:SetAttribute("Player_1", GetPlayerName(player))
+    object.Title:SetAttribute("Format", `Trading with [PLAYER]`)
+    object.Title:AddTag("DynamicNames")
+
+    ui:ToggleVisible(true)
 end
 
 return module
