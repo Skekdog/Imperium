@@ -7,6 +7,8 @@ local TradingUI = require(script.Parent.TradingUI)
 
 return function(plr: Player | Configuration): ()
     local offer = TradingUI.DraftTrade(plr)
+    TradingUI.UI:ToggleVisible(false)
+    
     if not offer then
         return
     end
