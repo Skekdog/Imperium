@@ -328,16 +328,30 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
     end
 
     if proposed then
+        local ourOfferedAssets: {string} = {}
+        for _, v in ourItems:GetChildren() do
+            if assets[v.Name] then
+                table.insert(ourOfferedAssets, v.Name)
+            end
+        end
+
+        local theirOfferedAssets: {string} = {}
+        for _, v in theirItems:GetChildren() do
+            if assets[v.Name] then
+                table.insert(theirOfferedAssets, v.Name)
+            end
+        end
+
         return {
             OurOffer = {
                 Money = ourMoneyOffer,
                 JailCards = ourJailCardsOffer,
-                Assets = {}, --todo: this
+                Assets = ourOfferedAssets,
             },
             TheirOffer = {
                 Money = 0, -- todo: also this
                 JailCards = 0,
-                Assets = {},
+                Assets = theirOfferedAssets,
             }
         }
     end
