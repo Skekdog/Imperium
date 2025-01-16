@@ -160,6 +160,26 @@ serverClient:WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: str
     end
 end)
 
+local function updateDisplayedMoneyOffer(label: TextLabel, value: number): ()
+    if value == 0 then
+        label.Visible = false
+        return
+    end
+
+    label.Text = `{GetCurrencySymbol()}{value} Cash`
+    label.Visible = true
+end
+
+local function updateDisplayJailCardsOffer(label: TextLabel, value: number): ()
+    if value == 0 then
+        label.Visible = false
+        return
+    end
+
+    label.Text = `{value} Jail Cards`
+    label.Visible = true
+end
+
 local moneyOfferTemplate = ourItems.MoneyOffers.Template
 
 local ourMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
@@ -180,8 +200,10 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
 
             if isOwn then
                 ourMoneyOffer += v
+                updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
             else
                 theirMoneyOffer += v
+                updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
             end
 
             local offer: ClientTypes.TradeOfferMoneyUpdate = {
@@ -193,8 +215,10 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
             if not success then
                 if isOwn then
                     ourMoneyOffer -= v
+                    updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
                 else
                     theirMoneyOffer -= v
+                    updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
                 end
             end
         end)
@@ -229,8 +253,10 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
 
             if isOwn then
                 ourJailCardsOffer += v
+                updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
             else
                 theirJailCardsOffer += v
+                updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
             end
 
             local offer: ClientTypes.TradeOfferJailCardsUpdate = {
@@ -242,8 +268,10 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
             if not success then
                 if isOwn then
                     ourJailCardsOffer -= v
+                    updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
                 else
                     theirJailCardsOffer -= v
+                    updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
                 end
             end
         end)
@@ -270,26 +298,6 @@ end
 object.Hide.Activated:Connect(function()
     setHidden(not isHidden)
 end)
-
-local function updateDisplayedMoneyOffer(label: TextLabel, value: number): ()
-    if value == 0 then
-        label.Visible = false
-        return
-    end
-
-    label.Text = `{GetCurrencySymbol()}{value} Cash`
-    label.Visible = true
-end
-
-local function updateDisplayJailCardsOffer(label: TextLabel, value: number): ()
-    if value == 0 then
-        label.Visible = false
-        return
-    end
-
-    label.Text = `{value} Jail Cards`
-    label.Visible = true
-end
 
 local function reset(): ()
     setHidden(false)
