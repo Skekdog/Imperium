@@ -64,6 +64,9 @@ local theirOffer = object.TheirOffer.Items
 local ourMoneyOffer = 0
 local ourJailCardsOffer = 0
 
+local theirMoneyOffer = 0
+local theirJailCardsOffer = 0
+
 local serverClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
@@ -163,11 +166,15 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if ourMoneyOffer + v > getPlayerMoney(if isOwn then nil else currentTrader) then
+            if (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", "You don't have enough money.")
             end
 
-            ourMoneyOffer += v
+            if isOwn then
+                ourMoneyOffer += v
+            else
+                theirMoneyOffer += v
+            end
 
             local offer: ClientTypes.TradeOfferMoneyUpdate = {
                 Kind = "Money",
@@ -176,7 +183,11 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
             
             local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
             if not success then
-                ourMoneyOffer -= v
+                if isOwn then
+                    ourMoneyOffer -= v
+                else
+                    theirMoneyOffer -= v
+                end
             end
         end)
 
@@ -204,11 +215,15 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if ourJailCardsOffer + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
+            if (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", "You don't have enough jail cards.")
             end
 
-            ourJailCardsOffer += v
+            if isOwn then
+                ourJailCardsOffer += v
+            else
+                theirJailCardsOffer += v
+            end
 
             local offer: ClientTypes.TradeOfferJailCardsUpdate = {
                 Kind = "JailCards",
@@ -217,7 +232,11 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
             
             local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
             if not success then
-                ourJailCardsOffer -= v
+                if isOwn then
+                    ourJailCardsOffer -= v
+                else
+                    theirJailCardsOffer -= v
+                end
             end
         end)
 
@@ -275,7 +294,13 @@ local function reset(): ()
         assert(v).Button.Parent = nil :: any
     end
 
+    currentTrader = nil
+
     ourMoneyOffer = 0
+    ourJailCardsOffer = 0
+
+    theirMoneyOffer = 0
+    theirJailCardsOffer = 0
 
     updateDisplayedMoneyOffer(ourOffer.OfferedMoney, 0)
     updateDisplayedMoneyOffer(theirOffer.OfferedMoney, 0)
@@ -366,8 +391,8 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                     Assets = ourOfferedAssets,
                 },
                 TheirOffer = {
-                    Money = 0, -- todo: also this
-                    JailCards = 0,
+                    Money = theirMoneyOffer,
+                    JailCards = theirJailCardsOffer,
                     Assets = theirOfferedAssets,
                 }
             }
