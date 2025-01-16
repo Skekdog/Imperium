@@ -376,12 +376,36 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 local asset = assets[v.Name]
                 if asset then
                     if asset.Owner ~= currentTrader then
-                        ScreenMessage("Error", `Failed to offer trade as {GetPlayerName(currentTrader)} no longer owns {asset.Name}.`)
+                        ScreenMessage("Error", `Failed to offer trade as target no longer owns {asset.Name}.`)
                         success = false
                         break
                     end
                     table.insert(theirOfferedAssets, v.Name)
                 end
+            end
+
+            if theirMoneyOffer > getPlayerMoney(currentTrader) then
+                ScreenMessage("Error", `Failed to offer trade as target doesn't have enough money.`)
+                success = false
+                return
+            end
+
+            if ourMoneyOffer > getPlayerMoney() then
+                ScreenMessage("Error", `Failed to offer trade as you don't have enough money.`)
+                success = false
+                return
+            end
+
+            if ourJailCardsOffer > getPlayerJailCards() then
+                ScreenMessage("Error", `Failed to offer trade as you don't have enough jail cards.`)
+                success = false
+                return
+            end
+
+            if theirJailCardsOffer > getPlayerJailCards(currentTrader) then
+                ScreenMessage("Error", `Failed to offer trade as target doesn't have enough jail cards.`)
+                success = false
+                return
             end
 
             return {
