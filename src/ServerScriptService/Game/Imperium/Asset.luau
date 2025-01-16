@@ -15,11 +15,11 @@ local Types = require(script.Parent.Types)
 local module = {}
 
 local function updateAsset(participant: Types.Participant, asset: Types.Asset, round: Types.Round): ()
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset"):FireAllClients(participant.Player, asset:GetClientAssetView(round))
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset"):FireAllClients(participant.Player.Name, asset:GetClientAssetView(round))
 end
 
 local function removeAsset(participant: Types.Participant, asset: Types.Asset): ()
-    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset"):FireAllClients(participant.Player, asset.AssetDescription.Name)
+    ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset"):FireAllClients(participant.Player.Name, asset.AssetDescription.Name)
 end
 
 local function updateAssetsInParticipantColourGroup(participant: Types.Participant, colourGroup: string, round: Types.Round): ()

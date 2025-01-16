@@ -18,6 +18,8 @@ local ToggleMovementEnabled = require(script.Parent.ToggleMovementEnabled)
 local UseGetOutOfJailFreeCard = require(script.Parent.UseGetOutOfJailFreeCard)
 local ViewDeed = require(script.Parent.ViewDeed)
 
+require(script.Parent.TradingUI)
+
 KeybindHintManager()
 
 local gameServerClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")

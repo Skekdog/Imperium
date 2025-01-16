@@ -408,7 +408,7 @@ end
 
 function module.Trading(player: Player | Configuration, offer: ClientTypes.InitialTradeOffer): ()
     reset()
-    
+
     currentTrader = player.Name
 
     updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, offer.OurOffer.JailCards)
@@ -443,5 +443,7 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
 
     ui:ToggleVisible(true)
 end
+
+module.UI = ui
 
 return module
