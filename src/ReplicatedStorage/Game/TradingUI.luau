@@ -152,6 +152,14 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: str
     end
 end)
 
+serverClient:WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: string, asset: string): ()
+    local assetData = assets[asset]
+    if assetData and assetData.Owner == plr then
+        assetData.Button:Destroy()
+        assets[asset] = nil
+    end
+end)
+
 local moneyOfferTemplate = ourItems.MoneyOffers.Template
 
 local ourMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
