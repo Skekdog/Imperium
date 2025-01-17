@@ -191,8 +191,9 @@ local moneyOfferTemplate = ourItems.MoneyOffers.Template
 local ourMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
 local theirMoneyOfferButtons: {[typeof(moneyOfferTemplate)]: number} = {}
 
+local moneyOfferIntervals = {1, 10, 100, -100, -10, -1}
 local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | typeof(theirItems.MoneyOffers), isOwn: boolean): ()
-    for _, v in {1, 10, 100, -100, -10, -1} do
+    for _, v in moneyOfferIntervals do
         local clone = moneyOfferTemplate:Clone()
         clone.Name = tostring(v)
         clone.Text = `{if v > 0 then "+" else ""}{GetCurrencySymbol()}{v}`
@@ -244,13 +245,18 @@ end
 makeMoneyOfferButtons(ourItems.MoneyOffers, true)
 makeMoneyOfferButtons(theirItems.MoneyOffers, false)
 
+local moneyCellSize = UDim2.new(1 / #moneyOfferIntervals, -ourItems.MoneyOffers.UIGridLayout.CellPadding.X.Offset, 1, 0)
+ourItems.MoneyOffers.UIGridLayout.CellSize = moneyCellSize
+theirItems.MoneyOffers.UIGridLayout.CellSize = moneyCellSize
+
 local jailCardOfferTemplate = ourItems.JailCardOffers.Template
 
 local ourJailCardOfferButtons: {[typeof(jailCardOfferTemplate)]: number} = {}
 local theirJailCardOfferButtons: {[typeof(jailCardOfferTemplate)]: number} = {}
 
+local jailCardOfferIntervals = {1, -1}
 local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) | typeof(theirItems.JailCardOffers), isOwn: boolean): ()
-    for _, v in {1, -1} do
+    for _, v in jailCardOfferIntervals do
         local clone = jailCardOfferTemplate:Clone()
         clone.Name = tostring(v)
         clone.Text = `{if v > 0 then "+" else ""}{v} Jail Card`
@@ -301,6 +307,10 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
 end
 makeJailCardOfferButtons(ourItems.JailCardOffers, true)
 makeJailCardOfferButtons(theirItems.JailCardOffers, false)
+
+local jailCardCellSize = UDim2.new(1 / #jailCardOfferIntervals, -ourItems.JailCardOffers.UIGridLayout.CellPadding.X.Offset, 1, 0)
+ourItems.JailCardOffers.UIGridLayout.CellSize = jailCardCellSize
+theirItems.JailCardOffers.UIGridLayout.CellSize = jailCardCellSize
 
 local isHidden = false
 local function setHidden(hidden: boolean): ()
