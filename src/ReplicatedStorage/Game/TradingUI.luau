@@ -195,7 +195,7 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
 
         bindToClick(clone, function()
             if (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentTrader) then
-                return ScreenMessage("Error", "You don't have enough money.")
+                return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough money.`)
             end
 
             if isOwn then
@@ -248,7 +248,7 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
 
         bindToClick(clone, function()
             if (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
-                return ScreenMessage("Error", "You don't have enough jail cards.")
+                return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough jail cards.`)
             end
 
             if isOwn then
