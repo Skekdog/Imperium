@@ -134,7 +134,6 @@ export type Trade = {
 export type TradeManager = {
     Participant: Participant,
 
-    OutgoingTarget: Participant?,
     LastRequestTimes: {[Participant]: number?},
     
     Trade: Trade?,

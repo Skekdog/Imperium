@@ -39,10 +39,6 @@ return function(plr: Player | Configuration): ()
         ScreenMessage("Error", "Unable to trade during bankruptcy.")
     elseif response == "Disconnected" then
         ScreenMessage("Error", "Unable to trade with a disconnected player.")
-    elseif response == "SelfAlreadyHasOutgoingRequest" then
-        ScreenMessage("Error", "You already have an outgoing trade request.")
-    elseif response == "OtherAlreadyHasIncomingRequest" then
-        ScreenMessage("Error", "Target already has an incoming trade request.")
     elseif response == "OtherNotEnoughJailCards" then
         ScreenMessage("Error", "Target no longer has enough jail cards.")
     elseif response == "OtherNotEnoughMoney" then

@@ -45,7 +45,7 @@ export type InitialTradeOffer = {
 
 export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate | TradeOfferAssetUpdate
 
-export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyHasOutgoingRequest" | "OtherAlreadyHasIncomingRequest"
+export type TradeRequestInvokeResult = "Success" | "Cooldown"
                                     | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt" | "Disconnected"
                                     | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError" | "SelfUnownedAsset" | "OtherUnownedAsset"
                                     | "SelfNotEnoughMoney" | "OtherNotEnoughMoney" | "SelfNotEnoughJailCards" | "OtherNotEnoughJailCards"

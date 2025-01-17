@@ -88,9 +88,6 @@ local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.T
     tradeManager.Trade = nil
     otherParticipant.TradeManager.Trade = nil
 
-    tradeManager.OutgoingTarget = nil
-    otherParticipant.TradeManager.OutgoingTarget = nil
-
     if reason ~= "BotDeclinedOffer" then
         FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, reason)
         FireRemote(tradeRemotes.TradeEnded, otherParticipant, reason)
@@ -244,11 +241,7 @@ local function createOffersFromInitialOffer(ourParticipant: Types.Participant, t
 end
 
 local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, initialOffer: ClientTypes.InitialTradeOffer): ClientTypes.TradeRequestInvokeResult
-    if tradeManager.OutgoingTarget then
-        return "SelfAlreadyTrading"
-    end
-
-    if tradeManager.Trade or tradeManager.OutgoingTarget then
+    if tradeManager.Trade then
         return "SelfAlreadyTrading"
     end
 
@@ -276,10 +269,7 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
         return offerResult.Reason
     end
 
-    tradeManager.OutgoingTarget = otherParticipant
     tradeManager.LastRequestTimes[otherParticipant] = GetTime()
-
-    otherParticipant.TradeManager.OutgoingTarget = tradeManager.Participant
 
     tradeManager.Trade = {
         Participant1 = tradeManager.Participant,
@@ -350,7 +340,6 @@ function module.new(participant: Types.Participant): Types.TradeManager
         LastRequestTimes = {},
 
         Trade = nil,
-        OutgoingTarget = nil,
         
         GetOtherParticipant = GetOtherParticipant,
         ResetBoth = ResetBoth,
