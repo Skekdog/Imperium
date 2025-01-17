@@ -55,6 +55,7 @@ local function getPlayerJailCards(playerName: string?): number
 end
 
 local currentTrader: string?
+local isDraftMode = false
 
 local ourItems = object.YourItems.Items
 local theirItems = object.TheirItems.Items
@@ -89,12 +90,14 @@ local function offerAsset(assetData: AssetData): ()
 
     assetData.Button.Parent = if assetData.Owner == lclPlayer.Name then ourOffer :: any else theirOffer :: any
 
-    local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
-    if not success then
-        if assetData.Owner == lclPlayer.Name then
-            assetData.Button.Parent = ourItems :: any
-        elseif assetData.Owner == currentTrader then
-            assetData.Button.Parent = theirItems :: any
+    if not isDraftMode then
+        local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+        if not success then
+            if assetData.Owner == lclPlayer.Name then
+                assetData.Button.Parent = ourItems :: any
+            elseif assetData.Owner == currentTrader then
+                assetData.Button.Parent = theirItems :: any
+            end
         end
     end
 end
@@ -108,12 +111,14 @@ local function retractAsset(assetData: AssetData): ()
 
     assetData.Button.Parent = if assetData.Owner == lclPlayer.Name then ourItems :: any else theirItems :: any
 
-    local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
-    if not success then
-        if assetData.Owner == lclPlayer.Name then
-            assetData.Button.Parent = ourOffer :: any
-        elseif assetData.Owner == currentTrader then
-            assetData.Button.Parent = theirOffer :: any
+    if not isDraftMode then
+        local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+        if not success then
+            if assetData.Owner == lclPlayer.Name then
+                assetData.Button.Parent = ourOffer :: any
+            elseif assetData.Owner == currentTrader then
+                assetData.Button.Parent = theirOffer :: any
+            end
         end
     end
 end
@@ -214,14 +219,16 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
                 Amount = v
             }
             
-            local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
-            if not success then
-                if isOwn then
-                    ourMoneyOffer -= actualDiff
-                    updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
-                else
-                    theirMoneyOffer -= actualDiff
-                    updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
+            if not isDraftMode then
+                local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+                if not success then
+                    if isOwn then
+                        ourMoneyOffer -= actualDiff
+                        updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
+                    else
+                        theirMoneyOffer -= actualDiff
+                        updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
+                    end
                 end
             end
         end)
@@ -270,14 +277,16 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
                 Amount = v
             }
             
-            local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
-            if not success then
-                if isOwn then
-                    ourJailCardsOffer -= actualDiff
-                    updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
-                else
-                    theirJailCardsOffer -= actualDiff
-                    updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
+            if not isDraftMode then
+                local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
+                if not success then
+                    if isOwn then
+                        ourJailCardsOffer -= actualDiff
+                        updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
+                    else
+                        theirJailCardsOffer -= actualDiff
+                        updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
+                    end
                 end
             end
         end)
@@ -334,6 +343,7 @@ local module = {}
 function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialTradeOffer?
     reset()
 
+    isDraftMode = true
     currentTrader = player.Name
 
     for _, v in assets do
@@ -451,6 +461,7 @@ end
 function module.Trading(player: Player | Configuration, offer: ClientTypes.InitialTradeOffer): ()
     reset()
 
+    isDraftMode = false
     currentTrader = player.Name
 
     updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, offer.OurOffer.JailCards)
