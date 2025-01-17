@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
-local currentOffer: Configuration | Player?
+local currentOffer: string?
 
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
@@ -19,7 +19,7 @@ local function updateNotificationDisplay(playerName: string): ()
     ui.Object.Trader:SetAttribute("Player_1", GetPlayerName(playerName))
     ui.Object.Trader:SetAttribute("Format", "[PLAYER]")
 
-    currentOffer = player :: Player | Configuration
+    currentOffer = (player :: Player | Configuration).Name
 
     ui:ToggleVisible(true)
 end
@@ -32,6 +32,7 @@ end)
 
 ui.Object.Response.Accept.Activated:Connect(function(): ()
     assert(currentOffer, "No current offer")
+
     ui:ToggleVisible(false)
     tradeRemotes:WaitForChild("RespondTradeRequest"):FireServer(currentOffer, true)
     currentOffer = nil
@@ -39,6 +40,7 @@ end)
 
 ui.Object.Response.Reject.Activated:Connect(function(): ()
     assert(currentOffer, "No current offer")
+
     ui:ToggleVisible(false)
     tradeRemotes:WaitForChild("RespondTradeRequest"):FireServer(currentOffer, false)
     currentOffer = nil

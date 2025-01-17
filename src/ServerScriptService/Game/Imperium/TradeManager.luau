@@ -299,8 +299,8 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
     end
 
     local con: RBXScriptConnection
-    con = tradeRemotes.RespondTradeRequest.OnServerEvent:Connect(function(plr: Player, accepted: unknown)
-        if plr ~= otherPlayer then
+    con = tradeRemotes.RespondTradeRequest.OnServerEvent:Connect(function(plr: Player, trader: string, accepted: unknown)
+        if plr ~= otherPlayer or trader ~= tradeManager.Participant.Player.Name then
             return
         end
 
@@ -311,7 +311,7 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
         response = accepted
     end)
 
-    FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant)
+    FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name)
 
     local startTime = GetTime()
     while response == nil and startTime + TRADE_TIMEOUT > GetTime() do
