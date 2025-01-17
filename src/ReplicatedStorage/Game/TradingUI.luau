@@ -487,6 +487,12 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     isDraftMode = false
     currentTrader = player.Name
 
+    ourMoneyOffer = offer.OurOffer.Money
+    theirMoneyOffer = offer.TheirOffer.Money
+
+    ourJailCardsOffer = offer.OurOffer.JailCards
+    theirJailCardsOffer = offer.TheirOffer.JailCards
+
     updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, offer.OurOffer.JailCards)
     updateDisplayedMoneyOffer(ourOffer.OfferedMoney, offer.OurOffer.Money)
 
@@ -507,8 +513,8 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
         end
     end
 
-    object.Choices.Propose.Visible = true
-    object.Choices.Cancel.Visible = true
+    object.Choices.Propose.Visible = false
+    object.Choices.Cancel.Visible = false
 
     object.Choices.Reject.Visible = true
     object.Choices.Accept.Visible = true
