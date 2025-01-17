@@ -43,7 +43,19 @@ return function(plr: Player | Configuration): ()
         ScreenMessage("Error", "You already have an outgoing trade request.")
     elseif response == "OtherAlreadyHasIncomingRequest" then
         ScreenMessage("Error", "Target already has an incoming trade request.")
+    elseif response == "OtherNotEnoughJailCards" then
+        ScreenMessage("Error", "Target no longer has enough jail cards.")
+    elseif response == "OtherNotEnoughMoney" then
+        ScreenMessage("Error", "Target no longer has enough money.")
+    elseif response == "SelfNotEnoughJailCards" then
+        ScreenMessage("Error", "You no longer have enough jail cards.")
+    elseif response == "SelfNotEnoughMoney" then
+        ScreenMessage("Error", "You no longer have enough money.")
+    elseif response == "SelfUnownedAsset" then
+        ScreenMessage("Error", "You no longer own some of the assets in your offer.")
+    elseif response == "OtherUnownedAsset" then
+        ScreenMessage("Error", "Target no longer owns some of the assets in their offer.")
     else
-        ScreenMessage("Error", "An unknown error occurred.")
+        ScreenMessage("Error", "An unknown error occurred: " .. tostring(response))
     end
 end
