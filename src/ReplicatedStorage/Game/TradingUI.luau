@@ -135,14 +135,6 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: str
     local assetData = assets[asset.Name]
     if assetData then
         assetData.Owner = plr
-        
-        if plr == currentTrader then
-            assetData.Button.Parent = theirItems :: any
-        elseif plr == Players.LocalPlayer.Name then
-            assetData.Button.Parent = ourItems :: any
-        else
-            assetData.Button.Parent = nil :: any
-        end
     else
         local button = CreateAssetButton(UDim2.new(1, 0, 0.15, 0), asset)
         assets[asset.Name] = {
@@ -154,6 +146,15 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: str
         bindToClick(button, function()
             processAssetButtonClick(assert(assets[asset.Name]))
         end)
+    end
+
+    local button = assert(assets[asset.Name]).Button
+    if plr == currentTrader then
+        button.Parent = theirItems :: any
+    elseif plr == Players.LocalPlayer.Name then
+        button.Parent = ourItems :: any
+    else
+        button.Parent = nil :: any
     end
 end)
 
