@@ -264,7 +264,7 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
 
             local actualDiff: number
             if isOwn then
-                actualDiff = math.max(ourJailCardsOffer + v, 0) - ourMoneyOffer
+                actualDiff = math.max(ourJailCardsOffer + v, 0) - ourJailCardsOffer
                 ourJailCardsOffer += actualDiff
                 updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
             else
