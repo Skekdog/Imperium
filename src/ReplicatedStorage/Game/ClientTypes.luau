@@ -59,6 +59,6 @@ export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError"
 
 export type TradeOfferRejectInvokeResult = "Success" | "Expired" | "OtherError"
 
-export type TradeResetReason = "TradeAccepted" | "TradeRejected" | "GoingBankrupt" | "Disconnected"
+export type TradeResetReason = "TradeAccepted" | "TradeRejected" | "GoingBankrupt" | "Disconnected" | "BotDeclinedOffer"
 
 return {}

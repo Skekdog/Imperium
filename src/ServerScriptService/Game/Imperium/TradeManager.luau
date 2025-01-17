@@ -88,8 +88,13 @@ local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.T
     tradeManager.Trade = nil
     otherParticipant.TradeManager.Trade = nil
 
-    FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, reason)
-    FireRemote(tradeRemotes.TradeEnded, otherParticipant, reason)
+    tradeManager.OutgoingTarget = nil
+    otherParticipant.TradeManager.OutgoingTarget = nil
+
+    if reason ~= "BotDeclinedOffer" then
+        FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, reason)
+        FireRemote(tradeRemotes.TradeEnded, otherParticipant, reason)
+    end
 end
 
 local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, offer: ClientTypes.TradeOfferUpdate): ClientTypes.TradeOfferUpdateInvokeResult
@@ -293,11 +298,13 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
 
     local response: boolean?
 
-    local botPlayer = tradeManager.Participant.Round:GetBotPlayer(tradeManager.Participant)
+    local botPlayer = tradeManager.Participant.Round:GetBotPlayer(otherParticipant)
     if botPlayer then
         if botPlayer:EvaluateTrade(tradeManager) then
+            doTrade(assert(tradeManager.Trade))
             return "BotAcceptedOffer"
         end
+        tradeManager:ResetBoth("TradeRejected")
         return "BotDeclinedOffer"
     end
 
