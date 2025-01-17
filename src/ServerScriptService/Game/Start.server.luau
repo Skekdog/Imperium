@@ -287,9 +287,55 @@ gameClientServer.UnmortgageProperty.OnServerEvent:Connect(function(plr, property
     asset:TryUnMortgage()
 end)
 
+local function isInitialTradeOffer(value: ClientTypes.InitialTradeOffer): boolean
+    if typeof(value) ~= "table" then
+        return false
+    end
+
+    local function isOffer(offer)
+        if typeof(offer) ~= "table" then
+            return false
+        end
+
+        if typeof(offer.Money) ~= "number" then
+            return false
+        end
+
+        if typeof(offer.JailCards) ~= "number" then
+            return false
+        end
+
+        if typeof(offer.Assets) ~= "table" then
+            return false
+        end
+
+        for _, asset in offer.Assets do
+            if typeof(asset) ~= "string" then
+                return false
+            end
+        end
+
+        return true
+    end
+
+    if not isOffer(value.OurOffer) then
+        return false
+    end
+
+    if not isOffer(value.TheirOffer) then
+        return false
+    end
+
+    return true
+end
+
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
-tradeRemotes:WaitForChild("SendTradeRequest").OnServerInvoke = function(plr, to: unknown): ClientTypes.TradeRequestInvokeResult
+tradeRemotes:WaitForChild("SendTradeRequest").OnServerInvoke = function(plr, to: unknown, initialOffer: ClientTypes.InitialTradeOffer): ClientTypes.TradeRequestInvokeResult
     if typeof(to) ~= "string" then
+        return "OtherError"
+    end
+
+    if not isInitialTradeOffer(initialOffer) then
         return "OtherError"
     end
 
