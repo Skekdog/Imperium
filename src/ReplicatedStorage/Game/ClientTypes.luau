@@ -47,7 +47,8 @@ export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate
 
 export type TradeRequestInvokeResult = "Success" | "Cooldown" | "SelfAlreadyHasOutgoingRequest" | "OtherAlreadyHasIncomingRequest"
                                     | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt" | "Disconnected"
-                                    | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError"
+                                    | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError" | "SelfUnownedAsset" | "OtherUnownedAsset"
+                                    | "SelfNotEnoughMoney" | "OtherNotEnoughMoney" | "SelfNotEnoughJailCards" | "OtherNotEnoughJailCards"
 
 export type TradeRequestAcceptInvokeResult = "Success" | "Expired" | "OtherError"
 

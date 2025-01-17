@@ -344,7 +344,7 @@ tradeRemotes:WaitForChild("SendTradeRequest").OnServerInvoke = function(plr, to:
         return "OtherError"
     end
 
-    return requestingParticipant.TradeManager:TryRequestTrade(to)
+    return requestingParticipant.TradeManager:TryRequestTrade(to, initialOffer)
 end
 
 tradeRemotes:WaitForChild("SendTradeAcceptance").OnServerInvoke = function(plr, to: unknown, accepted: unknown): ClientTypes.TradeOfferAcceptInvokeResult

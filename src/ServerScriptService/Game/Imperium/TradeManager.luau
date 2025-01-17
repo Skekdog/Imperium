@@ -157,7 +157,88 @@ local function TryRejectOffer(tradeManager: Types.TradeManager, with: string): C
     return "Success"
 end
 
-local function TryRequestTrade(tradeManager: Types.TradeManager, name: string): ClientTypes.TradeRequestInvokeResult
+local function createOffersFromInitialOffer(ourParticipant: Types.Participant, theirParticipant: Types.Participant, initialOffer: ClientTypes.InitialTradeOffer): {
+    Success: true,
+    OurOffer: Types.TradeOffer,
+    TheirOffer: Types.TradeOffer,
+} | {
+    Success: false,
+    Reason: ClientTypes.TradeRequestInvokeResult,
+}
+    if ourParticipant.Money < initialOffer.OurOffer.Money then
+        return {
+            Success = false,
+            Reason = "SelfNotEnoughMoney",
+        }
+    end
+
+    if theirParticipant.Money < initialOffer.TheirOffer.Money then
+        return {
+            Success = false,
+            Reason = "OtherNotEnoughMoney",
+        }
+    end
+
+    if ourParticipant.JailCards < initialOffer.OurOffer.JailCards then
+        return {
+            Success = false,
+            Reason = "SelfNotEnoughJailCards",
+        }
+    end
+
+    if theirParticipant.JailCards < initialOffer.TheirOffer.JailCards then
+        return {
+            Success = false,
+            Reason = "OtherNotEnoughJailCards",
+        }
+    end
+
+    local ourAssets: {Types.Asset} = {}
+    for _, assetName in initialOffer.OurOffer.Assets do
+        local asset = getAssetByName(ourParticipant, assetName)
+        if not asset then
+            return {
+                Success = false,
+                Reason = "SelfUnownedAsset",
+            }
+        end
+
+        table.insert(ourAssets, asset)
+    end
+
+    local theirAssets: {Types.Asset} = {}
+    for _, assetName in initialOffer.TheirOffer.Assets do
+        local asset = getAssetByName(theirParticipant, assetName)
+        if not asset then
+            return {
+                Success = false,
+                Reason = "OtherUnownedAsset",
+            }
+        end
+
+        table.insert(theirAssets, asset)
+    end
+
+    local ourOffer: Types.TradeOffer = {
+        Money = initialOffer.OurOffer.Money,
+        JailCards = initialOffer.OurOffer.JailCards,
+        Assets = ourAssets,
+    }
+
+    local theirOffer: Types.TradeOffer = {
+        Money = initialOffer.TheirOffer.Money,
+        JailCards = initialOffer.TheirOffer.JailCards,
+        Assets = theirAssets,
+    }
+
+    return {
+        Success = true,
+        OurOffer = ourOffer,
+        TheirOffer = theirOffer,
+    }
+end
+
+local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, initialOffer: ClientTypes.InitialTradeOffer): ClientTypes.TradeRequestInvokeResult
     if tradeManager.OutgoingTarget then
         return "SelfAlreadyTrading"
     end
@@ -184,6 +265,31 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string): 
     if lastTradeAttempt and GetTime() - lastTradeAttempt < TRADE_COOLDOWN then
         return "Cooldown"
     end
+
+    local offerResult = createOffersFromInitialOffer(tradeManager.Participant, otherParticipant, initialOffer)
+    if not offerResult.Success then
+        return offerResult.Reason
+    end
+
+    tradeManager.OutgoingTarget = otherParticipant
+    tradeManager.LastRequestTimes[otherParticipant] = GetTime()
+
+    otherParticipant.TradeManager.OutgoingTarget = tradeManager.Participant
+
+    tradeManager.Trade = {
+        Participant1 = tradeManager.Participant,
+        Participant2 = otherParticipant,
+        Confirmation = {
+            [tradeManager.Participant] = false,
+            [otherParticipant] = false,
+        },
+        Offers = {
+            [tradeManager.Participant] = offerResult.OurOffer,
+            [otherParticipant] = offerResult.TheirOffer,
+        }
+    }
+
+    otherParticipant.TradeManager.Trade = tradeManager.Trade
 
     local response: boolean?
 
