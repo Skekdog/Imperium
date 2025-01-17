@@ -77,7 +77,6 @@ local function bindToClick(button: TextButton, callback: () -> ())
         old:Disconnect()
     end
 
-    --todo: saving the connection in clickCons breaks the connection??? WTF ???
     clickCons[button] = button.Activated:Connect(callback)
 end
 
@@ -248,7 +247,6 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            print("clicked")
             if (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", "You don't have enough jail cards.")
             end
@@ -303,10 +301,6 @@ end)
 
 local function reset(): ()
     setHidden(false)
-
-    for _, v in clickCons do
-        assert(v):Disconnect()
-    end
 
     for _, v in assets do
         assert(v).Button.Parent = nil :: any
