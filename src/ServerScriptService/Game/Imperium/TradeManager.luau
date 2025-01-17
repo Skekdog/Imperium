@@ -159,6 +159,13 @@ local function TryRejectOffer(tradeManager: Types.TradeManager, with: string): C
     return "Success"
 end
 
+local function reverseInitialOffer(initialOffer: ClientTypes.InitialTradeOffer): ClientTypes.InitialTradeOffer
+    return {
+        OurOffer = initialOffer.TheirOffer,
+        TheirOffer = initialOffer.OurOffer,
+    }
+end
+
 local function createOffersFromInitialOffer(ourParticipant: Types.Participant, theirParticipant: Types.Participant, initialOffer: ClientTypes.InitialTradeOffer): {
     Success: true,
     OurOffer: Types.TradeOffer,
@@ -311,7 +318,7 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
         response = accepted
     end)
 
-    FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name)
+    FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name, reverseInitialOffer(initialOffer))
 
     local startTime = GetTime()
     while response == nil and startTime + TRADE_TIMEOUT > GetTime() do
