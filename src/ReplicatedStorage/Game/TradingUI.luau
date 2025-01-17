@@ -526,6 +526,30 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     ui:ToggleVisible(true)
 end
 
+-- todo: assets don't show up in asset manager????
+tradeRemotes.ReceiveUpdatedTradeOffer.OnClientEvent:Connect(function(trader: string, offer: ClientTypes.TradeOfferUpdate): ()
+    if currentTrader ~= trader then
+        return
+    end
+
+    if offer.Kind == "Money" then
+        theirMoneyOffer = offer.Amount
+        updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
+    elseif offer.Kind == "JailCards" then
+        theirJailCardsOffer = offer.Amount
+        updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
+    elseif offer.Kind == "Asset" then
+        local asset = assets[offer.Name]
+        if asset then
+            if offer.Mode == "Add" then
+                asset.Button.Parent = theirOffer :: any
+            elseif offer.Mode == "Remove" then
+                asset.Button.Parent = theirItems :: any
+            end
+        end
+    end
+end)
+
 module.UI = ui
 
 return module

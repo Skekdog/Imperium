@@ -121,7 +121,7 @@ local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, of
         return res
     end
 
-    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, tradeManager:GetOtherParticipant(), offer)
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, tradeManager:GetOtherParticipant(), with, offer)
 
     return "Success"
 end
