@@ -198,11 +198,14 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough money.`)
             end
 
+            local actualDiff: number
             if isOwn then
-                ourMoneyOffer += v
+                actualDiff = math.max(ourMoneyOffer + v, 0) - ourMoneyOffer
+                ourMoneyOffer = math.max(ourMoneyOffer + v, 0)
                 updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
             else
-                theirMoneyOffer += v
+                actualDiff = math.max(theirMoneyOffer + v, 0) - theirMoneyOffer
+                theirMoneyOffer = math.max(theirMoneyOffer + v, 0)
                 updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
             end
 
@@ -214,10 +217,10 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
             local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
             if not success then
                 if isOwn then
-                    ourMoneyOffer -= v
+                    ourMoneyOffer -= actualDiff
                     updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
                 else
-                    theirMoneyOffer -= v
+                    theirMoneyOffer -= actualDiff
                     updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
                 end
             end
@@ -251,10 +254,13 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough jail cards.`)
             end
 
+            local actualDiff: number
             if isOwn then
+                actualDiff = math.max(ourJailCardsOffer + v, 0) - ourMoneyOffer
                 ourJailCardsOffer += v
                 updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
             else
+                actualDiff = math.max(theirJailCardsOffer + v, 0) - theirJailCardsOffer
                 theirJailCardsOffer += v
                 updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
             end
@@ -267,10 +273,10 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
             local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
             if not success then
                 if isOwn then
-                    ourJailCardsOffer -= v
+                    ourJailCardsOffer -= actualDiff
                     updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
                 else
-                    theirJailCardsOffer -= v
+                    theirJailCardsOffer -= actualDiff
                     updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
                 end
             end
