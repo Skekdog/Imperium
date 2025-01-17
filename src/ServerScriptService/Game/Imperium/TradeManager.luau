@@ -300,7 +300,7 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
 
     local botPlayer = tradeManager.Participant.Round:GetBotPlayer(otherParticipant)
     if botPlayer then
-        if botPlayer:EvaluateTrade(tradeManager) then
+        if botPlayer:EvaluateTrade(otherParticipant.TradeManager) then
             doTrade(assert(tradeManager.Trade))
             return "BotAcceptedOffer"
         end

@@ -398,15 +398,16 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
 
         if proposed then
             local ourOfferedAssets: {string} = {}
-            for _, v in ourItems:GetChildren() do
-                local asset = assets[v.Name]
+            for _, v in ourOffer:GetChildren() do
+                local splitName = v.Name:split("Asset_")[2]
+                local asset = assets[splitName]
                 if asset then
                     if asset.Owner ~= lclPlayer.Name then
                         ScreenMessage("Error", `Failed to offer trade as you no longer own {asset.Name}.`)
                         success = false
                         break
                     end
-                    table.insert(ourOfferedAssets, v.Name)
+                    table.insert(ourOfferedAssets, splitName)
                 end
             end
 
@@ -415,15 +416,16 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
             end
 
             local theirOfferedAssets: {string} = {}
-            for _, v in theirItems:GetChildren() do
-                local asset = assets[v.Name]
+            for _, v in theirOffer:GetChildren() do
+                local splitName = v.Name:split("Asset_")[2]
+                local asset = assets[splitName]
                 if asset then
                     if asset.Owner ~= currentTrader then
                         ScreenMessage("Error", `Failed to offer trade as target no longer owns {asset.Name}.`)
                         success = false
                         break
                     end
-                    table.insert(theirOfferedAssets, v.Name)
+                    table.insert(theirOfferedAssets, splitName)
                 end
             end
 

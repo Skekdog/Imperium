@@ -140,19 +140,19 @@ local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeMana
 
     local them = tradeManager:GetOtherParticipant()
 
-    local ourOffer = trade.Offers[bot.Participant]
-    local ourTotalValue = ourOffer.Money + (ourOffer.JailCards * bot.Participant.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
-    for _, v in ourOffer.Assets do
-        ourTotalValue += bot:EvaluateAssetForSale(v, them)
+    local outgoingOffer = trade.Offers[bot.Participant]
+    local totalOutgoingValue = outgoingOffer.Money + (outgoingOffer.JailCards * bot.Participant.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
+    for _, v in outgoingOffer.Assets do
+        totalOutgoingValue += bot:EvaluateAssetForSale(v, them)
     end
 
-    local theirOffer = trade.Offers[them]
-    local theirTotalValue = theirOffer.Money + (theirOffer.JailCards * them.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
-    for _, v in theirOffer.Assets do
-        theirTotalValue += EvaluateAssetForSale(bot, v, them)
+    local incomingOffer = trade.Offers[them]
+    local totalIncomingValue = incomingOffer.Money + (incomingOffer.JailCards * them.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
+    for _, v in incomingOffer.Assets do
+        totalIncomingValue += bot:EvaluateAssetForPurchase(v, them)
     end
 
-    return ourTotalValue > theirTotalValue
+    return totalIncomingValue > totalOutgoingValue
 end
 
 local function DecideMove(bot: Types.BotPlayer): "Dice" | "JailCard" | "Fine"
