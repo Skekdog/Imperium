@@ -194,18 +194,18 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentTrader) then
+            if v > 0 and (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough money.`)
             end
 
             local actualDiff: number
             if isOwn then
                 actualDiff = math.max(ourMoneyOffer + v, 0) - ourMoneyOffer
-                ourMoneyOffer = math.max(ourMoneyOffer + v, 0)
+                ourMoneyOffer += actualDiff
                 updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
             else
                 actualDiff = math.max(theirMoneyOffer + v, 0) - theirMoneyOffer
-                theirMoneyOffer = math.max(theirMoneyOffer + v, 0)
+                theirMoneyOffer += actualDiff
                 updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
             end
 
@@ -250,18 +250,18 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
+            if v > 0 and (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough jail cards.`)
             end
 
             local actualDiff: number
             if isOwn then
                 actualDiff = math.max(ourJailCardsOffer + v, 0) - ourMoneyOffer
-                ourJailCardsOffer += v
+                ourJailCardsOffer += actualDiff
                 updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
             else
                 actualDiff = math.max(theirJailCardsOffer + v, 0) - theirJailCardsOffer
-                theirJailCardsOffer += v
+                theirJailCardsOffer += actualDiff
                 updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
             end
 
