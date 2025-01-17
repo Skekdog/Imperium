@@ -248,11 +248,11 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
     end
 
     local otherPlayer = Players:FindFirstChild(name)
-    if not otherPlayer or not otherPlayer:IsA("Player") or not otherPlayer:IsA("Configuration") then
+    if not otherPlayer or (not otherPlayer:IsA("Player") and not otherPlayer:IsA("Configuration")) then
         return "OtherError"
     end
 
-    local otherParticipant = tradeManager.Participant.Round:TryGetParticipant(otherPlayer)
+    local otherParticipant = tradeManager.Participant.Round:TryGetParticipant(otherPlayer :: Player)
     if not otherParticipant then
         return "OtherError"
     end
@@ -314,7 +314,7 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
         response = accepted
     end)
 
-    FireRemote(tradeRemotes.ReceiveTradeRequest, otherPlayer)
+    FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant)
 
     local startTime = GetTime()
     while response == nil and startTime + TRADE_TIMEOUT > GetTime() do
