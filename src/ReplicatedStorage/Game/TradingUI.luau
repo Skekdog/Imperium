@@ -399,6 +399,10 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 end
             end
 
+            if success == false then
+                continue
+            end
+
             local theirOfferedAssets: {string} = {}
             for _, v in theirItems:GetChildren() do
                 local asset = assets[v.Name]
@@ -412,28 +416,32 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 end
             end
 
+            if success == false then
+                continue
+            end
+
             if theirMoneyOffer > getPlayerMoney(currentTrader) then
                 ScreenMessage("Error", `Failed to offer trade as target doesn't have enough money.`)
                 success = false
-                return
+                continue
             end
 
             if ourMoneyOffer > getPlayerMoney() then
                 ScreenMessage("Error", `Failed to offer trade as you don't have enough money.`)
                 success = false
-                return
+                continue
             end
 
             if ourJailCardsOffer > getPlayerJailCards() then
                 ScreenMessage("Error", `Failed to offer trade as you don't have enough jail cards.`)
                 success = false
-                return
+                continue
             end
 
             if theirJailCardsOffer > getPlayerJailCards(currentTrader) then
                 ScreenMessage("Error", `Failed to offer trade as target doesn't have enough jail cards.`)
                 success = false
-                return
+                continue
             end
 
             return {
@@ -453,6 +461,8 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
         if success == nil then
             success = true
         end
+
+        proposed = nil
     until success
 
     return nil
