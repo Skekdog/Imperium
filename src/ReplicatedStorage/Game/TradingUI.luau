@@ -127,7 +127,7 @@ local function processAssetButtonClick(isOwn: boolean, assetData: AssetData): ()
     if not isDraftMode and not isOwn then
         return
     end
-    
+
     if assetData.Button.Parent == ourItems :: any or assetData.Button.Parent == theirItems :: any then
         offerAsset(assetData)
     elseif assetData.Button.Parent == ourOffer :: any or assetData.Button.Parent == theirOffer :: any then
@@ -526,7 +526,6 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     ui:ToggleVisible(true)
 end
 
--- todo: assets don't show up in asset manager????
 tradeRemotes.ReceiveUpdatedTradeOffer.OnClientEvent:Connect(function(trader: string, offer: ClientTypes.TradeOfferUpdate): ()
     if currentTrader ~= trader then
         return
