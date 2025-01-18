@@ -235,13 +235,13 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
 
             local offer: ClientTypes.TradeOfferMoneyUpdate = {
                 Kind = "Money",
-                Amount = v
+                Amount = if isOwn then ourMoneyOffer else theirMoneyOffer
             }
             
             if not isDraftMode then
                 local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
                 if not success then
-                    updateMoneyOffer(isOwn, value - actualDiff)
+                    updateMoneyOffer(isOwn, (if isOwn then ourMoneyOffer else theirMoneyOffer) - actualDiff)
                 end
             end
         end)
@@ -290,13 +290,13 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
 
             local offer: ClientTypes.TradeOfferJailCardsUpdate = {
                 Kind = "JailCards",
-                Amount = v
+                Amount = if isOwn then ourJailCardsOffer else theirJailCardsOffer
             }
             
             if not isDraftMode then
                 local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
                 if not success then
-                    updateJailCardsOffer(isOwn, value - actualDiff)
+                    updateJailCardsOffer(isOwn, (if isOwn then ourJailCardsOffer else theirJailCardsOffer) - actualDiff)
                 end
             end
         end)
