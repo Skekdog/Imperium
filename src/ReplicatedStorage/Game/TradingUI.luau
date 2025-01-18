@@ -56,8 +56,8 @@ local function getPlayerJailCards(playerName: string?): number
     return player:GetAttribute("JailCards") :: number or 0
 end
 
+local currentDraftTrader: string?
 local currentTrader: string?
-local isDraftMode = false
 
 local ourItems = object.YourItems.Items
 local theirItems = object.TheirItems.Items
@@ -114,7 +114,7 @@ local function offerAsset(assetData: AssetData): ()
 
     assetData.Button.Parent = if assetData.Owner == lclPlayer.Name then ourOffer :: any else theirOffer :: any
 
-    if not isDraftMode then
+    if currentTrader then
         local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
         if not success then
             if assetData.Owner == lclPlayer.Name then
@@ -135,7 +135,7 @@ local function retractAsset(assetData: AssetData): ()
 
     assetData.Button.Parent = if assetData.Owner == lclPlayer.Name then ourItems :: any else theirItems :: any
 
-    if not isDraftMode then
+    if currentTrader then
         local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
         if not success then
             if assetData.Owner == lclPlayer.Name then
@@ -148,7 +148,7 @@ local function retractAsset(assetData: AssetData): ()
 end
 
 local function processAssetButtonClick(isOwn: boolean, assetData: AssetData): ()
-    if not isDraftMode and not isOwn then
+    if currentTrader and not isOwn then
         return
     end
 
@@ -177,7 +177,7 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: str
     end
 
     local button = assert(assets[asset.Name]).Button
-    if plr == currentTrader then
+    if plr == currentTrader or plr == currentDraftTrader then
         button.Parent = theirItems :: any
     elseif plr == Players.LocalPlayer.Name then
         button.Parent = ourItems :: any
@@ -244,11 +244,11 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if not isDraftMode and not isOwn then
+            if currentTrader and not isOwn then
                 return
             end
 
-            if v > 0 and (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentTrader) then
+            if v > 0 and (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentDraftTrader) then
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough money.`)
             end
 
@@ -262,7 +262,7 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
                 Amount = if isOwn then ourMoneyOffer else theirMoneyOffer
             }
             
-            if not isDraftMode then
+            if currentTrader then
                 local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
                 if not success then
                     updateMoneyOffer(isOwn, (if isOwn then ourMoneyOffer else theirMoneyOffer) - actualDiff)
@@ -299,11 +299,11 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
-            if not isDraftMode and not isOwn then
+            if currentTrader and not isOwn then
                 return
             end
 
-            if v > 0 and (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
+            if v > 0 and (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentDraftTrader) then
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough jail cards.`)
             end
 
@@ -317,7 +317,7 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
                 Amount = if isOwn then ourJailCardsOffer else theirJailCardsOffer
             }
             
-            if not isDraftMode then
+            if currentTrader then
                 local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
                 if not success then
                     updateJailCardsOffer(isOwn, (if isOwn then ourJailCardsOffer else theirJailCardsOffer) - actualDiff)
@@ -359,6 +359,7 @@ local function reset(): ()
         assert(v).Button.Parent = nil :: any
     end
 
+    currentDraftTrader = nil
     currentTrader = nil
 
     updateAcceptance(true, false)
@@ -378,8 +379,7 @@ local module = {}
 function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialTradeOffer?
     reset()
 
-    isDraftMode = true
-    currentTrader = player.Name
+    currentDraftTrader = player.Name
 
     for _, v in assets do
         assert(v)
@@ -418,7 +418,7 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
             task.wait()
         end
 
-        assert(currentTrader, "No current trader")
+        assert(currentDraftTrader, "No current trader")
 
         if proposed then
             local ourOfferedAssets: {string} = {}
@@ -444,7 +444,7 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 local splitName = v.Name:split("Asset_")[2]
                 local asset = assets[splitName]
                 if asset then
-                    if asset.Owner ~= currentTrader then
+                    if asset.Owner ~= currentDraftTrader then
                         ScreenMessage("Error", `Failed to offer trade as target no longer owns {asset.Name}.`)
                         success = false
                         break
@@ -463,7 +463,7 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 continue
             end
 
-            if theirMoneyOffer > getPlayerMoney(currentTrader) then
+            if theirMoneyOffer > getPlayerMoney(currentDraftTrader) then
                 ScreenMessage("Error", `Failed to offer trade as target doesn't have enough money.`)
                 success = false
                 continue
@@ -481,7 +481,7 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 continue
             end
 
-            if theirJailCardsOffer > getPlayerJailCards(currentTrader) then
+            if theirJailCardsOffer > getPlayerJailCards(currentDraftTrader) then
                 ScreenMessage("Error", `Failed to offer trade as target doesn't have enough jail cards.`)
                 success = false
                 continue
@@ -514,7 +514,6 @@ end
 function module.Trading(player: Player | Configuration, offer: ClientTypes.InitialTradeOffer): ()
     reset()
 
-    isDraftMode = false
     currentTrader = player.Name
 
     updateMoneyOffer(true, offer.OurOffer.Money)
