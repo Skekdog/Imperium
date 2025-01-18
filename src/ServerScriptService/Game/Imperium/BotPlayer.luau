@@ -152,6 +152,7 @@ local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeMana
         totalIncomingValue += bot:EvaluateAssetForPurchase(v, them)
     end
 
+    print(`{bot.Player.Name} evaluates {them.Player.Name}'s trade as Incoming: {totalIncomingValue} and Outgoing: {totalOutgoingValue}.`)
     return totalIncomingValue > totalOutgoingValue
 end
 
