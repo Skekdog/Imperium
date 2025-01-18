@@ -123,7 +123,11 @@ local function retractAsset(assetData: AssetData): ()
     end
 end
 
-local function processAssetButtonClick(assetData: AssetData): ()
+local function processAssetButtonClick(isOwn: boolean, assetData: AssetData): ()
+    if not isDraftMode and not isOwn then
+        return
+    end
+    
     if assetData.Button.Parent == ourItems :: any or assetData.Button.Parent == theirItems :: any then
         offerAsset(assetData)
     elseif assetData.Button.Parent == ourOffer :: any or assetData.Button.Parent == theirOffer :: any then
@@ -144,7 +148,7 @@ serverClient:WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: str
         }
 
         bindToClick(button, function()
-            processAssetButtonClick(assert(assets[asset.Name]))
+            processAssetButtonClick(plr == lclPlayer.Name, assert(assets[asset.Name]))
         end)
     end
 
@@ -216,6 +220,10 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
+            if not isDraftMode and not isOwn then
+                return
+            end
+
             if v > 0 and (if isOwn then ourMoneyOffer else theirMoneyOffer) + v > getPlayerMoney(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough money.`)
             end
@@ -267,6 +275,10 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
         clone.Parent = parent :: any
 
         bindToClick(clone, function()
+            if not isDraftMode and not isOwn then
+                return
+            end
+
             if v > 0 and (if isOwn then ourJailCardsOffer else theirJailCardsOffer) + v > getPlayerJailCards(if isOwn then nil else currentTrader) then
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough jail cards.`)
             end
