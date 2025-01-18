@@ -499,6 +499,15 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, offer.TheirOffer.JailCards)
     updateDisplayedMoneyOffer(theirOffer.OfferedMoney, offer.TheirOffer.Money)
 
+    for _, v in assets do
+        assert(v)
+        if v.Owner == lclPlayer.Name then
+            v.Button.Parent = ourItems :: any
+        elseif v.Owner == player.Name then
+            v.Button.Parent = theirItems :: any
+        end
+    end
+
     for _, v in offer.OurOffer.Assets do
         local asset = assets[v]
         if asset then
