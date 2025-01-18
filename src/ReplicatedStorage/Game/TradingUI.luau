@@ -472,11 +472,11 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     isDraftMode = false
     currentTrader = player.Name
 
-    updateJailCardsOffer(true, offer.OurOffer.JailCards)
-    updateMoneyOffer(false, offer.OurOffer.Money)
-
-    updateJailCardsOffer(true, offer.TheirOffer.JailCards)
+    updateMoneyOffer(true, offer.OurOffer.Money)
     updateMoneyOffer(false, offer.TheirOffer.Money)
+
+    updateJailCardsOffer(true, offer.OurOffer.JailCards)
+    updateJailCardsOffer(false, offer.TheirOffer.JailCards)
 
     for _, v in assets do
         assert(v)
