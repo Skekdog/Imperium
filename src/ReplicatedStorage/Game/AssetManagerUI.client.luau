@@ -137,8 +137,8 @@ local function selectAsset(button: Button, name: string, asset: ClientTypes.Clie
     updateView(asset)
 end
 
-ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: Player, asset: ClientTypes.ClientAssetView)
-    if plr ~= Players.LocalPlayer then
+ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("UpdateAsset").OnClientEvent:Connect(function(plr: string, asset: ClientTypes.ClientAssetView)
+    if plr ~= Players.LocalPlayer.Name then
         return
     end
     local name = asset.Name
@@ -157,8 +157,8 @@ ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild
     end)
 end)
 
-ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: Player, name: string)
-    if plr ~= Players.LocalPlayer then
+ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient"):WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: string, name: string)
+    if plr ~= Players.LocalPlayer.Name then
         return
     end
     local button = assetList:FindFirstChild("Asset_" .. name) :: Button?
