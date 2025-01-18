@@ -550,7 +550,19 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     object.Choices.Cancel.Visible = false
 
     object.Choices.Reject.Visible = true
-    object.Choices.Accept.Visible = true
+    acceptButton.Visible = true
+
+    bindToClick(acceptButton, function()
+        assert(currentTrader, "No current trader")
+        updateAcceptance(true, not weAccepted)
+        notifyOfferUpdateResponse(tradeRemotes.SendTradeAcceptance:InvokeServer(currentTrader, weAccepted) :: ClientTypes.TradeOfferAcceptInvokeResult)
+    end)
+
+    bindToClick(object.Choices.Reject, function()
+        assert(currentTrader, "No current trader")
+        notifyOfferUpdateResponse(tradeRemotes.RejectTradeOffer:InvokeServer(currentTrader) :: ClientTypes.TradeOfferRejectInvokeResult)
+        ui:ToggleVisible(false)
+    end)
 
     object.Title:SetAttribute("Player_1", GetPlayerName(player))
     object.Title:SetAttribute("Format", `Trading with [PLAYER]`)
