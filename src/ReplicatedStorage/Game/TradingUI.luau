@@ -166,17 +166,32 @@ serverClient:WaitForChild("RemoveAsset").OnClientEvent:Connect(function(plr: str
     end
 end)
 
-local function updateDisplayedMoneyOffer(label: TextLabel, value: number): ()
+local function updateMoneyOffer(isOwn: boolean, value: number): ()
+    if isOwn then
+        ourMoneyOffer = value
+    else
+        theirMoneyOffer = value
+    end
+
+    local label = (if isOwn then ourOffer.OfferedMoney else theirOffer.OfferedMoney) :: TextLabel
     if value == 0 then
         label.Visible = false
         return
     end
+    assert(value > 0, "Value must be greater than 0")
 
     label.Text = `{GetCurrencySymbol()}{value} Cash`
     label.Visible = true
 end
 
-local function updateDisplayJailCardsOffer(label: TextLabel, value: number): ()
+local function updateJailCardsOffer(isOwn: boolean, value: number): ()
+    if isOwn then
+        ourJailCardsOffer = value
+    else
+        theirJailCardsOffer = value
+    end
+
+    local label = (if isOwn then ourOffer.OfferedJailCards else theirOffer.OfferedJailCards) :: TextLabel
     if value == 0 then
         label.Visible = false
         return
@@ -205,16 +220,10 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough money.`)
             end
 
-            local actualDiff: number
-            if isOwn then
-                actualDiff = math.max(ourMoneyOffer + v, 0) - ourMoneyOffer
-                ourMoneyOffer += actualDiff
-                updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
-            else
-                actualDiff = math.max(theirMoneyOffer + v, 0) - theirMoneyOffer
-                theirMoneyOffer += actualDiff
-                updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
-            end
+            local value = if isOwn then ourMoneyOffer else theirMoneyOffer
+            local actualDiff = math.max(value + v, 0) - value
+
+            updateMoneyOffer(isOwn, value + actualDiff)
 
             local offer: ClientTypes.TradeOfferMoneyUpdate = {
                 Kind = "Money",
@@ -224,13 +233,7 @@ local function makeMoneyOfferButtons(parent: typeof(ourItems.MoneyOffers) | type
             if not isDraftMode then
                 local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
                 if not success then
-                    if isOwn then
-                        ourMoneyOffer -= actualDiff
-                        updateDisplayedMoneyOffer(ourOffer.OfferedMoney, ourMoneyOffer)
-                    else
-                        theirMoneyOffer -= actualDiff
-                        updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
-                    end
+                    updateMoneyOffer(isOwn, value - actualDiff)
                 end
             end
         end)
@@ -268,16 +271,10 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
                 return ScreenMessage("Error", `{if isOwn then "You don't" else "Target doesn't"} have enough jail cards.`)
             end
 
-            local actualDiff: number
-            if isOwn then
-                actualDiff = math.max(ourJailCardsOffer + v, 0) - ourJailCardsOffer
-                ourJailCardsOffer += actualDiff
-                updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
-            else
-                actualDiff = math.max(theirJailCardsOffer + v, 0) - theirJailCardsOffer
-                theirJailCardsOffer += actualDiff
-                updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
-            end
+            local value = if isOwn then ourJailCardsOffer else theirJailCardsOffer
+            local actualDiff = math.max(value + v, 0) - value
+
+            updateJailCardsOffer(isOwn, value + actualDiff)
 
             local offer: ClientTypes.TradeOfferJailCardsUpdate = {
                 Kind = "JailCards",
@@ -287,13 +284,7 @@ local function makeJailCardOfferButtons(parent: typeof(ourItems.JailCardOffers) 
             if not isDraftMode then
                 local success = notifyOfferUpdateResponse(tradeRemotes:WaitForChild("UpdateTradeOffer"):InvokeServer(currentTrader, offer))
                 if not success then
-                    if isOwn then
-                        ourJailCardsOffer -= actualDiff
-                        updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, ourJailCardsOffer)
-                    else
-                        theirJailCardsOffer -= actualDiff
-                        updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
-                    end
+                    updateJailCardsOffer(isOwn, value - actualDiff)
                 end
             end
         end)
@@ -334,17 +325,11 @@ local function reset(): ()
 
     currentTrader = nil
 
-    ourMoneyOffer = 0
-    ourJailCardsOffer = 0
+    updateMoneyOffer(true, 0)
+    updateMoneyOffer(false, 0)
 
-    theirMoneyOffer = 0
-    theirJailCardsOffer = 0
-
-    updateDisplayedMoneyOffer(ourOffer.OfferedMoney, 0)
-    updateDisplayedMoneyOffer(theirOffer.OfferedMoney, 0)
-
-    updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, 0)
-    updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, 0)
+    updateJailCardsOffer(true, 0)
+    updateJailCardsOffer(false, 0)
 end
 
 reset()
@@ -487,17 +472,11 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     isDraftMode = false
     currentTrader = player.Name
 
-    ourMoneyOffer = offer.OurOffer.Money
-    theirMoneyOffer = offer.TheirOffer.Money
+    updateJailCardsOffer(true, offer.OurOffer.JailCards)
+    updateMoneyOffer(false, offer.OurOffer.Money)
 
-    ourJailCardsOffer = offer.OurOffer.JailCards
-    theirJailCardsOffer = offer.TheirOffer.JailCards
-
-    updateDisplayJailCardsOffer(ourOffer.OfferedJailCards, offer.OurOffer.JailCards)
-    updateDisplayedMoneyOffer(ourOffer.OfferedMoney, offer.OurOffer.Money)
-
-    updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, offer.TheirOffer.JailCards)
-    updateDisplayedMoneyOffer(theirOffer.OfferedMoney, offer.TheirOffer.Money)
+    updateJailCardsOffer(true, offer.TheirOffer.JailCards)
+    updateMoneyOffer(false, offer.TheirOffer.Money)
 
     for _, v in assets do
         assert(v)
@@ -543,10 +522,10 @@ tradeRemotes.ReceiveUpdatedTradeOffer.OnClientEvent:Connect(function(trader: str
 
     if offer.Kind == "Money" then
         theirMoneyOffer = offer.Amount
-        updateDisplayedMoneyOffer(theirOffer.OfferedMoney, theirMoneyOffer)
+        updateMoneyOffer(false, theirMoneyOffer)
     elseif offer.Kind == "JailCards" then
         theirJailCardsOffer = offer.Amount
-        updateDisplayJailCardsOffer(theirOffer.OfferedJailCards, theirJailCardsOffer)
+        updateJailCardsOffer(false, theirJailCardsOffer)
     elseif offer.Kind == "Asset" then
         local asset = assets[offer.Name]
         if asset then
