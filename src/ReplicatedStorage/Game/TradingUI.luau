@@ -602,6 +602,26 @@ tradeRemotes.ReceiveUpdatedTradeAcceptance.OnClientEvent:Connect(function(trader
     updateAcceptance(false, accepted)
 end)
 
+tradeRemotes.TradeEnded.OnClientEvent:Connect(function(trader: string, reason: ClientTypes.TradeResetReason)
+    if currentTrader ~= trader then
+        return
+    end
+
+    ui:ToggleVisible(false)
+
+    if reason == "Disconnected" then
+        ScreenMessage("Error", "Trade ended because target disconnected.")
+    elseif reason == "GoingBankrupt" then
+        ScreenMessage("Error", "Trade ended because someone is going bankrupt.")
+    elseif reason == "TradeAccepted" then
+        ScreenMessage("Success", `Trade accepted with {GetPlayerName(trader)}!`)
+    elseif reason == "TradeRejected" then
+        ScreenMessage("Error", "Trade was rejected.")
+    else
+        ScreenMessage("Error", "Trade ended for an unknown reason.")
+    end
+end)
+
 module.UI = ui
 
 return module

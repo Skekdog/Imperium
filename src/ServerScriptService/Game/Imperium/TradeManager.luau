@@ -99,8 +99,8 @@ local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.T
     otherParticipant.TradeManager.Trade = nil
 
     if reason ~= "BotDeclinedOffer" then
-        FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, reason)
-        FireRemote(tradeRemotes.TradeEnded, otherParticipant, reason)
+        FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, otherParticipant.Player.Name, reason)
+        FireRemote(tradeRemotes.TradeEnded, otherParticipant, tradeManager.Participant.Player.Name, reason)
     end
 end
 
