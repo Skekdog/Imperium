@@ -146,7 +146,7 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
     end
 
     tradeManager.Trade.Confirmation[tradeManager.Participant] = confirmed
-    FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), confirmed)
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), tradeManager.Participant.Player.Name, confirmed)
 
     if tradeManager.Trade.Confirmation[tradeManager.Participant] and tradeManager.Trade.Confirmation[tradeManager:GetOtherParticipant()] then
         doTrade(tradeManager.Trade)

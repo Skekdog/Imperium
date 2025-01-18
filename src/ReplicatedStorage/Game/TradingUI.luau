@@ -70,6 +70,28 @@ local ourJailCardsOffer = 0
 local theirMoneyOffer = 0
 local theirJailCardsOffer = 0
 
+local weAccepted = false
+local theyAccepted = false
+
+local acceptButton = object.Choices.Accept
+local function updateAcceptance(isOwn: boolean, accepted: boolean): ()
+    if isOwn then
+        weAccepted = accepted
+    else
+        theyAccepted = accepted
+    end
+
+    local countAccepted = 0
+    if weAccepted then
+        countAccepted += 1
+    end
+    if theyAccepted then
+        countAccepted += 1
+    end
+
+    acceptButton.Text = `{if weAccepted then "Unaccept" else "Accept"} ({countAccepted}/2)`
+end
+
 local serverClient = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ServerClient")
 local tradeRemotes = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Trading")
 
@@ -339,6 +361,9 @@ local function reset(): ()
 
     currentTrader = nil
 
+    updateAcceptance(true, false)
+    updateAcceptance(false, false)
+
     updateMoneyOffer(true, 0)
     updateMoneyOffer(false, 0)
 
@@ -555,6 +580,14 @@ tradeRemotes.ReceiveUpdatedTradeOffer.OnClientEvent:Connect(function(trader: str
             end
         end
     end
+end)
+
+tradeRemotes.ReceiveUpdatedTradeAcceptance.OnClientEvent:Connect(function(trader: string, accepted: boolean): ()
+    if currentTrader ~= trader then
+        return
+    end
+
+    updateAcceptance(false, accepted)
 end)
 
 module.UI = ui
