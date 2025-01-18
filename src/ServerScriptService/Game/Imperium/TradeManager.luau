@@ -109,7 +109,8 @@ local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, of
         return "Expired"
     end
 
-    if tradeManager:GetOtherParticipant().Player.Name ~= with then
+    local otherParticipant = tradeManager:GetOtherParticipant()
+    if otherParticipant.Player.Name ~= with then
         return "Expired"
     end
 
@@ -131,7 +132,10 @@ local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, of
         return res
     end
 
-    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, tradeManager:GetOtherParticipant(), participant.Player.Name, offer)
+    tradeManager:TryConfirmOffer(otherParticipant.Player.Name, false)
+    otherParticipant.TradeManager:TryConfirmOffer(participant.Player.Name, false)
+
+    FireRemote(tradeRemotes.ReceiveUpdatedTradeOffer, otherParticipant, participant.Player.Name, offer)
 
     return "Success"
 end
