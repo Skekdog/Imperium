@@ -149,6 +149,10 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
         return "Expired"
     end
 
+    if confirmed == tradeManager.Trade.Confirmation[tradeManager.Participant] then
+        return "Success"
+    end
+
     tradeManager.Trade.Confirmation[tradeManager.Participant] = confirmed
     FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), tradeManager.Participant.Player.Name, confirmed)
 
