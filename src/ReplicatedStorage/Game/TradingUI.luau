@@ -33,6 +33,8 @@ local function notifyOfferUpdateResponse(response: ClientTypes.TradeOfferUpdateI
         ScreenMessage("Error", "You don't have enough money.")
     elseif response == "Expired" then
         ScreenMessage("Error", "Trade has expired.")
+    elseif response == "ValueBelowZero" then
+        ScreenMessage("Error", "Some offered items are below zero.")
     elseif response == "Success" then
         return true
     else
@@ -427,6 +429,12 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
             end
 
             if success == false then
+                continue
+            end
+
+            if ourMoneyOffer < 0 or theirMoneyOffer < 0 or ourJailCardsOffer < 0 or theirJailCardsOffer < 0 then
+                ScreenMessage("Error", `Failed to offer trade as you cannot offer a negative amount of money or jail cards.`)
+                success = false
                 continue
             end
 

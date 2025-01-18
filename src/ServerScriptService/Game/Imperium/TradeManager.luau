@@ -44,6 +44,11 @@ local function tryUpdateMoneyOffer(participant: Types.Participant, currentOffer:
     if participant.Money < offer.Amount then
         return "NotEnoughMoney"
     end
+
+    if offer.Amount < 0 then
+        return "ValueBelowZero"
+    end
+
     currentOffer.Money = offer.Amount
     return "Success"
 end
@@ -52,6 +57,11 @@ local function tryUpdateJailCardsOffer(participant: Types.Participant, currentOf
     if participant.JailCards < offer.Amount then
         return "NotEnoughJailCards"
     end
+
+    if offer.Amount < 0 then
+        return "ValueBelowZero"
+    end
+
     currentOffer.JailCards = offer.Amount
     return "Success"
 end
@@ -199,6 +209,13 @@ local function createOffersFromInitialOffer(ourParticipant: Types.Participant, t
         return {
             Success = false,
             Reason = "OtherNotEnoughJailCards",
+        }
+    end
+
+    if initialOffer.TheirOffer.Money < 0 or initialOffer.TheirOffer.JailCards < 0 or initialOffer.OurOffer.Money < 0 or initialOffer.OurOffer.JailCards < 0 then
+        return {
+            Success = false,
+            Reason = "ValueBelowZero",
         }
     end
 

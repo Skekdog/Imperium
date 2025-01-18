@@ -51,6 +51,8 @@ return function(plr: Player | Configuration): ()
         ScreenMessage("Error", "You no longer own some of the assets in your offer.")
     elseif response == "OtherUnownedAsset" then
         ScreenMessage("Error", "Target no longer owns some of the assets in their offer.")
+    elseif response == "ValueBelowZero" then
+        ScreenMessage("Error", "Some offered items are below zero.")
     else
         ScreenMessage("Error", "An unknown error occurred: " .. tostring(response))
     end

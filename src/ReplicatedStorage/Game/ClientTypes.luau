@@ -49,10 +49,11 @@ export type TradeRequestInvokeResult = "Success" | "Cooldown"
                                     | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt" | "Disconnected"
                                     | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError" | "SelfUnownedAsset" | "OtherUnownedAsset"
                                     | "SelfNotEnoughMoney" | "OtherNotEnoughMoney" | "SelfNotEnoughJailCards" | "OtherNotEnoughJailCards"
+                                    | "ValueBelowZero"
 
 export type TradeRequestAcceptInvokeResult = "Success" | "Expired" | "OtherError"
 
-export type TradeOfferUpdateInvokeResult = "Success" | "Expired" | "NotEnoughMoney" | "NotEnoughJailCards"
+export type TradeOfferUpdateInvokeResult = "Success" | "Expired" | "NotEnoughMoney" | "NotEnoughJailCards" | "ValueBelowZero"
                                     | "UnownedAsset" | "AssetAlreadyAdded" | "AssetAlreadyRemoved" | "OtherError"
 
 export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError"
