@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GetPlayerName = require(ReplicatedStorage.Shared.GetPlayerName)
@@ -6,6 +7,12 @@ local ScreenMessage = require(script.Parent.Parent.Shared.ScreenMessage)
 local TradingUI = require(script.Parent.TradingUI)
 
 return function(plr: Player | Configuration): ()
+    if Players.LocalPlayer:GetAttribute("GoingBankrupt") then
+        return ScreenMessage("Error", "Cannot trade while going bankrupt.")
+    elseif plr:GetAttribute("GoingBankrupt") then
+        return ScreenMessage("Error", "Target is going bankrupt.")
+    end
+    
     local offer = TradingUI.DraftTrade(plr)
     TradingUI.UI:ToggleVisible(false)
     
@@ -35,8 +42,10 @@ return function(plr: Player | Configuration): ()
         ScreenMessage("Error", "Trade request timed out.")
     elseif response == "Declined" then
         ScreenMessage("Error", "Target declined your trade request.")
-    elseif response == "Bankrupt" then
-        ScreenMessage("Error", "Unable to trade during bankruptcy.")
+    elseif response == "SelfBankrupt" then
+        ScreenMessage("Error", "You are going bankrupt.")
+    elseif response == "OtherBankrupt" then
+        ScreenMessage("Error", "Target is going bankrupt.")
     elseif response == "Disconnected" then
         ScreenMessage("Error", "Unable to trade with a disconnected player.")
     elseif response == "OtherNotEnoughJailCards" then

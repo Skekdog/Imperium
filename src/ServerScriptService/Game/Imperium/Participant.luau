@@ -162,7 +162,9 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
+    participant.Player:SetAttribute("GoingBankrupt", true)
     participant.IsGoingBankrupt = true
+
     local players = {participant.Player}
     if to ~= "Bank" then
         table.insert(players, to.Player)
@@ -190,6 +192,7 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
     ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", 0)
 
     participant.IsGoingBankrupt = false
+    participant.Player:SetAttribute("GoingBankrupt", false)
 
     if participant.Money < targetAmount then
         GoBankrupt(participant, to)
