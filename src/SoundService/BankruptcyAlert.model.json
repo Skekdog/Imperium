@@ -1,9 +1,18 @@
 {
     "className": "Sound",
     "Properties": {
-        "SoundId": "rbxassetid://644569388",
-        "PlaybackSpeed": 0.5,
+        "SoundId": "rbxassetid://6176997734",
+        "PlaybackSpeed": 1,
         "Looped": true,
         "Volume": 0
-    }
+    },
+
+    "Children": [
+        {
+            "className": "PitchShiftSoundEffect",
+            "Properties": {
+                "Octave": 0.5
+            }
+        }
+    ]
 }
