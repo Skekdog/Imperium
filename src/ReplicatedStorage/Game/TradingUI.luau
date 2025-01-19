@@ -6,6 +6,7 @@ local ClientTypes = require(script.Parent.ClientTypes)
 local CreateAssetButton = require(script.Parent.CreateAssetButton)
 local UIAnimation = require(ReplicatedStorage.Shared.UIAnimation)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
+local IsTradeValid = require(script.Parent.IsTradeValid)
 local UIManager = require(script.Parent.Parent.Shared.UIManager)
 
 local lclPlayer = Players.LocalPlayer
@@ -455,6 +456,17 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
         assert(currentDraftTrader, "No current trader")
 
         if proposed then
+            local ourAssets: {string} = {}
+            local theirAssets: {string} = {}
+            for _, v in assets do
+                assert(v)
+                if v.Owner == lclPlayer.Name then
+                    table.insert(ourAssets, v.Name)
+                elseif v.Owner == currentDraftTrader then
+                    table.insert(theirAssets, v.Name)
+                end
+            end
+
             local ourOfferedAssets: {string} = {}
             for _, v in ourOffer:GetChildren() do
                 local splitName = v.Name:split("Asset_")[2]
@@ -491,37 +503,7 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                 continue
             end
 
-            if ourMoneyOffer < 0 or theirMoneyOffer < 0 or ourJailCardsOffer < 0 or theirJailCardsOffer < 0 then
-                ScreenMessage("Error", `Failed to offer trade as you cannot offer a negative amount of money or jail cards.`)
-                success = false
-                continue
-            end
-
-            if theirMoneyOffer > getPlayerMoney(currentDraftTrader) then
-                ScreenMessage("Error", `Failed to offer trade as target doesn't have enough money.`)
-                success = false
-                continue
-            end
-
-            if ourMoneyOffer > getPlayerMoney() then
-                ScreenMessage("Error", `Failed to offer trade as you don't have enough money.`)
-                success = false
-                continue
-            end
-
-            if ourJailCardsOffer > getPlayerJailCards() then
-                ScreenMessage("Error", `Failed to offer trade as you don't have enough jail cards.`)
-                success = false
-                continue
-            end
-
-            if theirJailCardsOffer > getPlayerJailCards(currentDraftTrader) then
-                ScreenMessage("Error", `Failed to offer trade as target doesn't have enough jail cards.`)
-                success = false
-                continue
-            end
-
-            return {
+            local tradeOffer = {
                 OurOffer = {
                     Money = ourMoneyOffer,
                     JailCards = ourJailCardsOffer,
@@ -533,6 +515,25 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
                     Assets = theirOfferedAssets,
                 }
             }
+
+            local ourView = {
+                Money = getPlayerMoney(),
+                JailCards = getPlayerJailCards(),
+                Assets = ourAssets,
+            }
+
+            local theirView = {
+                Money = getPlayerMoney(currentDraftTrader),
+                JailCards = getPlayerJailCards(currentDraftTrader),
+                Assets = theirAssets,
+            }
+
+            success = notifyOfferAcceptResponse(IsTradeValid.IsTradeValid(tradeOffer, ourView, theirView))
+            if not success then
+                continue
+            end
+
+            return tradeOffer
         end
 
         if success == nil then
