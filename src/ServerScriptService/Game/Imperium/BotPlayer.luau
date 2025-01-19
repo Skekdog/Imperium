@@ -258,7 +258,7 @@ local function getDesiredColoursForParticipant(participant: Types.Participant): 
     return desiredColours
 end
 
-local function getBestAssetToSellTo(bot: Types.BotPlayer, participant: Types.Participant, botDesiredColours: {string}): Types.Asset?
+local function getPossibleAssetsToSellTo(bot: Types.BotPlayer, participant: Types.Participant, botDesiredColours: {string}): {Types.Asset}
     local theirDesiredColours = getDesiredColoursForParticipant(participant)
     
     sortAssetPriceAscending(bot.Participant.Assets)
@@ -276,7 +276,7 @@ local function getBestAssetToSellTo(bot: Types.BotPlayer, participant: Types.Par
         table.insert(possibleAssets, v)
     end
 
-    return possibleAssets[1]
+    return possibleAssets
 end
 
 local function offerTradeTo(bot: Types.BotPlayer, participant: Types.Participant, ourAsset: Types.Asset, theirAsset: Types.Asset): ()
@@ -294,7 +294,7 @@ local function offerTradeTo(bot: Types.BotPlayer, participant: Types.Participant
     })
 end
 
-local function tryOfferTradeTo(bot: Types.BotPlayer, participant: Types.Participant, desiredColours: {string})
+local function tryOfferTradeTo(bot: Types.BotPlayer, participant: Types.Participant, desiredColours: {string}): boolean
     -- If we are missing one asset from a set, we want to try and get it.
     -- We do this by offering an asset for a set that we don't have but they do have.
     -- In the case of non-developable assets, we don't want to exchange another asset for it, instead just offer cash.
@@ -303,19 +303,41 @@ local function tryOfferTradeTo(bot: Types.BotPlayer, participant: Types.Particip
     local turn = bot.Participant.Round.Turn
 
     if bot.TradeRejectionTurns[participant] or 0 + bot.TradeRejectionCooldown > turn then
-        return
+        return false
     end
+
+    local trade: Types.Trade = {
+        Participant1 = bot.Participant,
+        Participant2 = participant,
+
+        Confirmation = {},
+
+        Offers = {[bot.Participant] = {
+            Money = 0,
+            JailCards = 0,
+            Assets = {},
+        },
+        [participant] = {
+            Money = 0,
+            JailCards = 0,
+            Assets = {},
+        }}
+    }
 
     for _, v in participant.Assets do
         if table.find(desiredColours, v.AssetDescription.Colour) then
-            local bestAsset = getBestAssetToSellTo(bot, participant, desiredColours)
-            if bestAsset then
-                offerTradeTo(bot, participant, bestAsset, v)
+            trade.Offers[participant].Assets = {v}
+            for _, asset in getPossibleAssetsToSellTo(bot, participant, desiredColours) do
+                trade.Offers[bot.Participant].Assets = {asset}
+                if bot:EvaluateTrade(trade, participant) then
+                    offerTradeTo(bot, participant, asset, v)
+                    return true
+                end
             end
-
-            return
         end
     end
+
+    return false
 end
 
 local function TryOfferTrades(bot: Types.BotPlayer): ()
