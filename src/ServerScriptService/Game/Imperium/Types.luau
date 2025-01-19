@@ -227,6 +227,7 @@ export type BotPlayer = {
     TradeRejectionCooldown: number,
     MinimumMoneyForDeveloping: number,
     MinimumMoneyForUnmortgaging: number,
+    MaxTradeDuration: number,
 
     FinishTurn: (BotPlayer) -> (),
 

@@ -27,7 +27,14 @@ local function updateNotificationDisplay(playerName: string): ()
     ui:ToggleVisible(true)
 end
 
-tradeRemotes:WaitForChild("ReceiveTradeRequest").OnClientEvent:Connect(function(from: string, offer: ClientTypes.InitialTradeOffer): ()
+tradeRemotes:WaitForChild("ReceiveTradeRequest").OnClientEvent:Connect(function(from: string, offer: ClientTypes.InitialTradeOffer?): ()
+    if from == currentTrader and offer == nil then
+        -- Trade request timedout
+        currentOffer = nil
+        currentTrader = nil
+        return ui:ToggleVisible(false)
+    end
+
     if not currentTrader then
         updateNotificationDisplay(from)
         currentOffer = offer

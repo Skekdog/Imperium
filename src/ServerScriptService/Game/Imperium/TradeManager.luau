@@ -140,6 +140,10 @@ local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.T
     tradeManager.Trade = nil
     otherParticipant.TradeManager.Trade = nil
 
+    if reason == "RequestTimeout" then
+        return FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name)
+    end
+
     if reason ~= "BotDeclinedOffer" then
         FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, otherParticipant.Player.Name, reason)
         FireRemote(tradeRemotes.TradeEnded, otherParticipant, tradeManager.Participant.Player.Name, reason)
@@ -350,7 +354,7 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
 
     tradeManager.LastRequestTimes[otherParticipant] = GetTime()
 
-    tradeManager.Trade = {
+    local trade = {
         Participant1 = tradeManager.Participant,
         Participant2 = otherParticipant,
         Confirmation = {
@@ -362,17 +366,16 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
             [otherParticipant] = offerResult.TheirOffer,
         }
     }
+    tradeManager.Trade = trade
 
-    assert(tradeManager.Trade)
-
-    otherParticipant.TradeManager.Trade = tradeManager.Trade
+    otherParticipant.TradeManager.Trade = trade
 
     local response: boolean?
 
-    local botPlayer = tradeManager.Participant.Round:GetBotPlayer(otherParticipant)
-    if botPlayer then
-        if botPlayer:EvaluateTrade(tradeManager.Trade, tradeManager.Participant) then
-            doTrade(assert(tradeManager.Trade))
+    local otherBotPlayer = tradeManager.Participant.Round:GetBotPlayer(otherParticipant)
+    if otherBotPlayer then
+        if otherBotPlayer:EvaluateTrade(trade, tradeManager.Participant) then
+            doTrade(trade)
             return "BotAcceptedOffer"
         end
         tradeManager:ResetBoth("TradeRejected")
@@ -402,9 +405,20 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
     con:Disconnect()
 
     if response == nil then
+        tradeManager:ResetBoth("RequestTimeout")
         return "Timeout"
     elseif response == false then
+        tradeManager:ResetBoth("TradeRejected")
         return "Declined"
+    end
+
+    local selfBotPlayer = tradeManager.Participant.Round:GetBotPlayer(tradeManager.Participant)
+    if selfBotPlayer then
+        task.delay(selfBotPlayer.MaxTradeDuration, function()
+            if tradeManager.Trade == trade then
+                tradeManager:TryRejectOffer(otherPlayer.Name)
+            end
+        end)
     end
 
     return "Success"

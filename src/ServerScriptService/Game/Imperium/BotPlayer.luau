@@ -475,6 +475,7 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
         TradeRejectionCooldown = 5,
         MinimumMoneyForDeveloping = 400,
         MinimumMoneyForUnmortgaging = 450,
+        MaxTradeDuration = 15,
 
         TradeRejectionTurns = {},
 
