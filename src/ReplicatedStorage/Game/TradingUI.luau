@@ -412,6 +412,8 @@ reset()
 local module = {}
 
 local function tryCreateOfferFromUI(): {Success: true, Offer: ClientTypes.InitialTradeOffer} | {Success: false, Reason: string}
+    assert(currentDraftTrader or currentTrader, "One of currentDraftTrader or currentTrader must be set")
+
     local ourOfferedAssets: {string} = {}
     for _, v in ourOffer:GetChildren() do
         local splitName = v.Name:split("Asset_")[2]
@@ -429,7 +431,7 @@ local function tryCreateOfferFromUI(): {Success: true, Offer: ClientTypes.Initia
         local splitName = v.Name:split("Asset_")[2]
         local asset = assets[splitName]
         if asset then
-            if asset.Owner ~= currentDraftTrader then
+            if asset.Owner ~= currentDraftTrader and asset.Owner ~= currentTrader then
                 return {Success = false, Reason = `Failed to offer trade as target no longer owns {asset.Name}.`}
             end
             table.insert(theirOfferedAssets, splitName)
@@ -456,6 +458,8 @@ local function tryCreateOfferFromUI(): {Success: true, Offer: ClientTypes.Initia
 end
 
 local function validateOfferFromUI(): {Success: false, Reason: string?} | {Success: true, Offer: ClientTypes.InitialTradeOffer}
+    assert(currentDraftTrader or currentTrader, "One of currentDraftTrader or currentTrader must be set")
+
     local offer = tryCreateOfferFromUI()
     if not offer.Success then
         ScreenMessage("Error", offer.Reason)
@@ -471,7 +475,7 @@ local function validateOfferFromUI(): {Success: false, Reason: string?} | {Succe
         assert(v)
         if v.Owner == lclPlayer.Name then
             table.insert(ourAssets, v.Name)
-        elseif v.Owner == currentDraftTrader then
+        elseif v.Owner == currentDraftTrader or v.Owner == currentTrader then
             table.insert(theirAssets, v.Name)
         end
     end
@@ -483,8 +487,8 @@ local function validateOfferFromUI(): {Success: false, Reason: string?} | {Succe
     }
 
     local theirView = {
-        Money = getPlayerMoney(currentDraftTrader),
-        JailCards = getPlayerJailCards(currentDraftTrader),
+        Money = getPlayerMoney(currentDraftTrader or currentTrader),
+        JailCards = getPlayerJailCards(currentDraftTrader or currentTrader),
         Assets = theirAssets,
     }
 

@@ -224,6 +224,14 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
     end
 
     tradeManager.Trade.Confirmation[tradeManager.Participant] = confirmed
+
+    local otherParticipant = tradeManager:GetOtherParticipant()
+    local botPlayer = otherParticipant.Round:GetBotPlayer(otherParticipant)
+    if botPlayer then
+        -- note: we should return here because calling again TryConfirmOffer() will doTrade if it should
+        return otherParticipant.TradeManager:TryConfirmOffer(tradeManager.Participant.Player.Name, botPlayer:EvaluateTrade(otherParticipant.TradeManager))
+    end
+    
     FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), tradeManager.Participant.Player.Name, confirmed)
 
     if tradeManager.Trade.Confirmation[tradeManager.Participant] and tradeManager.Trade.Confirmation[tradeManager:GetOtherParticipant()] then
