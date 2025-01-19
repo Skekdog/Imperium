@@ -140,8 +140,11 @@ local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.T
     tradeManager.Trade = nil
     otherParticipant.TradeManager.Trade = nil
 
+    FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name)
+    FireRemote(tradeRemotes.ReceiveTradeRequest, tradeManager.Participant, otherParticipant.Player.Name)
+
     if reason == "RequestTimeout" then
-        return FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name)
+        return
     end
 
     if reason ~= "BotDeclinedOffer" then
@@ -252,6 +255,11 @@ local function TryRejectOffer(tradeManager: Types.TradeManager, with: string): C
 
     if tradeManager:GetOtherParticipant().Player.Name ~= with then
         return "Expired"
+    end
+
+    local otherBotPlayer = tradeManager:GetOtherParticipant().Round:GetBotPlayer(tradeManager:GetOtherParticipant())
+    if otherBotPlayer then
+        otherBotPlayer.TradeRejectionTurns[tradeManager.Participant] = tradeManager.Participant.Round.Turn
     end
 
     tradeManager:ResetBoth("TradeRejected")

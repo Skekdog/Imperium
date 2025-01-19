@@ -35,6 +35,10 @@ tradeRemotes:WaitForChild("ReceiveTradeRequest").OnClientEvent:Connect(function(
         return ui:ToggleVisible(false)
     end
 
+    if offer == nil then
+        return
+    end
+
     if not currentTrader then
         updateNotificationDisplay(from)
         currentOffer = offer
