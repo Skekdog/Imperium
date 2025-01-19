@@ -349,6 +349,10 @@ local function TryOfferTrades(bot: Types.BotPlayer): ()
 
     coroutine.wrap(function()
         for _, v in bot.Participant.Round.Participants do
+            if v == bot.Participant or v.TradeManager.Trade then
+                continue
+            end
+            
             local sent = tryOfferTradeTo(bot, v, desiredColours)
             if sent then
                 return
