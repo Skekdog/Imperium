@@ -279,17 +279,17 @@ local function getPossibleAssetsToSellTo(bot: Types.BotPlayer, participant: Type
     return possibleAssets
 end
 
-local function offerTradeTo(bot: Types.BotPlayer, participant: Types.Participant, ourAsset: Types.Asset, theirAsset: Types.Asset): ()
+local function offerTradeTo(bot: Types.BotPlayer, participant: Types.Participant, ourAsset: Types.Asset?, theirAsset: Types.Asset?, ourMoney: number?, theirMoney: number?): ()
     bot.Participant.TradeManager:TryRequestTrade(participant.Player.Name, {
         OurOffer = {
-            Money = 0,
+            Money = if ourMoney then ourMoney else 0,
             JailCards = 0,
-            Assets = {ourAsset.AssetDescription.Name},
+            Assets = if ourAsset then {ourAsset.AssetDescription.Name} else {},
         },
         TheirOffer = {
-            Money = 0,
+            Money = if theirMoney then theirMoney else 0,
             JailCards = 0,
-            Assets = {theirAsset.AssetDescription.Name},
+            Assets = if theirAsset then {theirAsset.AssetDescription.Name} else {},
         }
     })
 end
@@ -327,11 +327,22 @@ local function tryOfferTradeTo(bot: Types.BotPlayer, participant: Types.Particip
     for _, v in participant.Assets do
         if table.find(desiredColours, v.AssetDescription.Colour) then
             trade.Offers[participant].Assets = {v}
-            for _, asset in getPossibleAssetsToSellTo(bot, participant, desiredColours) do
-                trade.Offers[bot.Participant].Assets = {asset}
+
+            trade.Offers[bot.Participant].Assets = {}
+            trade.Offers[bot.Participant].Money = 0
+            if not canAssetBeDeveloped(participant, v) then
+                trade.Offers[bot.Participant].Money = math.clamp(math.round(bot:EvaluateAssetForSale(v, participant)), 0, bot.Participant.Money)
                 if bot:EvaluateTrade(trade, participant) then
-                    offerTradeTo(bot, participant, asset, v)
+                    offerTradeTo(bot, participant, nil, v, trade.Offers[bot.Participant].Money)
                     return true
+                end
+            else
+                for _, asset in getPossibleAssetsToSellTo(bot, participant, desiredColours) do
+                    trade.Offers[bot.Participant].Assets = {asset}
+                    if bot:EvaluateTrade(trade, participant) then
+                        offerTradeTo(bot, participant, asset, v)
+                        return true
+                    end
                 end
             end
         end
