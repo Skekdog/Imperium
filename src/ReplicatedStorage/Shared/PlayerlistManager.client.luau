@@ -163,7 +163,7 @@ end
 Players.LocalPlayer:GetAttributeChangedSignal("Status"):Connect(function()
 	for _, v in Players:GetChildren() do
 		assert(v:IsA("Player") or v:IsA("Configuration"))
-		updatePlr(v)
+		updatePlr(v, findPlr(v.Name))
 	end
 end)
 
