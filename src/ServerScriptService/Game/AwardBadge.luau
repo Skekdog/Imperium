@@ -1,4 +1,5 @@
 local BadgeService = game:GetService("BadgeService")
+local RunService = game:GetService("RunService")
 
 export type BadgeName = --[["Monopoly"]] | "Imperium" | "Bankrupt!" | "Artificial, but not Intelligent"
 local badges: {[string]: number} = {
@@ -9,7 +10,7 @@ local badges: {[string]: number} = {
 }
 
 return function(plr: Player | Configuration, name: BadgeName): ()
-    if plr:IsA("Configuration") then
+    if RunService:IsStudio() or plr:IsA("Configuration") then
         return
     end
     
