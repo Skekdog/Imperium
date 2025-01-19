@@ -411,6 +411,94 @@ reset()
 
 local module = {}
 
+local function tryCreateOfferFromUI(): {Success: true, Offer: ClientTypes.InitialTradeOffer} | {Success: false, Reason: string}
+    local ourOfferedAssets: {string} = {}
+    for _, v in ourOffer:GetChildren() do
+        local splitName = v.Name:split("Asset_")[2]
+        local asset = assets[splitName]
+        if asset then
+            if asset.Owner ~= lclPlayer.Name then
+                return {Success = false, Reason = `Failed to offer trade as you no longer own {asset.Name}.`}
+            end
+            table.insert(ourOfferedAssets, splitName)
+        end
+    end
+
+    local theirOfferedAssets: {string} = {}
+    for _, v in theirOffer:GetChildren() do
+        local splitName = v.Name:split("Asset_")[2]
+        local asset = assets[splitName]
+        if asset then
+            if asset.Owner ~= currentDraftTrader then
+                return {Success = false, Reason = `Failed to offer trade as target no longer owns {asset.Name}.`}
+            end
+            table.insert(theirOfferedAssets, splitName)
+        end
+    end
+
+    local tradeOffer = {
+        OurOffer = {
+            Money = ourMoneyOffer,
+            JailCards = ourJailCardsOffer,
+            Assets = ourOfferedAssets,
+        },
+        TheirOffer = {
+            Money = theirMoneyOffer,
+            JailCards = theirJailCardsOffer,
+            Assets = theirOfferedAssets,
+        }
+    }
+
+    return {
+        Success = true,
+        Offer = tradeOffer,
+    }
+end
+
+local function validateOfferFromUI(): {Success: false, Reason: string?} | {Success: true, Offer: ClientTypes.InitialTradeOffer}
+    local offer = tryCreateOfferFromUI()
+    if not offer.Success then
+        return {
+            Success = false,
+            Reason = offer.Reason,
+        }
+    end
+
+    local ourAssets: {string} = {}
+    local theirAssets: {string} = {}
+    for _, v in assets do
+        assert(v)
+        if v.Owner == lclPlayer.Name then
+            table.insert(ourAssets, v.Name)
+        elseif v.Owner == currentDraftTrader then
+            table.insert(theirAssets, v.Name)
+        end
+    end
+
+    local ourView = {
+        Money = getPlayerMoney(),
+        JailCards = getPlayerJailCards(),
+        Assets = ourAssets,
+    }
+
+    local theirView = {
+        Money = getPlayerMoney(currentDraftTrader),
+        JailCards = getPlayerJailCards(currentDraftTrader),
+        Assets = theirAssets,
+    }
+
+    local success = notifyOfferAcceptResponse(IsTradeValid.IsTradeValid(offer.Offer, ourView, theirView))
+
+    if not success then
+        return {Success = false}
+    end
+
+    return {
+        Success = true,
+        Offer = offer.Offer,
+    }
+end
+
 function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialTradeOffer?
     reset()
 
@@ -456,84 +544,13 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
         assert(currentDraftTrader, "No current trader")
 
         if proposed then
-            local ourAssets: {string} = {}
-            local theirAssets: {string} = {}
-            for _, v in assets do
-                assert(v)
-                if v.Owner == lclPlayer.Name then
-                    table.insert(ourAssets, v.Name)
-                elseif v.Owner == currentDraftTrader then
-                    table.insert(theirAssets, v.Name)
-                end
-            end
-
-            local ourOfferedAssets: {string} = {}
-            for _, v in ourOffer:GetChildren() do
-                local splitName = v.Name:split("Asset_")[2]
-                local asset = assets[splitName]
-                if asset then
-                    if asset.Owner ~= lclPlayer.Name then
-                        ScreenMessage("Error", `Failed to offer trade as you no longer own {asset.Name}.`)
-                        success = false
-                        break
-                    end
-                    table.insert(ourOfferedAssets, splitName)
-                end
-            end
-
-            if success == false then
+            local tradeOffer = validateOfferFromUI()
+            if not tradeOffer.Success then
+                success = false
                 continue
             end
 
-            local theirOfferedAssets: {string} = {}
-            for _, v in theirOffer:GetChildren() do
-                local splitName = v.Name:split("Asset_")[2]
-                local asset = assets[splitName]
-                if asset then
-                    if asset.Owner ~= currentDraftTrader then
-                        ScreenMessage("Error", `Failed to offer trade as target no longer owns {asset.Name}.`)
-                        success = false
-                        break
-                    end
-                    table.insert(theirOfferedAssets, splitName)
-                end
-            end
-
-            if success == false then
-                continue
-            end
-
-            local tradeOffer = {
-                OurOffer = {
-                    Money = ourMoneyOffer,
-                    JailCards = ourJailCardsOffer,
-                    Assets = ourOfferedAssets,
-                },
-                TheirOffer = {
-                    Money = theirMoneyOffer,
-                    JailCards = theirJailCardsOffer,
-                    Assets = theirOfferedAssets,
-                }
-            }
-
-            local ourView = {
-                Money = getPlayerMoney(),
-                JailCards = getPlayerJailCards(),
-                Assets = ourAssets,
-            }
-
-            local theirView = {
-                Money = getPlayerMoney(currentDraftTrader),
-                JailCards = getPlayerJailCards(currentDraftTrader),
-                Assets = theirAssets,
-            }
-
-            success = notifyOfferAcceptResponse(IsTradeValid.IsTradeValid(tradeOffer, ourView, theirView))
-            if not success then
-                continue
-            end
-
-            return tradeOffer
+            return tradeOffer.Offer
         end
 
         if success == nil then
@@ -588,6 +605,12 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
 
     bindToClick(acceptButton, function()
         assert(currentTrader, "No current trader")
+        
+        local pass = validateOfferFromUI().Success
+        if not pass then
+            return
+        end
+
         updateAcceptance(true, not weAccepted)
         local success = notifyOfferAcceptResponse(tradeRemotes.SendTradeAcceptance:InvokeServer(currentTrader, weAccepted) :: ClientTypes.TradeOfferAcceptInvokeResult)
         if not success then
