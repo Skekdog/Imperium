@@ -83,7 +83,7 @@ local function doTrade(trade: Types.Trade): ()
 end
 
 local function tryUpdateMoneyOffer(participant: Types.Participant, currentOffer: Types.TradeOffer, offer: ClientTypes.TradeOfferMoneyUpdate): ClientTypes.TradeOfferUpdateInvokeResult
-    if participant.Money < offer.Amount then
+    if participant.Money < offer.Amount and currentOffer.Money < offer.Amount then
         return "NotEnoughMoney"
     end
 
@@ -96,7 +96,7 @@ local function tryUpdateMoneyOffer(participant: Types.Participant, currentOffer:
 end
 
 local function tryUpdateJailCardsOffer(participant: Types.Participant, currentOffer: Types.TradeOffer, offer: ClientTypes.TradeOfferJailCardsUpdate): ClientTypes.TradeOfferUpdateInvokeResult
-    if participant.JailCards < offer.Amount then
+    if participant.JailCards < offer.Amount and currentOffer.JailCards < offer.Amount then
         return "NotEnoughJailCards"
     end
 
