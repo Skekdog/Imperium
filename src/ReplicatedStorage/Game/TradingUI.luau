@@ -33,8 +33,10 @@ local function notifyOfferUpdateResponse(response: ClientTypes.TradeOfferUpdateI
         ScreenMessage("Error", "You don't have enough money.")
     elseif response == "Expired" then
         ScreenMessage("Error", "Trade has expired.")
-    elseif response == "ValueBelowZero" then
-        ScreenMessage("Error", "Some offered items are below zero.")
+    elseif response == "JailCardsBelowZero" then
+        ScreenMessage("Error", "Cannot offer a negative amount of jail cards.")
+    elseif response == "MoneyBelowZero" then
+        ScreenMessage("Error", "Cannot offer a negative amount of money.")
     elseif response == "Success" then
         return true
     else

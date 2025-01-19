@@ -51,8 +51,14 @@ return function(plr: Player | Configuration): ()
         ScreenMessage("Error", "You no longer own some of the assets in your offer.")
     elseif response == "OtherUnownedAsset" then
         ScreenMessage("Error", "Target no longer owns some of the assets in their offer.")
-    elseif response == "ValueBelowZero" then
-        ScreenMessage("Error", "Some offered items are below zero.")
+    elseif response == "OtherJailCardsBelowZero" then
+        ScreenMessage("Error", "Target offer has a negative amount of jail cards.")
+    elseif response == "OtherMoneyBelowZero" then
+        ScreenMessage("Error", "Target offer has a negative amount of money.")
+    elseif response == "SelfJailCardsBelowZero" then
+        ScreenMessage("Error", "Your offer has a negative amount of jail cards.")
+    elseif response == "SelfMoneyBelowZero" then
+        ScreenMessage("Error", "Your offer has a negative amount of money.")
     else
         ScreenMessage("Error", "An unknown error occurred: " .. tostring(response))
     end

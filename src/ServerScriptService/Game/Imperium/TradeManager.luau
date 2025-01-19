@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientTypes = require(ReplicatedStorage.Game.ClientTypes)
+local IsTradeValid = require(ReplicatedStorage.Game.IsTradeValid)
 local GetTime = require(ReplicatedStorage.Shared.GetTime)
 local FireRemote = require(script.Parent.Util.FireRemote)
 local SendNotification = require(script.Parent.Parent.Parent.Shared.SendNotification)
@@ -21,6 +22,47 @@ local function getAssetByName(participant: Types.Participant, name: string): Typ
     end
 
     return nil
+end
+
+local function tradeToClientTrade(tradeManager: Types.TradeManager): {
+    TradeOffer: ClientTypes.InitialTradeOffer,
+    OurAssets: {string},
+    TheirAssets: {string},
+}
+    assert(tradeManager.Trade, "TradeManager has no trade")
+
+    local ourParticipant = tradeManager.Participant
+    local otherParticipant = tradeManager:GetOtherParticipant()
+
+    local ourOffer = tradeManager.Trade.Offers[ourParticipant]
+    local theirOffer = tradeManager.Trade.Offers[otherParticipant]
+
+    local ourAssets: {string} = {}
+    for _, asset in ourOffer.Assets do
+        table.insert(ourAssets, asset.AssetDescription.Name)
+    end
+
+    local theirAssets: {string} = {}
+    for _, asset in theirOffer.Assets do
+        table.insert(theirAssets, asset.AssetDescription.Name)
+    end
+
+    return {
+            TradeOffer = {
+                OurOffer = {
+                    Money = ourOffer.Money,
+                    JailCards = ourOffer.JailCards,
+                    Assets = ourAssets,
+                },
+                TheirOffer = {
+                    Money = theirOffer.Money,
+                    JailCards = theirOffer.JailCards,
+                    Assets = theirAssets,
+                }
+            },
+            OurAssets = ourAssets,
+            TheirAssets = theirAssets,
+        }
 end
 
 local function giveOfferToOtherParticipant(offer: Types.TradeOffer, participant: Types.Participant, to: Types.Participant): ()
@@ -46,7 +88,7 @@ local function tryUpdateMoneyOffer(participant: Types.Participant, currentOffer:
     end
 
     if offer.Amount < 0 then
-        return "ValueBelowZero"
+        return "MoneyBelowZero"
     end
 
     currentOffer.Money = offer.Amount
@@ -59,7 +101,7 @@ local function tryUpdateJailCardsOffer(participant: Types.Participant, currentOf
     end
 
     if offer.Amount < 0 then
-        return "ValueBelowZero"
+        return "JailCardsBelowZero"
     end
 
     currentOffer.JailCards = offer.Amount
@@ -102,6 +144,29 @@ local function ResetBoth(tradeManager: Types.TradeManager, reason: ClientTypes.T
         FireRemote(tradeRemotes.TradeEnded, tradeManager.Participant, otherParticipant.Player.Name, reason)
         FireRemote(tradeRemotes.TradeEnded, otherParticipant, tradeManager.Participant.Player.Name, reason)
     end
+end
+
+local function IsTradeOfferValid(tradeManager: Types.TradeManager): ClientTypes.TradeValidationResult
+    assert(tradeManager.Trade, "TradeManager has no trade")
+
+    local participant = tradeManager.Participant
+    local otherParticipant = tradeManager:GetOtherParticipant()
+
+    local res = tradeToClientTrade(tradeManager)
+
+    local ourView = {
+        Money = participant.Money,
+        JailCards = participant.JailCards,
+        Assets = res.OurAssets,
+    }
+
+    local theirView = {
+        Money = otherParticipant.Money,
+        JailCards = otherParticipant.JailCards,
+        Assets = res.TheirAssets,
+    }
+
+    return require(ReplicatedStorage.Game.IsTradeValid).IsTradeValid(res.TradeOffer, ourView, theirView)
 end
 
 local function TryUpdateOffer(tradeManager: Types.TradeManager, with: string, offer: ClientTypes.TradeOfferUpdate): ClientTypes.TradeOfferUpdateInvokeResult
@@ -156,6 +221,8 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
     tradeManager.Trade.Confirmation[tradeManager.Participant] = confirmed
     FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), tradeManager.Participant.Player.Name, confirmed)
 
+    
+
     if tradeManager.Trade.Confirmation[tradeManager.Participant] and tradeManager.Trade.Confirmation[tradeManager:GetOtherParticipant()] then
         doTrade(tradeManager.Trade)
     end
@@ -192,64 +259,25 @@ local function createOffersFromInitialOffer(ourParticipant: Types.Participant, t
     Success: false,
     Reason: ClientTypes.TradeRequestInvokeResult,
 }
-    if ourParticipant.Money < initialOffer.OurOffer.Money then
+    local isValid: ClientTypes.TradeValidationResult = IsTradeValid.IsTradeValid(initialOffer, ourParticipant, theirParticipant)
+    if isValid ~= "Success" then
         return {
             Success = false,
-            Reason = "SelfNotEnoughMoney",
-        }
-    end
-
-    if theirParticipant.Money < initialOffer.TheirOffer.Money then
-        return {
-            Success = false,
-            Reason = "OtherNotEnoughMoney",
-        }
-    end
-
-    if ourParticipant.JailCards < initialOffer.OurOffer.JailCards then
-        return {
-            Success = false,
-            Reason = "SelfNotEnoughJailCards",
-        }
-    end
-
-    if theirParticipant.JailCards < initialOffer.TheirOffer.JailCards then
-        return {
-            Success = false,
-            Reason = "OtherNotEnoughJailCards",
-        }
-    end
-
-    if initialOffer.TheirOffer.Money < 0 or initialOffer.TheirOffer.JailCards < 0 or initialOffer.OurOffer.Money < 0 or initialOffer.OurOffer.JailCards < 0 then
-        return {
-            Success = false,
-            Reason = "ValueBelowZero",
+            Reason = isValid,
         }
     end
 
     local ourAssets: {Types.Asset} = {}
     for _, assetName in initialOffer.OurOffer.Assets do
         local asset = getAssetByName(ourParticipant, assetName)
-        if not asset then
-            return {
-                Success = false,
-                Reason = "SelfUnownedAsset",
-            }
-        end
-
+        assert(asset, "Asset not found")
         table.insert(ourAssets, asset)
     end
 
     local theirAssets: {Types.Asset} = {}
     for _, assetName in initialOffer.TheirOffer.Assets do
         local asset = getAssetByName(theirParticipant, assetName)
-        if not asset then
-            return {
-                Success = false,
-                Reason = "OtherUnownedAsset",
-            }
-        end
-
+        assert(asset, "Asset not found")
         table.insert(theirAssets, asset)
     end
 
@@ -376,6 +404,7 @@ function module.new(participant: Types.Participant): Types.TradeManager
         GetOtherParticipant = GetOtherParticipant,
         ResetBoth = ResetBoth,
 
+        IsTradeOfferValid = IsTradeOfferValid,
         TryRequestTrade = TryRequestTrade,
 
         TryUpdateOffer = TryUpdateOffer,
