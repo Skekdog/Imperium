@@ -245,9 +245,95 @@ local function TryAvoidBankruptcy(bot: Types.BotPlayer, requiredMoney: number): 
     return
 end
 
+local function getDesiredColoursForParticipant(participant: Types.Participant): {string}
+    local desiredColours: {string} = {}
+    for colour, assets in groupAssetsByColour(participant.Assets) do
+        local canBeDeveloped = canAssetBeDeveloped(participant, assets[1])
+        if canBeDeveloped then
+            local fullSet = #participant.Board:GetAllAssetsInColourGroup(colour)
+            if #assets == fullSet - 1 then
+                table.insert(desiredColours, colour)
+            end 
+        else
+            table.insert(desiredColours, colour)
+        end
+    end
+
+    return desiredColours
+end
+
+local function getBestAssetToSellTo(bot: Types.BotPlayer, participant: Types.Participant, botDesiredColours: {string}): Types.Asset?
+    local theirDesiredColours = getDesiredColoursForParticipant(participant)
+    
+    sortAssetPriceAscending(bot.Participant.Assets)
+
+    local possibleAssets: {Types.Asset} = {}
+    for _, v in bot.Participant.Assets do
+        if table.find(botDesiredColours, v.AssetDescription.Colour) then
+            continue
+        end
+
+        if not table.find(theirDesiredColours, v.AssetDescription.Colour) then
+            continue
+        end
+        
+        table.insert(possibleAssets, v)
+    end
+
+    return possibleAssets[1]
+end
+
+local function offerTradeTo(bot: Types.BotPlayer, participant: Types.Participant, ourAsset: Types.Asset, theirAsset: Types.Asset): ()
+    bot.Participant.TradeManager:TryRequestTrade(participant.Player.Name, {
+        OurOffer = {
+            Money = 0,
+            JailCards = 0,
+            Assets = {ourAsset.AssetDescription.Name},
+        },
+        TheirOffer = {
+            Money = 0,
+            JailCards = 0,
+            Assets = {theirAsset.AssetDescription.Name},
+        }
+    })
+end
+
+local function tryOfferTradeTo(bot: Types.BotPlayer, participant: Types.Participant, desiredColours: {string})
+    -- If we are missing one asset from a set, we want to try and get it.
+    -- We do this by offering an asset for a set that we don't have but they do have.
+    -- In the case of non-developable assets, we don't want to exchange another asset for it, instead just offer cash.
+    -- Reason being is that their value usually directly scales with the number owned (stations go 25 -> 50 -> 100 -> 200), whereas normal assets only get a boost when the entire set is owned.
+
+    local turn = bot.Participant.Round.Turn
+
+    if bot.TradeRejectionTurns[participant] or 0 + bot.TradeRejectionCooldown > turn then
+        return
+    end
+
+    for _, v in participant.Assets do
+        if table.find(desiredColours, v.AssetDescription.Colour) then
+            local bestAsset = getBestAssetToSellTo(bot, participant, desiredColours)
+            if bestAsset then
+                offerTradeTo(bot, participant, bestAsset, v)
+            end
+
+            return
+        end
+    end
+end
+
+local function TryOfferTrades(bot: Types.BotPlayer): ()
+    local desiredColours = getDesiredColoursForParticipant(bot.Participant)
+
+    for _, v in bot.Participant.Round.Participants do
+        tryOfferTradeTo(bot, v, desiredColours)
+    end
+end
+
 local function FinishTurn(bot: Types.BotPlayer): ()
     bot:TryUnmortgageAssets()
     bot:TryBuildDevelopments()
+    bot:TryOfferTrades()
 end
 
 local function randomNegativeHalf(value: number): number
@@ -361,8 +447,11 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
         Player = player,
         Model = char,
 
+        TradeRejectionCooldown = 5,
         MinimumMoneyForDeveloping = 400,
         MinimumMoneyForUnmortgaging = 450,
+
+        TradeRejectionTurns = {},
 
         FinishTurn = FinishTurn,
 
@@ -379,6 +468,8 @@ function module.new(round: Types.Round, name: string): Types.BotPlayer
 
         TryBuildDevelopments = TryBuildDevelopments,
         TryUnmortgageAssets = TryUnmortgageAssets,
+        TryOfferTrades = TryOfferTrades,
+
         TryAvoidBankruptcy = TryAvoidBankruptcy,
     }
 end

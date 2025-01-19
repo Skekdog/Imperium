@@ -222,6 +222,9 @@ export type BotPlayer = {
     Player: Configuration,
     Model: Model,
 
+    TradeRejectionTurns: {[Participant]: number?},
+
+    TradeRejectionCooldown: number,
     MinimumMoneyForDeveloping: number,
     MinimumMoneyForUnmortgaging: number,
 
@@ -240,6 +243,7 @@ export type BotPlayer = {
 
     TryBuildDevelopments: (BotPlayer) -> (),
     TryUnmortgageAssets: (BotPlayer) -> (),
+    TryOfferTrades: (BotPlayer) -> (),
 
     TryAvoidBankruptcy: (BotPlayer, requiredMoney: number) -> (),
 }
