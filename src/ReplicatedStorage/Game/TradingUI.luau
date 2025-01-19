@@ -458,6 +458,7 @@ end
 local function validateOfferFromUI(): {Success: false, Reason: string?} | {Success: true, Offer: ClientTypes.InitialTradeOffer}
     local offer = tryCreateOfferFromUI()
     if not offer.Success then
+        ScreenMessage("Error", offer.Reason)
         return {
             Success = false,
             Reason = offer.Reason,
