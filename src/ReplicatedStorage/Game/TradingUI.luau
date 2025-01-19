@@ -70,6 +70,10 @@ local function notifyOfferAcceptResponse(response: ClientTypes.TradeOfferAcceptI
         ScreenMessage("Error", "Target no longer owns some of the assets in their offer.")
     elseif response == "SelfUnownedAsset" then
         ScreenMessage("Error", "You no longer own some of the assets in your offer.")
+    elseif response == "OtherBankrupt" then
+        ScreenMessage("Error", "Target is going bankrupt.")
+    elseif response == "SelfBankrupt" then
+        ScreenMessage("Error", "You are going bankrupt.")
     elseif response == "Success" then
         return true
     else

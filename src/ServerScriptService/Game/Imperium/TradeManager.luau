@@ -316,6 +316,10 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
         return "SelfAlreadyTrading"
     end
 
+    if tradeManager.Participant.IsGoingBankrupt then
+        return "SelfBankrupt"
+    end
+
     local otherPlayer = Players:FindFirstChild(name)
     if not otherPlayer or (not otherPlayer:IsA("Player") and not otherPlayer:IsA("Configuration")) then
         return "OtherError"
@@ -328,6 +332,10 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
 
     if otherParticipant.TradeManager.Trade then
         return "OtherAlreadyTrading"
+    end
+
+    if otherParticipant.IsGoingBankrupt then
+        return "OtherBankrupt"
     end
 
     local lastTradeAttempt = tradeManager.LastRequestTimes[otherParticipant]

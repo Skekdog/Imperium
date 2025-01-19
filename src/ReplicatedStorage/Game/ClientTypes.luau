@@ -45,8 +45,8 @@ export type InitialTradeOffer = {
 
 export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate | TradeOfferAssetUpdate
 
-export type TradeRequestInvokeResult = "Success" | "Cooldown"
-                                    | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt" | "Disconnected"
+export type TradeRequestInvokeResult = "Success" | "Cooldown" | "OtherBankrupt"
+                                    | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "SelfBankrupt" | "Disconnected"
                                     | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError" | TradeValidationResult
 
 export type TradeRequestAcceptInvokeResult = "Success" | "Expired" | "OtherError"
@@ -59,7 +59,7 @@ export type TradeValidationResult = "SelfMoneyBelowZero" | "OtherMoneyBelowZero"
                                     | "SelfNotEnoughMoney" | "OtherNotEnoughMoney" | "SelfNotEnoughJailCards" | "OtherNotEnoughJailCards"
                                     | "SelfUnownedAsset" | "OtherUnownedAsset" | "Success" | "OtherError"
 
-export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError" | TradeValidationResult
+export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError" | TradeValidationResult | "SelfBankrupt" | "OtherBankrupt"
 
 export type TradeOfferRejectInvokeResult = "Success" | "Expired" | "OtherError"
 
