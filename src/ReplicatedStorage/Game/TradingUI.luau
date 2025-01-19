@@ -553,6 +553,22 @@ function module.DraftTrade(player: Player | Configuration): ClientTypes.InitialT
         assert(currentDraftTrader, "No current trader")
 
         if proposed then
+            if lclPlayer:GetAttribute("GoingBankrupt") then
+                ScreenMessage("Error", "You are going bankrupt.")
+                return nil
+            end
+
+            local otherPlayer = Players:FindFirstChild(currentDraftTrader)
+            if not otherPlayer then
+                ScreenMessage("Error", "Target disconnected.")
+                return nil
+            end
+
+            if otherPlayer:GetAttribute("GoingBankrupt") then
+                ScreenMessage("Error", "Target is going bankrupt.")
+                return nil
+            end
+
             local tradeOffer = validateOfferFromUI()
             if not tradeOffer.Success then
                 success = false
@@ -614,6 +630,19 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
 
     bindToClick(acceptButton, function()
         assert(currentTrader, "No current trader")
+
+        if lclPlayer:GetAttribute("GoingBankrupt") then
+            return ScreenMessage("Error", "You are going bankrupt.")
+        end
+
+        local otherPlayer = Players:FindFirstChild(currentTrader)
+        if not otherPlayer then
+            return ScreenMessage("Error", "Target disconnected.")
+        end
+
+        if otherPlayer:GetAttribute("GoingBankrupt") then
+            return ScreenMessage("Error", "Target is going bankrupt.")
+        end
         
         local pass = validateOfferFromUI().Success
         if not pass then
