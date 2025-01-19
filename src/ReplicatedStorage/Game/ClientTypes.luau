@@ -47,9 +47,7 @@ export type TradeOfferUpdate = TradeOfferJailCardsUpdate | TradeOfferMoneyUpdate
 
 export type TradeRequestInvokeResult = "Success" | "Cooldown"
                                     | "SelfAlreadyTrading" | "OtherAlreadyTrading" | "Timeout" | "Declined" | "Bankrupt" | "Disconnected"
-                                    | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError" | "SelfUnownedAsset" | "OtherUnownedAsset"
-                                    | "SelfNotEnoughMoney" | "OtherNotEnoughMoney" | "SelfNotEnoughJailCards" | "OtherNotEnoughJailCards"
-                                    | "SelfMoneyBelowZero" | "OtherMoneyBelowZero" | "SelfJailCardsBelowZero" | "OtherJailCardsBelowZero"
+                                    | "BotDeclinedOffer" | "BotAcceptedOffer" | "OtherError" | TradeValidationResult
 
 export type TradeRequestAcceptInvokeResult = "Success" | "Expired" | "OtherError"
 
@@ -61,7 +59,7 @@ export type TradeValidationResult = "SelfMoneyBelowZero" | "OtherMoneyBelowZero"
                                     | "SelfNotEnoughMoney" | "OtherNotEnoughMoney" | "SelfNotEnoughJailCards" | "OtherNotEnoughJailCards"
                                     | "SelfUnownedAsset" | "OtherUnownedAsset" | "Success" | "OtherError"
 
-export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError"
+export type TradeOfferAcceptInvokeResult = "Success" | "Expired" | "OtherError" | TradeValidationResult
 
 export type TradeOfferRejectInvokeResult = "Success" | "Expired" | "OtherError"
 

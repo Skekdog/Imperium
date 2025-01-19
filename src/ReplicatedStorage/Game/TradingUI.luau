@@ -46,6 +46,38 @@ local function notifyOfferUpdateResponse(response: ClientTypes.TradeOfferUpdateI
     return false
 end
 
+local function notifyOfferAcceptResponse(response: ClientTypes.TradeOfferAcceptInvokeResult): boolean
+    if response == "Expired" then
+        ScreenMessage("Error", "Trade has expired.")
+    elseif response == "OtherJailCardsBelowZero" then
+        ScreenMessage("Error", "Target offer has a negative amount of jail cards.")
+    elseif response == "OtherMoneyBelowZero" then
+        ScreenMessage("Error", "Target offer has a negative amount of money.")
+    elseif response == "SelfJailCardsBelowZero" then
+        ScreenMessage("Error", "Your offer has a negative amount of jail cards.")
+    elseif response == "SelfMoneyBelowZero" then
+        ScreenMessage("Error", "Your offer has a negative amount of money.")
+    elseif response == "OtherNotEnoughJailCards" then
+        ScreenMessage("Error", "Target no longer has enough jail cards.")
+    elseif response == "OtherNotEnoughMoney" then
+        ScreenMessage("Error", "Target no longer has enough money.")
+    elseif response == "SelfNotEnoughJailCards" then
+        ScreenMessage("Error", "You no longer have enough jail cards.")
+    elseif response == "SelfNotEnoughMoney" then
+        ScreenMessage("Error", "You no longer have enough money.")
+    elseif response == "OtherUnownedAsset" then
+        ScreenMessage("Error", "Target no longer owns some of the assets in their offer.")
+    elseif response == "SelfUnownedAsset" then
+        ScreenMessage("Error", "You no longer own some of the assets in your offer.")
+    elseif response == "Success" then
+        return true
+    else
+        ScreenMessage("Error", "An unknown error occurred.")
+    end
+
+    return false
+end
+
 local function getPlayerMoney(playerName: string?): number
     local player = if playerName then Players:FindFirstChild(playerName) else Players.LocalPlayer
     assert(player and (player:IsA("Player") or player:IsA("Configuration")), "Player not found")
@@ -556,12 +588,15 @@ function module.Trading(player: Player | Configuration, offer: ClientTypes.Initi
     bindToClick(acceptButton, function()
         assert(currentTrader, "No current trader")
         updateAcceptance(true, not weAccepted)
-        notifyOfferUpdateResponse(tradeRemotes.SendTradeAcceptance:InvokeServer(currentTrader, weAccepted) :: ClientTypes.TradeOfferAcceptInvokeResult)
+        local success = notifyOfferAcceptResponse(tradeRemotes.SendTradeAcceptance:InvokeServer(currentTrader, weAccepted) :: ClientTypes.TradeOfferAcceptInvokeResult)
+        if not success then
+            updateAcceptance(true, false)
+        end
     end)
 
     bindToClick(object.Choices.Reject, function()
         assert(currentTrader, "No current trader")
-        notifyOfferUpdateResponse(tradeRemotes.RejectTradeOffer:InvokeServer(currentTrader) :: ClientTypes.TradeOfferRejectInvokeResult)
+        notifyOfferAcceptResponse(tradeRemotes.RejectTradeOffer:InvokeServer(currentTrader) :: ClientTypes.TradeOfferRejectInvokeResult)
         ui:ToggleVisible(false)
     end)
 
