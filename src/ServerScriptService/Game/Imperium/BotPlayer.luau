@@ -347,12 +347,14 @@ local function TryOfferTrades(bot: Types.BotPlayer): ()
 
     local desiredColours = getDesiredColoursForParticipant(bot.Participant)
 
-    for _, v in bot.Participant.Round.Participants do
-        local sent = tryOfferTradeTo(bot, v, desiredColours)
-        if sent then
-            return
+    coroutine.wrap(function()
+        for _, v in bot.Participant.Round.Participants do
+            local sent = tryOfferTradeTo(bot, v, desiredColours)
+            if sent then
+                return
+            end
         end
-    end
+    end)()
 end
 
 local function FinishTurn(bot: Types.BotPlayer): ()
