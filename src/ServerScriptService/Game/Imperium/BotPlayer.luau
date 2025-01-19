@@ -135,24 +135,20 @@ local function EvaluateSkipJail(bot: Types.BotPlayer): boolean
     return percentOwned < 0.8
 end
 
-local function EvaluateTrade(bot: Types.BotPlayer, tradeManager: Types.TradeManager): boolean
-    local trade = assert(tradeManager.Trade, "TradeManager has no trade")
-
-    local them = tradeManager:GetOtherParticipant()
-
+local function EvaluateTrade(bot: Types.BotPlayer, trade: Types.Trade, otherParticipant: Types.Participant): boolean
     local outgoingOffer = trade.Offers[bot.Participant]
     local totalOutgoingValue = outgoingOffer.Money + (outgoingOffer.JailCards * bot.Participant.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
     for _, v in outgoingOffer.Assets do
-        totalOutgoingValue += bot:EvaluateAssetForSale(v, them)
+        totalOutgoingValue += bot:EvaluateAssetForSale(v, otherParticipant)
     end
 
-    local incomingOffer = trade.Offers[them]
-    local totalIncomingValue = incomingOffer.Money + (incomingOffer.JailCards * them.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
+    local incomingOffer = trade.Offers[otherParticipant]
+    local totalIncomingValue = incomingOffer.Money + (incomingOffer.JailCards * otherParticipant.Round.BoardConfiguration.JailFine * JAIL_CARD_VALUE_MULTIPLIER)
     for _, v in incomingOffer.Assets do
-        totalIncomingValue += bot:EvaluateAssetForPurchase(v, them)
+        totalIncomingValue += bot:EvaluateAssetForPurchase(v, otherParticipant)
     end
 
-    print(`{bot.Player.Name} evaluates {them.Player.Name}'s trade as Incoming: {totalIncomingValue} and Outgoing: {totalOutgoingValue}.`)
+    print(`{bot.Player.Name} evaluates {otherParticipant.Player.Name}'s trade as Incoming: {totalIncomingValue} and Outgoing: {totalOutgoingValue}.`)
     return totalIncomingValue > totalOutgoingValue
 end
 

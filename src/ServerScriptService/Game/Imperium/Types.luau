@@ -236,7 +236,7 @@ export type BotPlayer = {
     EvaluateAssetForPurchase: (BotPlayer, Asset, from: AssetOwner) -> number,
 
     EvaluateSkipJail: (BotPlayer) -> boolean,
-    EvaluateTrade: (BotPlayer, TradeManager) -> boolean,
+    EvaluateTrade: (BotPlayer, trade: Trade, otherParticipant: Participant) -> boolean,
 
     DecideMove: (BotPlayer) -> "Dice" | "JailCard" | "Fine",
     DecidePurchase: (BotPlayer, Asset) -> boolean,

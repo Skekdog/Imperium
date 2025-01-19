@@ -228,8 +228,8 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
     local otherParticipant = tradeManager:GetOtherParticipant()
     local botPlayer = otherParticipant.Round:GetBotPlayer(otherParticipant)
     if botPlayer then
-        -- note: we should return here because calling again TryConfirmOffer() will doTrade if it should
-        return otherParticipant.TradeManager:TryConfirmOffer(tradeManager.Participant.Player.Name, botPlayer:EvaluateTrade(otherParticipant.TradeManager))
+        -- note: we should return here because calling againTryConfirmOffer() will doTrade if it should
+        return otherParticipant.TradeManager:TryConfirmOffer(tradeManager.Participant.Player.Name, botPlayer:EvaluateTrade(tradeManager.Trade, tradeManager.Participant))
     end
     
     FireRemote(tradeRemotes.ReceiveUpdatedTradeAcceptance, tradeManager:GetOtherParticipant(), tradeManager.Participant.Player.Name, confirmed)
@@ -355,13 +355,15 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
         }
     }
 
+    assert(tradeManager.Trade)
+
     otherParticipant.TradeManager.Trade = tradeManager.Trade
 
     local response: boolean?
 
     local botPlayer = tradeManager.Participant.Round:GetBotPlayer(otherParticipant)
     if botPlayer then
-        if botPlayer:EvaluateTrade(otherParticipant.TradeManager) then
+        if botPlayer:EvaluateTrade(tradeManager.Trade, tradeManager.Participant) then
             doTrade(assert(tradeManager.Trade))
             return "BotAcceptedOffer"
         end
