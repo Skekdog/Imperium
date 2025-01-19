@@ -75,7 +75,7 @@ local function giveOfferToOtherParticipant(offer: Types.TradeOffer, participant:
 end
 
 local function doTrade(trade: Types.Trade): ()
-    SendNotification(`[PLAYER] accepted a trade with [PLAYER]`, {trade.Participant1.Player, trade.Participant2.Player})
+    SendNotification(`[PLAYER] accepted a trade with [PLAYER].`, {trade.Participant1.Player, trade.Participant2.Player})
     giveOfferToOtherParticipant(trade.Offers[trade.Participant1], trade.Participant1, trade.Participant2)
     giveOfferToOtherParticipant(trade.Offers[trade.Participant2], trade.Participant2, trade.Participant1)
 
