@@ -82,13 +82,13 @@ end
 local function getPlayerMoney(playerName: string?): number
     local player = if playerName then Players:FindFirstChild(playerName) else Players.LocalPlayer
     assert(player and (player:IsA("Player") or player:IsA("Configuration")), "Player not found")
-    return player:GetAttribute("Money") :: number or 0
+    return player:GetAttribute("Money") :: number? or 0
 end
 
 local function getPlayerJailCards(playerName: string?): number
     local player = if playerName then Players:FindFirstChild(playerName) else Players.LocalPlayer
     assert(player and (player:IsA("Player") or player:IsA("Configuration")), "Player not found")
-    return player:GetAttribute("JailCards") :: number or 0
+    return player:GetAttribute("GetOutOfJailFreeCards") :: number? or 0
 end
 
 local currentDraftTrader: string?
