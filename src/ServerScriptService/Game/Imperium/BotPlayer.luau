@@ -341,10 +341,17 @@ local function tryOfferTradeTo(bot: Types.BotPlayer, participant: Types.Particip
 end
 
 local function TryOfferTrades(bot: Types.BotPlayer): ()
+    if bot.Participant.TradeManager.Trade then
+        return
+    end
+
     local desiredColours = getDesiredColoursForParticipant(bot.Participant)
 
     for _, v in bot.Participant.Round.Participants do
-        tryOfferTradeTo(bot, v, desiredColours)
+        local sent = tryOfferTradeTo(bot, v, desiredColours)
+        if sent then
+            return
+        end
     end
 end
 
