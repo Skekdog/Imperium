@@ -404,15 +404,21 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
 
     con:Disconnect()
 
+    local selfBotPlayer = tradeManager.Participant.Round:GetBotPlayer(tradeManager.Participant)
+
     if response == nil then
         tradeManager:ResetBoth("RequestTimeout")
         return "Timeout"
     elseif response == false then
         tradeManager:ResetBoth("TradeRejected")
+
+        if selfBotPlayer then
+            selfBotPlayer.TradeRejectionTurns[otherParticipant] = otherParticipant.Round.Turn
+        end
+
         return "Declined"
     end
 
-    local selfBotPlayer = tradeManager.Participant.Round:GetBotPlayer(tradeManager.Participant)
     if selfBotPlayer then
         task.delay(selfBotPlayer.MaxTradeDuration, function()
             if tradeManager.Trade == trade then
