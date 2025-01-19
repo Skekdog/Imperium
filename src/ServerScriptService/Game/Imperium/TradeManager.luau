@@ -225,6 +225,14 @@ local function TryConfirmOffer(tradeManager: Types.TradeManager, with: string, c
         return "Success"
     end
 
+    if tradeManager.Participant.IsGoingBankrupt then
+        return "SelfBankrupt"
+    end
+
+    if tradeManager:GetOtherParticipant().IsGoingBankrupt then
+        return "OtherBankrupt"
+    end
+
     local success: ClientTypes.TradeValidationResult = tradeManager:IsTradeOfferValid()
     if success ~= "Success" then
         return success
