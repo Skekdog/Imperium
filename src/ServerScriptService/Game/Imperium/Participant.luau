@@ -383,10 +383,15 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
         return
     end
 
-    participant.PreviousPosition = participant.Position
-    local passGo = (participant.Position == 1) or ((participant.Position > position) and (position ~= 1))
-    if passGo and not moveDirectly and participant.Round.Turn ~= 1 then
+    local lastPosition = participant.Position
+
+    local passGo = (lastPosition == 1) or ((lastPosition > position) and (position ~= 1))
+    if passGo and participant.HasEverLeftGo and not moveDirectly then
         GiveMoney(participant, participant.Round.BoardConfiguration.PassGoMoney)
+    end
+
+    if lastPosition ~= 0 then
+        participant.HasEverLeftGo = true
     end
     participant.Position = position
 
@@ -418,11 +423,10 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
 
             local targetRow = TileMath.GetRowFromPosition(position, numTiles)
 
-            local currentPosition = participant.PreviousPosition
-            local currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
+            local currentRow = TileMath.GetRowFromPosition(lastPosition, numTiles)
 
             local rowDiff: number?
-            if moveDirectly or (currentPosition < position and targetRow == currentRow) then
+            if moveDirectly or (lastPosition < position and targetRow == currentRow) then
                 rowDiff = 0
             elseif targetRow == currentRow then
                 rowDiff = 4
@@ -438,12 +442,12 @@ local function MoveTo(participant: Types.Participant, position: number, moveDire
                 if participant.HasDisconnected then
                     return
                 end
-                local nextCorner = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(currentPosition, numTiles), numTiles)
+                local nextCorner = TileMath.GetWrapAround(TileMath.GetNextCornerPosition(lastPosition, numTiles), numTiles)
 
-                currentPosition = nextCorner
-                currentRow = TileMath.GetRowFromPosition(currentPosition, numTiles)
+                lastPosition = nextCorner
+                currentRow = TileMath.GetRowFromPosition(lastPosition, numTiles)
 
-                local nextTile = participant.Board.Tiles[currentPosition]
+                local nextTile = participant.Board.Tiles[lastPosition]
                 moveCharacter(participant, nextTile, false, GetTime() - startTime, isJailed)
             end
             moveCharacter(participant, tile, nil, nil, isJailed)
@@ -864,9 +868,9 @@ function module.new(player: Player | Configuration, round: Types.Round): Types.P
 
     participant.IsMoving = false
     participant.DoublesStreak = 0
-    participant.PreviousPosition = 0
     participant.Position = 0
     participant.JailedOn = 0
+    participant.HasEverLeftGo = false
 
     participant.SendToJail = SendToJail
     participant.GiveMoney = GiveMoney

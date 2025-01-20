@@ -168,8 +168,8 @@ export type Participant = {
     TradeManager: TradeManager,
 
     IsMoving: boolean,
-    PreviousPosition: number,
     Position: number,
+    HasEverLeftGo: boolean,
 
     ValidPropertyPurchaseTurn: number?,
     
