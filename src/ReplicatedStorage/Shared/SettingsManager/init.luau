@@ -47,7 +47,7 @@ module.AvailableSettings = {
 		Category = "User Interface",
 		Tooltip = "Enables or disables the night sky. Does not take effect in the lobby.",
 		PossibleValues = "Boolean",
-		Default = false,
+		Default = true,
 	},
 	{
 		Name = "Player Names",
