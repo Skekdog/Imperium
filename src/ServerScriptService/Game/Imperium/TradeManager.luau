@@ -414,7 +414,10 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
     FireRemote(tradeRemotes.ReceiveTradeRequest, otherParticipant, tradeManager.Participant.Player.Name, reverseInitialOffer(initialOffer))
 
     local startTime = GetTime()
-    while response == nil and startTime + TRADE_TIMEOUT > GetTime() and tradeManager.Participant.Player.Parent == Players and otherPlayer.Parent == Players do
+    while response == nil and startTime + TRADE_TIMEOUT > GetTime() and
+        tradeManager.Participant.Player.Parent == Players and otherPlayer.Parent == Players and
+        not tradeManager.Participant.IsGoingBankrupt and not otherParticipant.IsGoingBankrupt
+    do
         task.wait()
     end
 
@@ -422,7 +425,11 @@ local function TryRequestTrade(tradeManager: Types.TradeManager, name: string, i
 
     local selfBotPlayer = tradeManager.Participant.Round:GetBotPlayer(tradeManager.Participant)
 
-    if tradeManager.Participant.Player.Parent ~= Players or otherPlayer.Parent ~= Players then
+    if tradeManager.Participant.IsGoingBankrupt then
+        return "SelfBankrupt"
+    elseif otherParticipant.IsGoingBankrupt then
+        return "OtherBankrupt"
+    elseif tradeManager.Participant.Player.Parent ~= Players or otherPlayer.Parent ~= Players then
         return "Disconnected" -- note: we don't need to :ResetBoth() here, because that is done in the disconnect handler
     elseif response == nil then
         tradeManager:ResetBoth("RequestTimeout")
