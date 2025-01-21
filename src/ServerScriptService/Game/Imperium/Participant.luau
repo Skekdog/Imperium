@@ -688,7 +688,7 @@ local function TryPlayMove(participant: Types.Participant): ()
             end
 
             MoveBy(participant, result.Result)
-            return if participant.JailedOn == 0 then play() else nil -- We could land on Go To Jail hence the check
+            return if participant.JailedOn == 0 and participant.IsInGame then play() else nil -- We could land on Go To Jail hence the check
         else
             participant.DoublesStreak = 0
         end
