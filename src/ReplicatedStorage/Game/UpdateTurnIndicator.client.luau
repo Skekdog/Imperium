@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(ReplicatedStorage.Shared.UIManager)
-local BankruptcyAlert = require(script.Parent.BankruptcyAlert)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
@@ -51,12 +50,6 @@ ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(fun
 
     if neededMoney > 0 then
         object.Bankruptcy.Text = `GOING BANKRUPT (NEED ANOTHER {GetCurrencySymbol()}{neededMoney})`
-
-        if ReplicatedStorage:GetAttribute("CurrentPlayer") == Players.LocalPlayer.Name then
-            BankruptcyAlert.Start()
-        end
-    else
-        BankruptcyAlert.Stop()
     end
 end)
 

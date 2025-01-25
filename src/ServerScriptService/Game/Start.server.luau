@@ -23,7 +23,7 @@ local INTERMISSION_DURATION = 5
 local MIN_PLAYERS_OR_EXIT = 1
 
 local STUDIO_MIN_PLAYERS = if IsBotSimulationEnabled() then 1 else 1
-local STUDIO_BOT_PLAYERS = 0
+local STUDIO_BOT_PLAYERS = 2
 
 local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 

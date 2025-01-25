@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local AnimateDrawCard = require(script.Parent.AnimateDrawCard)
+local BankruptcyAlert = require(script.Parent.BankruptcyAlert)
 local GetCharacter = require(script.Parent.GetCharacter)
 local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local LerpModelCFrame = require(script.Parent.LerpModelCFrame)
@@ -27,6 +28,14 @@ local gameClientServer = ReplicatedStorage:WaitForChild("Game"):WaitForChild("Cl
 gameServerClient.SetMovementEnabled.OnClientEvent:Connect(ToggleMovementEnabled)
 
 local localPlayer = Players.LocalPlayer
+
+localPlayer:GetAttributeChangedSignal("GoingBankrupt"):Connect(function()
+    if localPlayer:GetAttribute("GoingBankrupt") then
+        BankruptcyAlert.Start()
+    else
+        BankruptcyAlert.Stop()
+    end
+end)
 
 local function highlightCharacter(model: Model?, enabled: boolean?)
     if not model then
