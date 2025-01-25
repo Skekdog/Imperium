@@ -25,6 +25,14 @@ module.SETTINGS_VERSION = 3
 module.Settings = {}
 module.AvailableSettings = {
 	{
+		Name = "Background Music",
+		Tab = "Sound",
+		Category = "Music",
+		Tooltip = "Enables or disables background music.",
+		PossibleValues = "Boolean",
+		Default = true,
+	},
+	{
 		Name = "Your Turn Alert",
 		Tab = "Sound",
 		Category = "Alerts",

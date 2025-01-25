@@ -1,3 +1,6 @@
 {
-	"className": "SoundGroup"
+	"className": "SoundGroup",
+	"properties": {
+		"Volume": 0.25
+	}
 }
