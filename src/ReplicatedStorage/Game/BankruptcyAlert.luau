@@ -25,7 +25,7 @@ function module.Start(): ()
     if not alert.IsPlaying and SettingsManager.GetSetting("Bankruptcy Alert") then
         alert:Play()
     end
-    alert.Volume = 0.1
+    alert.Volume = 0.25
 end
 
 function module.Stop(): ()
