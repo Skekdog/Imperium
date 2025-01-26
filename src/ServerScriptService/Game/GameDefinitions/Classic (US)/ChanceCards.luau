@@ -129,6 +129,10 @@ module[14] = {
     Title = "You have been elected Chairman of the Board. Pay each player $50.",
     Effect = function(participant: Types.Participant): ()
         for _, otherParticipant in participant.Round.Participants do
+            if not participant.IsInGame then
+                return
+            end
+            
             if otherParticipant ~= participant then
                 participant:TransferMoneyTo(otherParticipant, 50)
             end

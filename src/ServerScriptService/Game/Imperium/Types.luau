@@ -4,9 +4,15 @@ local ClientTypes = require(ReplicatedStorage.Game.ClientTypes)
 
 type Turn = number
 export type AssetOwner = Participant | "Bank"
+
 export type DiceRollResult = {
     Result: number,
     IsDoubles: boolean,
+}
+
+export type GetNextParticipantResult = {
+    Participant: Participant,
+    IncrementTurn: boolean,
 }
 
 export type BoardConfiguration = {
@@ -154,6 +160,7 @@ export type Participant = {
     Player: Player | Configuration,
     Character: Model?,
     
+    Index: number,
     Round: Round,
     Board: Board,
     IsInGame: boolean,
@@ -214,7 +221,7 @@ export type Participant = {
 
     TryReceiveFreeParkingMoney: (Participant) -> (),
 
-    RemoveParticipant: (Participant, doNotStartNextTurn: boolean?) -> (),
+    RemoveParticipant: (Participant) -> (),
 }
 
 export type BotPlayer = {
@@ -268,20 +275,22 @@ export type Round = {
     Started: boolean,
     Turn: Turn,
 
+    CurrentParticipant: Participant?,
+    Participants: {Participant},
+    GetHighestParticipantIndex: (Round) -> number,
+    GetParticipantCount: (Round) -> number,
+    GetNextParticipant: (Round) -> GetNextParticipantResult,
+
     _freeParkingMoney: number,
     SetFreeParkingMoney: (Round, amount: number) -> (),
     GetFreeParkingMoney: (Round) -> number,
-   
-    Participants: {Participant},
-    CurrentParticipant: Participant?,
 
     BotPlayers: {[Participant]: BotPlayer?},
     GetBotPlayer: (Round, participant: Participant) -> BotPlayer?,
 
     StartRound: (Round) -> (),
     TryGetParticipant: (Round, player: Player | Configuration) -> Participant?,
-    StartNextParticipantTurn: (Round, participant: Participant?) -> (),
-    SetNextParticipant: (Round) -> (),
+    StartNextParticipantTurn: (Round) -> (),
 }
 
 return {}

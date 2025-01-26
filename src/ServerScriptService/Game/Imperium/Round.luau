@@ -13,34 +13,74 @@ local Types = require(script.Parent.Types)
 
 local module = {}
 
-local function SetNextParticipant(round: Types.Round): Types.Participant
-    local lastIndex: number? = 0
-    if round.CurrentParticipant then
-        if #Players:GetChildren() < 1 or #round.Participants < 1 then
-            WaitForever()
+local function getMinIndex(tbl: {[number]: any}): number
+    -- note: the order of non-sequential table keys is undefined
+    local lowest = table.maxn(tbl :: {any})
+    for i in tbl do
+        if i < lowest then
+            lowest = i :: number
         end
-        lastIndex = table.find(round.Participants, round.CurrentParticipant)
-        assert(lastIndex, "Round has no current participant")
-    end
-    assert(lastIndex)
-
-    if lastIndex >= #round.Participants then
-        round.Turn += 1
-        lastIndex = 0
     end
 
-    lastIndex += 1
-
-    local nextParticipant = round.Participants[lastIndex]
-    assert(nextParticipant, "Round has no next participant")
-
-    round.CurrentParticipant = nextParticipant
-
-    return nextParticipant
+    return lowest
 end
 
-local function StartNextParticipantTurn(round: Types.Round, participant: Types.Participant?): ()
-    local nextParticipant = participant or SetNextParticipant(round)
+local function GetParticipantCount(round: Types.Round): number
+    local count = 0
+    for _ in round.Participants do
+        count += 1
+    end
+
+    return count
+end
+
+local function GetHighestParticipantIndex(round: Types.Round): number
+    return table.maxn(round.Participants)
+end
+
+local function GetNextParticipant(round: Types.Round): Types.GetNextParticipantResult
+    local minIndex = getMinIndex(round.Participants)
+
+    if #Players:GetChildren() < 1 or round:GetParticipantCount() < 1 then
+        WaitForever()
+    end
+
+    if not round.CurrentParticipant then
+        return {
+            Participant = round.Participants[minIndex],
+            IncrementTurn = false,
+        }
+    end
+
+    if round.CurrentParticipant.Index >= round:GetHighestParticipantIndex() then
+        return {
+            Participant = round.Participants[minIndex],
+            IncrementTurn = true,
+        }
+    end
+    
+    for i, v in round.Participants do
+        assert(i)
+        if i > round.CurrentParticipant.Index then
+            return {
+                Participant = v,
+                IncrementTurn = false,
+            }
+        end
+    end
+
+    error("Failed to get next participant")
+end
+
+local function StartNextParticipantTurn(round: Types.Round): ()
+    local result = round:GetNextParticipant()
+    local nextParticipant = result.Participant
+    
+    if result.IncrementTurn then
+        round.Turn += 1
+    end
+
+    round.CurrentParticipant = nextParticipant
 
     if round.IsPaused then
         ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
@@ -53,7 +93,8 @@ local function StartNextParticipantTurn(round: Types.Round, participant: Types.P
     end
 
     if nextParticipant.HasDisconnected then
-        return task.defer(nextParticipant.RemoveParticipant, nextParticipant, true)
+        nextParticipant:RemoveParticipant()
+        return task.defer(round.StartNextParticipantTurn, round)
     end
 
     ReplicatedStorage:SetAttribute("CurrentPlayer", nextParticipant.Player.Name)
@@ -211,7 +252,10 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
     round.StartNextParticipantTurn = StartNextParticipantTurn
     round.TryGetParticipant = TryGetParticipant
     round.StartRound = StartRound
-    round.SetNextParticipant = SetNextParticipant
+    round.GetNextParticipant = GetNextParticipant
+
+    round.GetParticipantCount = GetParticipantCount
+    round.GetHighestParticipantIndex = GetHighestParticipantIndex
 
     round.SetFreeParkingMoney = SetFreeParkingMoney
     round.GetFreeParkingMoney = GetFreeParkingMoney
@@ -238,9 +282,11 @@ function module.new(boardConfiguration: Types.BoardConfiguration, tiles: {Types.
         end
     end
 
-    ReplicatedStorage:SetAttribute("FineAmount", boardConfiguration.JailFine)
+    for i, v in participants do
+        v.Index = i
+    end
 
-    round.CurrentParticipant = round.Participants[#round.Participants]
+    ReplicatedStorage:SetAttribute("FineAmount", boardConfiguration.JailFine)
 
     local colourOrders = ReplicatedStorage:WaitForChild("Game"):WaitForChild("ColourOrders")
     for i, tile in tiles do

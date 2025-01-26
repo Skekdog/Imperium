@@ -158,7 +158,7 @@ local function GoBankrupt(participant: Types.Participant, to: Types.AssetOwner):
 
     AwardBadge(participant.Player, "Bankrupt!")
 
-    participant:RemoveParticipant(true)
+    participant:RemoveParticipant()
 end
 
 local function BankruptcyWarning(participant: Types.Participant, targetAmount: number, to: Types.AssetOwner): boolean
@@ -796,18 +796,21 @@ local function CanAfford(participant: Types.Participant, amount: number): boolea
     return participant.Money >= amount
 end
 
-local function RemoveParticipant(participant: Types.Participant, doNotStartNextTurn: boolean?): ()
+local function RemoveParticipant(participant: Types.Participant): ()
     local round = participant.Round
 
-    local nextParticipant: Types.Participant?
-    if round.CurrentParticipant == participant then
-        nextParticipant = round:SetNextParticipant()
+    local index: number?
+    for i, v in round.Participants do
+        if v == participant then
+            index = i
+            break
+        end
     end
 
-    local index = table.find(round.Participants, participant)
-    assert(index, `Invalid index for participant {participant.Player.Name}`)
     print("Removing participant", participant.Player.Name)
-    table.remove(round.Participants, index)
+
+    assert(index, "Invalid index")
+    round.Participants[index] = nil
     
     participant.IsInGame = false
     participant.Player:SetAttribute("Status", "Spectating")
@@ -821,19 +824,15 @@ local function RemoveParticipant(participant: Types.Participant, doNotStartNextT
         end
     end
 
-    local isGameOver = #round.Participants == 1
+    local isGameOver = round:GetParticipantCount() == 1
     if isGameOver then
-        return round.Participants[1]:GetTheDub()
+        return round.Participants[round:GetHighestParticipantIndex()]:GetTheDub()
     end
 
     for i = #participant.Assets, 1, -1 do
         local asset = participant.Assets[i]
         assert(asset, `Invalid index for asset {i}`)
         asset:StartAuction(round, true)
-    end
-
-    if nextParticipant and #round.Participants > 1 and not doNotStartNextTurn then
-        round:StartNextParticipantTurn(nextParticipant)
     end
 end
 
@@ -898,6 +897,8 @@ function module.new(player: Player | Configuration, round: Types.Round): Types.P
 
     participant.HasMonopoly = HasMonopoly
     participant.CanAfford = CanAfford
+
+    participant.Index = 0
 
     participant.IsInGame = true
     participant.HasDisconnected = false
