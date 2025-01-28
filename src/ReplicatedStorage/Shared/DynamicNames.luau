@@ -44,7 +44,8 @@ function module.UpdateLabel(mode: Mode, textLabel: TextLabel): ()
         end
     end
 
-    textLabel.Text = replacePlayers(format, descriptors, mode)
+    local text = replacePlayers(format, descriptors, mode)
+    textLabel.Text = if textLabel:GetAttribute("MakeUpper") then text:upper() else text
 end
 
 function module.UpdateAll(mode: Mode): ()

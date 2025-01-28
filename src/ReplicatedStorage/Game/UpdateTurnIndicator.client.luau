@@ -42,6 +42,21 @@ setWaitingText()
 
 ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(setPlayerText)
 
+local currentBankruptingPlayer: Player | Configuration?
+
+local function onPlayerAdded(plr: Player | Configuration): ()
+    plr:GetAttributeChangedSignal("GoingBankrupt"):Connect(function()
+        if plr:GetAttribute("GoingBankrupt") then
+            currentBankruptingPlayer = plr
+        end
+    end)
+end
+
+for _, plr in Players:GetPlayers() do
+    onPlayerAdded(plr)
+end
+Players.PlayerAdded:Connect(onPlayerAdded)
+
 ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(function()
     local neededMoney = ReplicatedStorage:GetAttribute("NeededMoneyBankruptcy") :: number
     UIAnimation.Animate(object.Bankruptcy, TweenInfo.new(0.1), {
@@ -49,7 +64,11 @@ ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(fun
     })
 
     if neededMoney > 0 then
-        object.Bankruptcy.Text = `GOING BANKRUPT (NEED ANOTHER {GetCurrencySymbol()}{neededMoney})`
+        assert(currentBankruptingPlayer, "Current bankrupting player is nil")
+        object.Bankruptcy:SetAttribute("Player_1", GetPlayerName(currentBankruptingPlayer))
+        object.Bankruptcy:SetAttribute("Format", `[PLAYER] IS GOING BANKRUPT (NEED ANOTHER {GetCurrencySymbol()}{neededMoney})`)
+        object.Bankruptcy:SetAttribute("MakeUpper", true)
+        object.Bankruptcy:AddTag("DynamicNames")
     end
 end)
 
