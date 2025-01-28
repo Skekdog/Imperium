@@ -1,0 +1,9 @@
+{
+	"className": "Sound",
+	"Properties": {
+		"SoundId": "rbxassetid://123723467281477",
+		"PlaybackSpeed": 1,
+		"Looped": false,
+		"Volume": 0.5
+	}
+}
