@@ -3,30 +3,43 @@ local tracksFolder = SoundService.BackgroundMusic
 
 local PAUSE_TIME = 10
 
-local tracks = {}
-for _, v in tracksFolder:GetChildren() do
-	if not v:IsA("Sound") then
-		continue
+local random = Random.new(workspace:GetServerTimeNow())
+
+local tracks: {Sound} = {}
+
+local function tryAddTrack(track: Instance): ()
+	if not track:IsA("Sound") then
+		return
 	end
 
-	v.SoundGroup = SoundService.BackgroundMusic
-	table.insert(tracks, v)
+	track.SoundGroup = SoundService.BackgroundMusic
+	table.insert(tracks, track)
 end
 
-local lastTrack: Sound?
+tracksFolder.ChildAdded:Connect(function(child)
+	tryAddTrack(child)
+	random:Shuffle(tracks)
+end)
+
+for _, v in tracksFolder:GetChildren() do
+	tryAddTrack(v)
+end
+
+random:Shuffle(tracks)
+
+local index = 0
 
 while true do
-	local chosenTrack: Sound?
-	repeat
-		chosenTrack = tracks[math.random(#tracks)]
-	until chosenTrack ~= lastTrack
+	index += 1
+	if index > #tracks then
+		index = 1
+	end
 
-	lastTrack = chosenTrack
+	local track = tracks[index]
+	assert(track, "Index out of bounds")
+	track:Play()
 
-	assert(chosenTrack)
-	chosenTrack:Play()
-
-	chosenTrack.Ended:Wait()
+	track.Ended:Wait()
 
 	task.wait(PAUSE_TIME)
 end
