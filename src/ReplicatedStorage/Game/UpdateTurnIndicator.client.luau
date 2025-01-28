@@ -44,7 +44,11 @@ ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(setPlayerTe
 
 local currentBankruptingPlayer: Player | Configuration?
 
-local function onPlayerAdded(plr: Player | Configuration): ()
+local function tryOnPlayerAdded(plr: Instance): ()
+    if not plr:IsA("Player") or not plr:IsA("Configuration") then
+        return
+    end
+    
     plr:GetAttributeChangedSignal("GoingBankrupt"):Connect(function()
         if plr:GetAttribute("GoingBankrupt") then
             currentBankruptingPlayer = plr
@@ -52,10 +56,10 @@ local function onPlayerAdded(plr: Player | Configuration): ()
     end)
 end
 
-for _, plr in Players:GetPlayers() do
-    onPlayerAdded(plr)
+for _, plr in Players:GetChildren() do
+    tryOnPlayerAdded(plr)
 end
-Players.PlayerAdded:Connect(onPlayerAdded)
+Players.ChildAdded:Connect(tryOnPlayerAdded)
 
 ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(function()
     local neededMoney = ReplicatedStorage:GetAttribute("NeededMoneyBankruptcy") :: number
