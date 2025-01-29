@@ -1,7 +1,9 @@
 local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
 local tracksFolder = SoundService.BackgroundMusic
 
-local PAUSE_TIME = 10
+local FADE_OUT_TIME = 5
+local PAUSE_TIME = 1
 
 local random = Random.new(workspace:GetServerTimeNow())
 
@@ -38,6 +40,10 @@ while true do
 	local track = tracks[index]
 	assert(track, "Index out of bounds")
 	track:Play()
+
+	task.delay(track.TimeLength - FADE_OUT_TIME, function() -- normally wouldn't do this but some of the tracks end REALLY abruptly
+		TweenService:Create(track, TweenInfo.new(FADE_OUT_TIME), {Volume = 0}):Play()
+	end)
 
 	track.Ended:Wait()
 
