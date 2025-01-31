@@ -122,6 +122,13 @@ local function TryJoin(lobby: LobbyTypes.Lobby, plr: Player, password: unknown):
         return "you are already in this lobby"
     end
 
+    for _, v in lobbies do
+        assert(v)
+        if table.find(v.Players, plr.Name) then
+            return "you are already in a lobby"
+        end
+    end
+
     if IsTeleporting(plr) then
         return "you are already joining a game"
     end
