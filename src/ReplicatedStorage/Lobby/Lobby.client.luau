@@ -310,7 +310,7 @@ local function addPlayerToLobby(lobbyId: number, plr: string): ()
 end
 
 local function removePlayerFromLobby(lobbyId: number, plr: string): ()
-    if lobbyId == currentLobby then
+    if lobbyId == currentLobby and plr == Players.LocalPlayer.Name then
         setCurrentLobby(nil)
     end
 
