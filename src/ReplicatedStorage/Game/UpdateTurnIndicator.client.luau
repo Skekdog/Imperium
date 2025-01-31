@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(ReplicatedStorage.Shared.UIManager)
-local GetCurrencySymbol = require(script.Parent.GetCurrencySymbol)
 local GetPlayerName = require(script.Parent.Parent.Shared.GetPlayerName)
 local UIAnimation = require(script.Parent.Parent.Shared.UIAnimation)
 
@@ -42,39 +41,16 @@ setWaitingText()
 
 ReplicatedStorage:GetAttributeChangedSignal("CurrentPlayer"):Connect(setPlayerText)
 
-local currentBankruptingPlayer: Player | Configuration?
-
 local function tryOnPlayerAdded(plr: Instance): ()
     if not plr:IsA("Player") or not plr:IsA("Configuration") then
         return
     end
-    
-    plr:GetAttributeChangedSignal("GoingBankrupt"):Connect(function()
-        if plr:GetAttribute("GoingBankrupt") then
-            currentBankruptingPlayer = plr
-        end
-    end)
 end
 
 for _, plr in Players:GetChildren() do
     tryOnPlayerAdded(plr)
 end
 Players.ChildAdded:Connect(tryOnPlayerAdded)
-
-ReplicatedStorage:GetAttributeChangedSignal("NeededMoneyBankruptcy"):Connect(function()
-    local neededMoney = ReplicatedStorage:GetAttribute("NeededMoneyBankruptcy") :: number
-    UIAnimation.Animate(object.Bankruptcy, TweenInfo.new(0.1), {
-        Position = UDim2.fromScale(0.5, if neededMoney > 0 then 1 else 0.7)
-    })
-
-    if neededMoney > 0 then
-        assert(currentBankruptingPlayer, "Current bankrupting player is nil")
-        object.Bankruptcy:SetAttribute("Player_1", GetPlayerName(currentBankruptingPlayer))
-        object.Bankruptcy:SetAttribute("Format", `[PLAYER] IS GOING BANKRUPT (NEED ANOTHER {GetCurrencySymbol()}{neededMoney})`)
-        object.Bankruptcy:SetAttribute("MakeUpper", true)
-        object.Bankruptcy:AddTag("DynamicNames")
-    end
-end)
 
 ReplicatedStorage:GetAttributeChangedSignal("IsPaused"):Connect(function()
     local isPaused = ReplicatedStorage:GetAttribute("IsPaused") :: boolean

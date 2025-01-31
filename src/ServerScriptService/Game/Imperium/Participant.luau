@@ -129,9 +129,9 @@ local function GiveMoney(participant: Types.Participant, amount: number): ()
     participant.Money += amount
     participant.Player:SetAttribute("Money", participant.Money)
 
-    local moneyNeeded = ReplicatedStorage:GetAttribute("NeededMoneyBankruptcy") :: number
-    if moneyNeeded ~= 0 then
-        ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", moneyNeeded - amount)
+    if participant.NeededMoneyBankruptcy then
+        participant.NeededMoneyBankruptcy -= amount
+        ReplicatedStorage.Game.ServerClient.Bankruptcy:FireAllClients(participant.Player, participant.NeededMoneyBankruptcy)
     end
 
     if amount > 0 then
@@ -182,17 +182,19 @@ local function BankruptcyWarning(participant: Types.Participant, targetAmount: n
         task.delay(3, botPlayer.TryAvoidBankruptcy, botPlayer, targetAmount) -- We delay to give the humans some time to process what's happening
     end
 
-    ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", neededMoney)
+    participant.NeededMoneyBankruptcy = targetAmount
+    ReplicatedStorage.Game.ServerClient.Bankruptcy:FireAllClients(participant.Player, neededMoney)
     local start = GetTime()
     local maxTime = start + if botPlayer then 5 else participant.Round.GameConfiguration.BankruptcyTime
     SetTimeMilestone(participant.Round.GameConfiguration.BankruptcyTime)
     while GetTime() < maxTime and participant.Money < targetAmount and not participant.HasDisconnected do
         task.wait()
     end
-    ReplicatedStorage:SetAttribute("NeededMoneyBankruptcy", 0)
+    participant.NeededMoneyBankruptcy = nil
 
     participant.IsGoingBankrupt = false
     participant.Player:SetAttribute("GoingBankrupt", false)
+    ReplicatedStorage.Game.ServerClient.Bankruptcy:FireAllClients(nil)
 
     if participant.Money < targetAmount then
         GoBankrupt(participant, to)

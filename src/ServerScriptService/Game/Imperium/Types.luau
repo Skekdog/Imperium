@@ -167,6 +167,7 @@ export type Participant = {
     HasDisconnected: boolean,
 
     IsGoingBankrupt: boolean,
+    NeededMoneyBankruptcy: number?,
 
     Money: number,
     JailCards: number,
