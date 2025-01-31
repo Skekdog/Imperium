@@ -18,7 +18,7 @@ local BotCharacters = require(ServerScriptService.Shared.BotNames)
 local SendChatMessage = require(ServerScriptService.Shared.SendChatMessage)
 local SetWaitingText = require(script.Parent.SetWaitingText)
 
-local MAX_PLAYER_LOAD_WAIT_TIME = 120
+local MAX_PLAYER_LOAD_WAIT_TIME = 60
 local INTERMISSION_DURATION = 5
 local MIN_PLAYERS_OR_EXIT = 1
 
