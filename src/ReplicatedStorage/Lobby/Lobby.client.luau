@@ -354,7 +354,6 @@ hostView.Start.Activated:Connect(function()
     clientServer.StartLobby:FireServer()
 end)
 
-hostView.LobbyOverview.Players.AddBotButton.Visible = Players.LocalPlayer.Name == "Scelly_Dog"
 hostView.LobbyOverview.Players.AddBotButton.Activated:Connect(function()
     PlayClickSound()
     local response = clientServer.AddBotPlayer:InvokeServer()
