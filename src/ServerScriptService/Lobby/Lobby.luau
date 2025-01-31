@@ -98,7 +98,7 @@ local function AddPlayer(lobby: LobbyTypes.Lobby, plr: Player): ()
 
     table.insert(lobby.Players, plr.Name)
 
-    serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, plr)
+    serverClient.PlayerAdded:FireAllClients(lobby.Owner.UserId, plr.Name)
 end
 
 local function TryJoin(lobby: LobbyTypes.Lobby, plr: Player, password: unknown): "Success" | string
