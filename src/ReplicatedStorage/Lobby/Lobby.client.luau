@@ -90,6 +90,16 @@ local function setCurrentLobby(id: number?): ()
     end
 end
 
+local function updatePlayerCount(slot: LobbySlot): ()
+    local playerCount = 0
+    for _, v in slot.Players:GetChildren() do
+        if v.Name:sub(1, 1) == "_" then
+            playerCount += 1
+        end
+    end
+    slot.Capacity.Text = `{playerCount} / {tostring(MAX_PLAYERS)}`
+end
+
 local function addPlayer(slot: LobbySlot, player: string): ()
     local plr: Player? = Players:FindFirstChild(player) :: Player?
     if plr then
@@ -128,7 +138,7 @@ local function addPlayer(slot: LobbySlot, player: string): ()
     
     playerFrame.Parent = slot.Players
 
-    slot.Capacity.Text = `{#slot.Players:GetChildren() - 4} / {tostring(MAX_PLAYERS)}`
+    updatePlayerCount(slot)
 
     if slot.Parent == (hostView :: any) then
         local button: typeof(hostView.LobbyOverview.Players.PlayerTemplate) = playerFrame :: any
@@ -152,7 +162,7 @@ local function removePlayer(slot: LobbySlot, plr: string): ()
         image:Destroy()
     end
 
-    slot.Capacity.Text = `{#slot.Players:GetChildren() - 4} / {tostring(MAX_PLAYERS)}`
+    updatePlayerCount(slot)
 end
 
 local function setHostSettingsView(setting: string, value: string | number): ()
