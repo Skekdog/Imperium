@@ -65,7 +65,7 @@ local function Start(lobby: LobbyTypes.Lobby): ()
     end
 
     SendNotification("[PLAYER] has started the game. Please wait.", {lobby.Owner}, playerPlayers)
-    Teleport(playerPlayers, "Game", info, function(success)
+    Teleport(playerPlayers, "Game", true, info, function(success)
         if not success then
             for _, v in playerPlayers do
                 local index = table.find(teleportingPlayers, v)

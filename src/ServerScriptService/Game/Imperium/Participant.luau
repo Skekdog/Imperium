@@ -779,7 +779,7 @@ local function GetTheDub(participant: Types.Participant): ()
     end
 
     task.wait(15)
-    Teleport(Players:GetPlayers(), "Lobby")
+    Teleport(Players:GetPlayers(), "Lobby", false)
 
     WaitForever()
 end

@@ -12,7 +12,7 @@ export type GameInfo = {
     BotPlayers: {string},
 } & GameConfiguration.SerialisedSettings
 
-return function(players: {Player}, place: "Game" | "Lobby", gameInfo: GameInfo?, callback: ((success: boolean, TeleportAsyncResult) -> ())?): ()
+return function(players: {Player}, place: "Game" | "Lobby", shouldReserve: boolean, gameInfo: GameInfo?, callback: ((success: boolean, TeleportAsyncResult) -> ())?): ()
     task.spawn(function()
         local accessCode, privateId = TeleportService:ReserveServer(if place == "Game" then SharedData.GameId else SharedData.LobbyId)
 
