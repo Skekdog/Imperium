@@ -1,5 +1,5 @@
 # Imperium
-![Imperium Logo](./Images/Promotional%20Images/Game%20Thumbnail.png)
+![Imperium Logo](./Images/Promotional%20Images/Imperium%20Thumbnail.png)
 
 [The classic Monopoly experience, now in Roblox](https://www.roblox.com/games/110109018598423)! Will you prosper, or will you be drained by the great big capitalist machine? Refer to Monopoly rules for how to play.
 
