@@ -22,7 +22,7 @@ for _, projectName in targets:split(";") do
     local placeId = (project.servePlaceIds or error("Missing servePlaceIds"))[1]
 
     local outputName = projectName .. ".rbxl"
-    local buildResult = process.spawn("rojo", {"build", "--output", outputName, projectFileName})
+    local buildResult = process.exec("rojo", {"build", "--output", outputName, projectFileName})
     assert(buildResult.ok, buildResult.stderr)
 
     local outputFile = fs.readFile(outputName)
