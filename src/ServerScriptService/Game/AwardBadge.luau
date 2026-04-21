@@ -13,12 +13,12 @@ return function(plr: Player | Configuration, name: BadgeName): ()
     if RunService:IsStudio() or plr:IsA("Configuration") then
         return
     end
-    
+
     local success, result
     local tries = 0
 
     repeat
-        success, result = pcall(BadgeService.AwardBadge, BadgeService, plr.UserId, badges[name])
+        success, result = pcall(BadgeService.AwardBadgeAsync, BadgeService, plr.UserId, badges[name])
         tries += 1
     until (success and result) or (tries >= 3)
 

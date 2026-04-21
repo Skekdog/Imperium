@@ -161,7 +161,7 @@ end
 local function onPlayerAdded(plr: Player)
     plr:SetAttribute("Status", "Spectating")
     plr.CharacterAdded:Connect(DisableCharacterCollision)
-    plr:LoadCharacter()
+    plr:LoadCharacterAsync()
 
     pauseVotes[plr] = false
 
@@ -213,7 +213,7 @@ local function getAsset(plr: Player, name: string): Types.Asset?
     if not participant then
         return
     end
-    
+
     for _, v in participant.Assets do
         if v.AssetDescription.Name == name then
             return v

@@ -1,12 +1,12 @@
 local RunService = game:GetService("RunService")
 
 return function(model: PVInstance, targetCFrame: CFrame, duration: number): ()
-    local startTime = tick()
+    local startTime = os.clock()
     local startCFrame = model:GetPivot()
 
     local con
     con = RunService.Heartbeat:Connect(function()
-        local elapsedTime = tick() - startTime
+        local elapsedTime = os.clock() - startTime
         local alpha = math.min(elapsedTime / duration, 1) ^ 6
 
         local newCFrame = startCFrame:Lerp(targetCFrame, alpha)
