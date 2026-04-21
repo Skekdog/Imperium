@@ -25,7 +25,7 @@ local MIN_PLAYERS_OR_EXIT = 1
 local STUDIO_MIN_PLAYERS = if IsBotSimulationEnabled() then 1 else 1
 local STUDIO_BOT_PLAYERS = 2
 
-local info = (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
+local info = if RunService:IsStudio() then nil else (MemoryStoreService:GetHashMap("GameInfo"):GetAsync(if game.PrivateServerId ~= "" then game.PrivateServerId else "NONE") or {}) :: Teleport.GameInfo?
 
 if not info then
     info = {} :: Teleport.GameInfo
